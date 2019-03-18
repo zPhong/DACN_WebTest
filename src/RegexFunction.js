@@ -2,10 +2,10 @@ const get_key_regex = "[^{\\}]+(?=})";
 const get_other_regex = "(^([^{]+(?={)))|((?<=})([^{]+)(?={))|(((?<=})[^}]+)$)"
 
 const test_regex = '{segment} = {distance}'
-
+const test_regex2 = '{point} trung điểm {segment}'
 export function Regex(string){
-    let others = test_regex.match(new RegExp(get_other_regex,"g"));
-    let params = test_regex.match(new RegExp(get_key_regex,"g"));
+    let others = test_regex2.match(new RegExp(get_other_regex,"g"));
+    let params = test_regex2.match(new RegExp(get_key_regex,"g"));
 
     let result = [];
 
