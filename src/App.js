@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './css/App.css';
-import {Regex} from './RegexFunction'
+import {GetInfomation} from './RegexFunction'
 
 // eslint-disable-next-line react/prefer-stateless-function
 class App extends Component {
@@ -22,7 +22,7 @@ class App extends Component {
           <input style={{fleX:1, height:'100%' }}  type='text' name='title' value={input} onChange={(event)=>{this.setState({input:event.target.value})}}/>
         </div>
         <button type="button" className="btn btn-success" onClick={()=>{
-          this.setState({result : Regex(input)})
+          this.setState({result : GetInfomation(input)})
         }}>Success</button>
             {Object.keys(result).map((value,index)=>
             (

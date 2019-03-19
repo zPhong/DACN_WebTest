@@ -1,4 +1,4 @@
-const defineSentenses={
+const defineSentences = {
     segment :[
         '{segment} = {distance}',
         '{segment} song song {segment}',
@@ -7,8 +7,10 @@ const defineSentenses={
         '{segment} giao {segment} tại {point}',
         '{segment} phân giác {angle}',
         '{segment} + {segment} = {segment}',
+        '{segment} + {segment} = {distance}',
         '{segment} - {segment} = {segment}',
-        "{segment} = {value}*{segment}",
+        '{segment} - {segment} = {distance}',
+        "{segment} = {value} {segment}",
     ],
     point:[
         "{point},{point},{point} thẳng hàng",
@@ -20,7 +22,7 @@ const defineSentenses={
     ],
     angle:[
         "{angle} = {radius}",
-        "{angle} = {value}*{angle}"
+        "{angle} = {value} {angle}"
     ],
     line:[
         'đường thẳng {d}',
@@ -28,11 +30,16 @@ const defineSentenses={
     ray:[
         "tia {ray}"
     ],
-    triangle:[
-        "tam giác {type} {triangle}"
-    ],
-    quad:[
-
+    shape:[
+        "tam giác {type} {triangle}",
+        "tứ giác {quadrilateral}",
+        "hình thang {type} {trapezoid}",
+        "hình bình hành {parallelogram}",
+        "hình chữ nhật {rectangle}",
+        "hình thoi {rhombus}",
+        "hình vuông {square}"
     ]
 }
 
+
+export default defineSentences;
