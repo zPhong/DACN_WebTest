@@ -1,45 +1,43 @@
 const defineSentences = {
-    segment :[
-        '{segment} = {distance}',
-        '{segment} song song {segment}',
-        '{segment} vuông góc {segment}',
-        '{segment} cắt {segment} tại {point}',
-        '{segment} giao {segment} tại {point}',
-        '{segment} phân giác {angle}',
-        '{segment} + {segment} = {segment}',
-        '{segment} + {segment} = {distance}',
-        '{segment} - {segment} = {segment}',
-        '{segment} - {segment} = {distance}',
-        "{segment} = {value} {segment}",
+    define:[
+        '{object} + {object} = {value}',
+        '{object} - {object} = {value}',
+        '{object} = {value} * {object}',
+        '{object} = {value}'
+    ],
+    relation :[
+        '{object} song song {object}',
+        '{object} vuông góc {object}',
+        '{object} cắt {object} tại {point}',
+        '{object} phân giác {angle}',
     ],
     point:[
-        "{point},{point},{point} thẳng hàng",
+        "{arrayPoints} thẳng hàng",
         '{point} trung điểm {segment}',
         "{point} thuộc {segment}",
-        "{point} nằm giữa {segment}",
-        "{point} nằm giữa {point},{point}",
         "{point} không thuộc {segment}"
     ],
-    angle:[
-        "{angle} = {radius}",
-        "{angle} = {value} {angle}"
-    ],
-    line:[
-        'đường thẳng {d}',
-    ],
-    ray:[
-        "tia {ray}"
-    ],
     shape:[
-        "tam giác {type} {triangle}",
+        "tam giác {type triangle}",
         "tứ giác {quadrilateral}",
-        "hình thang {type} {trapezoid}",
+        "hình thang {type trapezoid}",
         "hình bình hành {parallelogram}",
         "hình chữ nhật {rectangle}",
         "hình thoi {rhombus}",
-        "hình vuông {square}"
+        "hình vuông {square}",
+        "đường tròn tâm {point}"
     ]
 }
 
+const validate = {
+    object: {
+        define:['angle','segment'],
+        relation:['ray','line','segment']
+    },
+    point: {length: 1, format: "1" },
+    segment: {length : 2,format :"11"},
+    angle: {length:3},
+}
 
-export default defineSentences;
+
+export {validate, defineSentences};
