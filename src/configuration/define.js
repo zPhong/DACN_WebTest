@@ -25,7 +25,7 @@ const defineSentences = {
         "hình chữ nhật {rectangle}",
         "hình thoi {rhombus}",
         "hình vuông {square}",
-        "đường tròn tâm {point}"
+        "đường tròn tâm {circle}"
     ]
 }
 
@@ -37,6 +37,20 @@ const validate = {
     point: {length: 1, format: "1" },
     segment: {length : 2,format :"11"},
     angle: {length:3},
+    shape: {
+        triangle: {length:3, format : '111'},
+        quadrilateral:{length:4, format : '1111'},
+        trapezoid:{length:4, format : '1111'},
+        parallelogram:{length:4, format : '1111'},
+        rectangle:{length:4, format : '1111'},
+        rhombus:{length:4, format : '1111'},
+        square:{length:4, format : '1111'},
+        circle:{length:1, format : '1'},
+    },
+    shapeType:{ 
+        triangle: ['','vuông','cân','vuông cân','đều'],
+        trapezoid: ['','vuông','cân']
+    }
 }
 
 

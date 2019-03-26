@@ -4,10 +4,10 @@ export function defineShapeType(data){
     Object.keys(data).forEach(key => {
         if(key.includes('type')) {
             const result = data[key].toString().split(' ');
-            returner["type"] = result[0];
-            returner[key.split(' ')[1]] = result[1];
+            returner[key.split(' ')[1]] = result[1]|| result[0];
+            returner["type"] = result.length > 1 ? result[0] : '';
         } else {
-        returner[key] = data[key]
+        returner[key] = data[key].toString();
         }
     })
     return returner

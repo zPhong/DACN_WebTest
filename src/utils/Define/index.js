@@ -28,7 +28,7 @@ function defineInfomation(data){
     })
 
     delete result.object;
-
+    console.log(result)
     const validate = validateInfomation(result);
     if(validate)
         return result;
