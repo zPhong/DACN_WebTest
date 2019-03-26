@@ -1,9 +1,9 @@
 const defineSentences = {
     define:[
-        '{object} + {object} = {value}',
-        '{object} - {object} = {value}',
+        '{object} + {object} = {object}',
+        '{object} - {object} = {object}',
         '{object} = {value} * {object}',
-        '{object} = {value}'
+        '{object} = {object}'
     ],
     relation :[
         '{object} song song {object}',

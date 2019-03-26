@@ -1,16 +1,5 @@
-export function progressPointType(data){
-    let returner= {};
-    Object.keys(data).forEach(key => {
-        if(key === 'arrayPoints') {
-            returner["point"] = data[key].toString().split(',');
-        } else {
-        returner[key] = data[key]
-        }
-    })
-    return returner
-}
 
-export function progressShapeType(data){
+export function defineShapeType(data){
     let returner= {};
     Object.keys(data).forEach(key => {
         if(key.includes('type')) {
@@ -23,4 +12,3 @@ export function progressShapeType(data){
     })
     return returner
 }
-

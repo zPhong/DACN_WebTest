@@ -4,7 +4,12 @@ function isLowerCaseChar(char)
     return '1'
 }
 
-function checkFormatString(str)
+function isNumberic(str)
+{
+    return !isNaN(str)
+}
+
+export function checkFormatString(str)
 {
     let result ='';
     str.split("").forEach(element => {
@@ -13,9 +18,21 @@ function checkFormatString(str)
     return result;
 }
 
+function validateObject(str)
+{
+    for(let i = 0; i < str.length;i++)
+    {
+        if(!isNaN(str[i])) return false;
+        if(i > 0 ) if(str.slice(0,i-1).includes(str[i])) return false;
+    }
+    return true;
+}
+
 
 export function defineObject(value)
 {
+    if(isNumberic(value)) return 'value';
+    if(!validateObject(value)) return undefined;
     const formatObj = checkFormatString(value);
     if(value.length === 3) return 'angle';
     switch(formatObj){
