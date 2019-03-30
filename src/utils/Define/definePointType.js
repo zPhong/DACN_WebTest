@@ -1,11 +1,11 @@
-export function definePointType(data){
-    let returner= {};
+export function definePointType(data) {
+    let result = {};
     Object.keys(data).forEach(key => {
-        if(key === 'arrayPoints') {
-            returner["point"] = data[key].toString().split(',');
+        if (key === 'arrayPoints') {
+            result["point"] = data[key].toString().split(',');
         } else {
-        returner[key] = data[key]
+            result[key] = data[key]
         }
     })
-    return returner
+    return result
 }
