@@ -4,6 +4,8 @@ import { defineInfomation } from './utils/Define/index'
 const get_key_regex = "[^{\\}]+(?=})";
 const get_other_regex = "(^([^{]+(?={)))|((?<=})([^{]+)(?={))|(((?<=})[^}]+)$)"
 
+const operations = ['+', '-', '*'];
+
 export function GetInfomation(string) {
     const _string = '_ '.concat(string.concat(' _'));
     let isMatching = false;
@@ -21,10 +23,19 @@ export function GetInfomation(string) {
             }
         })
     })
+    const type = preProgress.outputType;
 
     const result = defineInfomation(preProgress)
 
     if (!result) return { Error: 'Sai định dạng' };
+
+    // add operation for define type
+    if (type === 'define') {
+        operations.forEach(operation => {
+            if (string.includes(operation))
+                result['operation'] = operation;
+        })
+    }
     return result;
 }
 

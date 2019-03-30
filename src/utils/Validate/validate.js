@@ -1,22 +1,24 @@
 import { validate } from '../../configuration/define'
 import { checkFormatString } from '../Define/defineObjType';
+import { fromByteArray } from 'ipaddr.js';
 
 export function validateValue(value, type) {
     const validateGeomatryType = validate.object[type];
     let validateType;
-    if (value.key === 'value' || value.key === 'relation') return true;
+    if (value.key === 'value' || value.key === 'relation' || value.key === 'undefined') return true;
     if (value.key === 'angle') if (!validateAngle(value.value)) return false;
 
     if (validateGeomatryType.includes(value.key) || value.key !== 'object') {
         const format = checkFormatString(value.value);
         validateType = validate[value.key];
-        if (validateType.format) {
-            if (format === validateType.format && value.value.length === validateType.length)
-                return true
-        }
-        else if (value.value.length === validateType.length) {
-            return true;
-        }
+        if (validateType && format)
+            if (validateType.format) {
+                if (format === validateType.format && value.value.length === validateType.length)
+                    return true
+            }
+            else if (value.value.length === validateType.length) {
+                return true;
+            }
     }
     return false;
 }
@@ -56,8 +58,21 @@ export function validateInfomation(info) {
             let key = keys[i];
             for (let j = 0; j < array.length; j++) {
                 let value = array[j]
-                return validateValue({ key, value }, type);
+                const check = validateValue({ key, value }, type);
+
+                if (!check) return check;
             }
         }
     }
+
+    if (type === 'define') {
+        if (keys.includes("value")) {
+            return (keys.length === 2)
+        }
+        else {
+            return (keys.length === 1)
+        }
+    }
+
+    return true;
 }
