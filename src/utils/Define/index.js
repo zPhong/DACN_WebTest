@@ -1,11 +1,10 @@
 import { defineObject } from './defineObjType'
 import { validateInfomation } from '../Validate/validate'
-import { definePointType } from './definePointType'
+import { definePointType } from './definePointType'
 import { defineShapeType } from './defineShapeType'
 
 function defineInfomation(data) {
     let result;
-    console.log('data', data);
     switch (data.outputType) {
         case 'shape':
             result = defineShapeType(data);

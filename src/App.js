@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './css/App.css';
-import { GetInfomation } from './RegexFunction'
+import { AnalyzeInput } from './RegexFunction'
 import { defineSentences } from './configuration/define'
 
 // eslint-disable-next-line react/prefer-stateless-function
@@ -20,12 +20,13 @@ class App extends Component {
           <div style={{ flex: 1, height: '100vh', maxHeight: '100vh', borderRight: 'solid red' }} >
             <div style={{ height: '50%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
               <div style={{
+                width: '100%',
                 height: '50%', marginBottom: '1rem'
               }} >
-                <input style={{ fleX: 1, height: 100 }} type='text' name='title' value={input} onChange={(event) => { this.setState({ input: event.target.value }) }} />
+                <textarea row={5} style={{ flex: 1, height: 100 }} numberOfLine type='text' name='title' value={input} onChange={(event) => { this.setState({ input: event.target.value }) }} />
               </div>
               <button type="button" className="btn btn-success" onClick={() => {
-                this.setState({ result: GetInfomation(input) })
+                this.setState({ result: AnalyzeInput(input) })
               }}>Success</button>
             </div>
             <div style={{ height: '50%', maxHeight: '50%', overflowX: 'scroll' }}>
@@ -39,7 +40,7 @@ class App extends Component {
           <span style={{ flex: 1 }} >
             {Object.keys(result).map((value, index) =>
               (
-                <p key={index} >{`${value} : ${result[value]}`}</p>
+                <p key={index} >{`${value} : ${JSON.stringify(result[value])}`}</p>
               ))}
           </span>
         </header>

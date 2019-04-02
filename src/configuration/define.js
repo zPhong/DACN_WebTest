@@ -2,8 +2,10 @@ const defineSentences = {
     define: [
         '{object} + {object} = {object}',
         '{object} - {object} = {object}',
-        '{object} = {value} * {object}',
-        '{object} = {object}'
+        '{object} * {value} = {object}',
+        '{object} = {object}',
+        '{object} > {object}',
+        '{object} < {object}'
     ],
     relation: [
         '{object} song song {object}',
@@ -27,6 +29,8 @@ const defineSentences = {
     ]
 }
 
+const RankingObjectContain = [['point'], ['segment', 'ray'], ['angle']];
+
 const validate = {
     object: {
         define: ['angle', 'segment'],
@@ -34,6 +38,8 @@ const validate = {
     },
     point: { length: 1, format: "1" },
     segment: { length: 2, format: "11" },
+    ray: { length: 2, format: '10' },
+    line: { length: 1, format: '0' },
     angle: { length: 3 },
     shape: {
         triangle: { length: 3, format: '111' },
@@ -52,4 +58,4 @@ const validate = {
 }
 
 
-export { validate, defineSentences };
+export { validate, defineSentences, RankingObjectContain };

@@ -1,6 +1,5 @@
-import { validate } from '../../configuration/define'
+import { validate, RankingObjectContain } from '../../configuration/define'
 import { checkFormatString } from '../Define/defineObjType';
-import { fromByteArray } from 'ipaddr.js';
 
 export function validateValue(value, type) {
     const validateGeomatryType = validate.object[type];
@@ -45,14 +44,47 @@ function validateShape(shape) {
 
 }
 
+function validateDataRelationship(data) {
+    const keys = Object.keys(data);
+
+    for (let indexOfRankingLevel = 0; indexOfRankingLevel < RankingObjectContain.length - 1; indexOfRankingLevel++) {
+        for (let indexOfObjectCurrentLevel = 0; indexOfObjectCurrentLevel < RankingObjectContain[indexOfRankingLevel].length; indexOfObjectCurrentLevel++) {
+            for (let indexOfObjectNextLevel = 0; indexOfObjectNextLevel < RankingObjectContain[indexOfRankingLevel + 1].length; indexOfObjectNextLevel++)
+                if (keys.includes(RankingObjectContain[indexOfRankingLevel][indexOfObjectCurrentLevel])) {
+                    if (data[RankingObjectContain[indexOfRankingLevel + 1][indexOfObjectNextLevel]])
+                        return checkObjectRelationship(data[RankingObjectContain[indexOfRankingLevel][indexOfObjectCurrentLevel]][0], data[RankingObjectContain[indexOfRankingLevel + 1][indexOfObjectNextLevel]][0])
+                }
+        }
+    }
+
+    return true;
+}
+
+function checkObjectRelationship(obj1, obj2) {
+    let check = obj2.split("").map(char => {
+        return obj1.includes(char)
+    })
+    const result = [...new Set(check)];
+
+    if (result.length === 1) {
+        return !result[0];
+    }
+    if (obj2.length === 2)
+        return check.indexOf(true) === -1;
+    if (obj2.length === 3) {
+        return !(check.indexOf(true) === 0 || check.indexOf(true) === 2);
+    }
+}
+
 export function validateInfomation(info) {
     const type = info.outputType;
-    delete info.outputType;
-    const keys = Object.keys(info);
+
     if (type === 'shape') {
         return validateShape(info)
     }
     else {
+        delete info.outputType;
+        let keys = Object.keys(info);
         for (let i = 0; i < keys.length; i++) {
             let array = info[keys[i]];
             let key = keys[i];
@@ -64,7 +96,7 @@ export function validateInfomation(info) {
             }
         }
     }
-
+    const keys = Object.keys(info);
     if (type === 'define') {
         if (keys.includes("value")) {
             return (keys.length === 2)
@@ -72,6 +104,10 @@ export function validateInfomation(info) {
         else {
             return (keys.length === 1)
         }
+    }
+
+    if (type === 'relation') {
+        return validateDataRelationship(info)
     }
 
     return true;
