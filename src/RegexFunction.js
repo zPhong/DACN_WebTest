@@ -1,5 +1,5 @@
 import { defineSentences } from './configuration/define'
-import { defineInfomation } from './utils/Define/index'
+import { defineInformation } from './utils/Define/index'
 
 const get_key_regex = "[^{\\}]+(?=})";
 const get_other_regex = "(^([^{]+(?={)))|((?<=})([^{]+)(?={))|(((?<=})[^}]+)$)"
@@ -9,7 +9,7 @@ const operations = ['+', '-', '*', '<', '>', '='];
 export function AnalyzeInput(input) {
     const data = input.replace(new RegExp('(\r?\n)', 'g'), '').split(';').map(
         sentence => {
-            return GetInfomation(sentence);
+            return getInformation(sentence);
         }
     );
 
@@ -45,7 +45,7 @@ function MergeData(source, data) {
     return source;
 }
 
-function GetInfomation(string) {
+function getInformation(string) {
     const _string = '_ '.concat(string.concat(' _'));
     let isMatching = false;
     let preProgress = [];
@@ -65,7 +65,7 @@ function GetInfomation(string) {
     const type = preProgress.outputType;
 
     console.log(preProgress)
-    const result = defineInfomation(preProgress)
+    const result = defineInformation(preProgress)
 
     if (!result) return { Error: 'Sai định dạng' };
 

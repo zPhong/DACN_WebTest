@@ -1,9 +1,9 @@
 import { defineObject } from './defineObjType'
-import { validateInfomation } from '../Validate/validate'
+import { validateInformation } from '../Validate/validate'
 import { definePointType } from './definePointType'
 import { defineShapeType } from './defineShapeType'
 
-function defineInfomation(data) {
+function defineInformation(data) {
     let result;
     switch (data.outputType) {
         case 'shape':
@@ -27,10 +27,10 @@ function defineInfomation(data) {
     })
 
     delete result.object;
-    const validate = validateInfomation(result);
+    const validate = validateInformation(result);
     if (validate) {
         return result;
     }
 }
 
-export { defineInfomation };
+export { defineInformation };

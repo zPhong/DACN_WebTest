@@ -76,7 +76,7 @@ function checkObjectRelationship(obj1, obj2) {
     }
 }
 
-export function validateInfomation(info) {
+export function validateInformation(info) {
     const type = info.outputType;
 
     if (type === 'shape') {
