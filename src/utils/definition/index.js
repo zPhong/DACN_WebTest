@@ -1,9 +1,9 @@
-import { defineObject } from './defineObjType'
-import { validateInfomation } from '../Validate/validate'
-import { definePointType } from './definePointType'
-import { defineShapeType } from './defineShapeType'
+import { defineObject } from './defineObjType';
+import { validateInformation } from '../validation/validation';
+import { definePointType } from './definePointType';
+import { defineShapeType } from './defineShapeType';
 
-function defineInfomation(data) {
+function defineInformation(data) {
     let result;
     switch (data.outputType) {
         case 'shape':
@@ -22,15 +22,15 @@ function defineInfomation(data) {
                 const type = defineObject(value);
                 if (!result[type]) result[type] = [];
                 result[type].push(value);
-            })
+            });
         }
-    })
+    });
 
     delete result.object;
-    const validate = validateInfomation(result);
+    const validate = validateInformation(result);
     if (validate) {
         return result;
     }
 }
 
-export { defineInfomation };
+export { defineInformation };
