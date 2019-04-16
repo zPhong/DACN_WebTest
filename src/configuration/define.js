@@ -12,32 +12,44 @@ const defineSentences = {
         '{object} vuông góc {object}',
         '{object} cắt {object} tại {point}',
         '{object} phân giác {angle}',
-        "{arrayPoints} thẳng hàng",
+        '{arrayPoints} thẳng hàng',
         '{point} trung điểm {segment}',
-        "{point} thuộc {object}",
-        "{point} không thuộc {object}"
+        '{point} thuộc {object}',
+        '{point} không thuộc {object}'
     ],
     shape: [
-        "tam giác {type triangle}",
-        "tứ giác {quadrilateral}",
-        "hình thang {type trapezoid}",
-        "hình bình hành {parallelogram}",
-        "hình chữ nhật {rectangle}",
-        "hình thoi {rhombus}",
-        "hình vuông {square}",
-        "đường tròn tâm {circle}"
+        'tam giác {type triangle}',
+        'tứ giác {quadrilateral}',
+        'hình thang {type trapezoid}',
+        'hình bình hành {parallelogram}',
+        'hình chữ nhật {rectangle}',
+        'hình thoi {rhombus}',
+        'hình vuông {square}',
+        'đường tròn tâm {circle}'
     ]
-}
+};
+
+const shapeList = [
+    'triangle',
+    'quadrilateral',
+    'trapezoid',
+    'parallelogram',
+    'rectangle',
+    'rhombus',
+    'square'
+];
 
 const RankingObjectContain = [['point'], ['segment', 'ray'], ['angle']];
+
+const objectWithPoint = ['angle', 'segment', 'ray', 'point'];
 
 const validate = {
     object: {
         define: ['angle', 'segment'],
         relation: ['ray', 'line', 'segment']
     },
-    point: { length: 1, format: "1" },
-    segment: { length: 2, format: "11" },
+    point: { length: 1, format: '1' },
+    segment: { length: 2, format: '11' },
     ray: { length: 2, format: '10' },
     line: { length: 1, format: '0' },
     angle: { length: 3 },
@@ -49,13 +61,18 @@ const validate = {
         rectangle: { length: 4, format: '1111' },
         rhombus: { length: 4, format: '1111' },
         square: { length: 4, format: '1111' },
-        circle: { length: 1, format: '1' },
+        circle: { length: 1, format: '1' }
     },
     shapeType: {
         triangle: ['', 'vuông', 'cân', 'vuông cân', 'đều'],
         trapezoid: ['', 'vuông', 'cân']
     }
-}
+};
 
-
-export { validate, defineSentences, RankingObjectContain };
+export {
+    validate,
+    defineSentences,
+    RankingObjectContain,
+    objectWithPoint,
+    shapeList
+};

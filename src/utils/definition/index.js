@@ -1,7 +1,14 @@
+<<<<<<< HEAD:src/utils/Define/index.js
 import { defineObject } from './defineObjType'
 import { validateInformation } from '../Validate/validate'
 import { definePointType } from './definePointType'
 import { defineShapeType } from './defineShapeType'
+=======
+import { defineObject } from './defineObjType';
+import { validateInformation } from '../validation/validation';
+import { definePointType } from './definePointType';
+import { defineShapeType } from './defineShapeType';
+>>>>>>> master:src/utils/definition/index.js
 
 function defineInformation(data) {
     let result;
@@ -22,9 +29,9 @@ function defineInformation(data) {
                 const type = defineObject(value);
                 if (!result[type]) result[type] = [];
                 result[type].push(value);
-            })
+            });
         }
-    })
+    });
 
     delete result.object;
     const validate = validateInformation(result);
