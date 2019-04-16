@@ -11,24 +11,25 @@ export function analyzeInput(input) {
     const data = input
         .replace(new RegExp('(\r?\n)', 'g'), '')
         .split(';')
+        .filter(sentence => (sentence ? true : false))
         .map(sentence => {
             return getInformation(sentence);
         });
 
     let result = {
-        shape: [],
-        relation: []
+        shapes: [],
+        relations: []
     };
-
     for (let i = 0; i < data.length; i++) {
         let item = data[i];
+        if (!item) return { Error: 'lỗi' };
         if (item.Error) return item;
 
         if (item.outputType === 'shape') {
             delete item.outputType;
-            result.shape.push(item);
+            result.shapes.push(item);
         } else {
-            result.relation.push(item);
+            result.relations.push(item);
         }
     }
     result = analyzeResult(result);
@@ -55,7 +56,6 @@ function getInformation(string) {
     });
     const type = preProgress.outputType;
 
-    console.log(preProgress);
     const result = defineInformation(preProgress);
 
     if (!result) return { Error: 'Sai định dạng' };

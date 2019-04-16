@@ -41,6 +41,8 @@ const shapeList = [
 
 const RankingObjectContain = [['point'], ['segment', 'ray'], ['angle']];
 
+const objectWithPoint = ['angle', 'segment', 'ray', 'point'];
+
 const validate = {
     object: {
         define: ['angle', 'segment'],
@@ -67,4 +69,10 @@ const validate = {
     }
 };
 
-export { validate, defineSentences, RankingObjectContain, shapeList };
+export {
+    validate,
+    defineSentences,
+    RankingObjectContain,
+    objectWithPoint,
+    shapeList
+};
