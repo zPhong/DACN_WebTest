@@ -22,6 +22,7 @@ export function analyzeResult(validateResult: ResultType) {
         });
     });
     trimPointsMap();
+    console.table(PointsMap);
     return {};
 }
 
@@ -29,22 +30,26 @@ function trimPointsMap() {
     PointsMap = PointsMap.map(
         (node: NodeType): NodeType => ({
             ...node,
-            dependentNode: node.dependentNode.filter(
-                (x, i, a) => a.indexOf(x) === i
-            )
+            dependentNode: unique(node.dependentNode)
         })
     );
+}
 
-    console.table(
-        PointsMap.map(
-            (node: NodeType): NodeType => ({
-                ...node,
-                dependentNode: node.dependentNode.filter((x, i, a) => {
-                    a.indexOf(x) === i;
-                })
-            })
-        )
-    );
+function unique(
+    dependentNode: Array<NodeRelationType>
+): Array<NodeRelationType> {
+    let result = [];
+
+    dependentNode.forEach(node => {
+        for (let i = 0; i < result.length; i++) {
+            console.log(i, node, result[i]);
+            if (JSON.stringify(node) === JSON.stringify(result[i])) return;
+            console.log('!=');
+        }
+        result.push(node);
+    });
+
+    return result;
 }
 
 function createPointsMapByShape(shape: any) {
