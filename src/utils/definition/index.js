@@ -2,6 +2,7 @@ import { defineObject } from './defineObjType';
 import { validateInformation } from '../validation/validation';
 import { definePointType } from './definePointType';
 import { defineShapeType } from './defineShapeType';
+import { reversedDependentObjRelation } from '../../configuration/define';
 
 function defineInformation(data) {
     let result;
@@ -16,6 +17,8 @@ function defineInformation(data) {
             result = data;
     }
 
+    if (reversedDependentObjRelation.includes(result.relation))
+        result.object = result.object.reverse();
     Object.keys(result).forEach(key => {
         if (key === 'object') {
             result[key].forEach(value => {
@@ -28,6 +31,7 @@ function defineInformation(data) {
 
     delete result.object;
     const validate = validateInformation(result);
+
     if (validate) {
         return result;
     }

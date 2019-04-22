@@ -5,7 +5,7 @@ type CoordinateType = {
 };
 
 type NodeRelationType = {
-    key: string,
+    id: string,
     relation: any
 };
 
