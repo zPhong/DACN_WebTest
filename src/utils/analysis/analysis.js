@@ -42,9 +42,7 @@ function unique(
 
     dependentNode.forEach(node => {
         for (let i = 0; i < result.length; i++) {
-            console.log(i, node, result[i]);
             if (JSON.stringify(node) === JSON.stringify(result[i])) return;
-            console.log('!=');
         }
         result.push(node);
     });
