@@ -1,4 +1,4 @@
-type CoordinateType = {
+export type CoordinateType = {
     x: number,
     y: number,
     z: number
@@ -16,7 +16,7 @@ export type NodeType = {
     dependentNode: Array<NodeRelationType>
 };
 
-export type ResultType = {
+export type RelationsResultType = {
     shapes: Array<mixed>,
     relations: Array<mixed>
 };
