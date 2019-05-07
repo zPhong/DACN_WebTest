@@ -4,7 +4,7 @@ export type CoordinateType = {
     z: number
 };
 
-type NodeRelationType = {
+export type NodeRelationType = {
     id: string,
     relation: any
 };

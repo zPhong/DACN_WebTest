@@ -5,7 +5,7 @@ import type {
 } from '../../types/types';
 import appModel from '../../appModel';
 
-const excutedRelations = [];
+const executedRelations = [];
 
 function readPointsMap(): Array<CoordinateType> {}
 
@@ -13,15 +13,15 @@ function _isStaticNode(node: NodeType): boolean {
     if (node.isStatic) return true;
     let count = 0;
     node.dependentNode((dNode: NodeRelationType) => {
-        if (!_isExcutedRelation(dNode.relation)) count++;
+        if (!_isExecutedRelation(dNode.relation)) count++;
     });
 
     return count === 0;
 }
 
-function _isExcutedRelation(relation: any): boolean {
-    for (let i = 0; i < excutedRelations.length; i++) {
-        if (relation === excutedRelations[i]) return true;
+function _isExecutedRelation(relation: any): boolean {
+    for (let i = 0; i < executedRelations.length; i++) {
+        if (relation === executedRelations[i]) return true;
     }
     return false;
 }
@@ -36,24 +36,24 @@ function _updateStaticNode() {
 }
 
 function _getNextExcutionNode(): NodeType {
-    const clonePointsMap = [...appModel.pointsMap].sort(sortNodeByPerior);
+    const clonePointsMap = [...appModel.pointsMap].sort(sortNodeByPriority);
     return clonePointsMap[0];
 }
 
-function sortNodeByPerior(nodeOne: NoteType, nodeTwo: NoteType): number {
-    const staticnodeOneCount = _getDependentStaticNodeCount(nodeOne);
+function sortNodeByPriority(nodeOne: NodeType, nodeTwo: NodeType): number {
+    const staticNodeOneCount = _getDependentStaticNodeCount(nodeOne);
     const nodeOneData = {
-        static: staticnodeOneCount,
-        nonStatic: nodeOne.dependentNode.length - staticnodeOneCount,
+        static: staticNodeOneCount,
+        nonStatic: nodeOne.dependentNode.length - staticNodeOneCount,
         dependence: nodeOne.dependentNode.length,
         minRelationIndex: _getMinIndexOfDependentNodeInRelationsList(nodeOne),
         index: _getIndexOfNodeInPointsMap(nodeOne)
     };
 
-    const staticnodeTwoCount = _getDependentStaticNodeCount(nodeTwo);
+    const staticNodeTwoCount = _getDependentStaticNodeCount(nodeTwo);
     const nodeTwoData = {
-        static: staticnodeTwoCount,
-        nonStatic: nodeTwo.dependentNode.length - staticnodeTwoCount,
+        static: staticNodeTwoCount,
+        nonStatic: nodeTwo.dependentNode.length - staticNodeTwoCount,
         dependence: nodeTwo.dependentNode.length,
         minRelationIndex: _getMinIndexOfDependentNodeInRelationsList(nodeTwo),
         index: _getIndexOfNodeInPointsMap(nodeTwo)
@@ -113,7 +113,7 @@ function _getIndexOfRelationInRelationsList(relation: any): number {
         ...appModel.relationsResult.shapes,
         ...appModel.relationsResult.relations
     ];
-    for (let i = 0; i < list.lengthl; i++) {
+    for (let i = 0; i < list.length; i++) {
         if (relation === list[i]) return i;
     }
     return 99;

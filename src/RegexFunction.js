@@ -12,7 +12,7 @@ export function analyzeInput(input) {
     const data = input
         .replace(new RegExp('(\r?\n)', 'g'), '')
         .split(';')
-        .filter(sentence => (sentence ? true : false))
+        .filter(sentence => (!!sentence))
         .map(sentence => {
             return getInformation(sentence);
         });
