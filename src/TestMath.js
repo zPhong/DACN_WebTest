@@ -1,16 +1,19 @@
 import React, {Component} from 'react';
 import './css/App.css';
-import Math2D from './utils/math/Math2D';
 import type {CoordinateType, LinearEquation} from "./types/types";
+import {
+  calculateDistanceTwoPoints,
+  calculateLinearPointFromTwoPoints,
+  calculateParallelEquation
+} from "./utils/math/Math2D";
 
 class TestMath extends Component {
   render() {
     const firstPoint: CoordinateType = {x: 1, y: 2, z: 0};
     const secondPoint: CoordinateType = {x: 7, y: 3, z: 0};
-    const linearEquation: LinearEquation = Math2D.calculateLinearPointFromTwoPoints(firstPoint,secondPoint);
+    const linearEquation: LinearEquation = calculateLinearPointFromTwoPoints(firstPoint, secondPoint);
 
-
-    const equation = Math2D.calculateParallelEquation(linearEquation);
+    const equation = calculateParallelEquation(linearEquation);
     return (
        <div className="container">
          <div className="row">
@@ -28,7 +31,7 @@ class TestMath extends Component {
            = 0
          </div>
          <div>
-           {Math2D.calculateDistanceTwoPoints(firstPoint, secondPoint)}
+           {calculateDistanceTwoPoints(firstPoint, secondPoint)}
          </div>
        </div>
     );
