@@ -1,14 +1,8 @@
-<<<<<<< HEAD:src/utils/Define/index.js
-import { defineObject } from './defineObjType'
-import { validateInformation } from '../Validate/validate'
-import { definePointType } from './definePointType'
-import { defineShapeType } from './defineShapeType'
-=======
-import { defineObject } from './defineObjType';
-import { validateInformation } from '../validation/validation';
-import { definePointType } from './definePointType';
-import { defineShapeType } from './defineShapeType';
->>>>>>> master:src/utils/definition/index.js
+import {defineObject} from "./defineObjType";
+import {validateInformation} from "../validation/validation";
+import {defineShapeType} from "./defineShapeType";
+import {definePointType} from "./definePointType";
+
 
 function defineInformation(data) {
     let result;
