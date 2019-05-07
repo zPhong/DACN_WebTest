@@ -1,6 +1,7 @@
 import { defineSentences } from './configuration/define';
 import { defineInformation } from './utils/definition/index';
 import { analyzeResult } from './utils/analysis/analysis';
+import appModel from './appModel';
 
 const get_key_regex = '[^{\\}]+(?=})';
 const get_other_regex = '(^([^{]+(?={)))|((?<=})([^{]+)(?={))|(((?<=})[^}]+)$)';
@@ -32,9 +33,12 @@ export function analyzeInput(input) {
             result.relations.push(item);
         }
     }
-    result = analyzeResult(result);
 
-    return result;
+    appModel.relationsResult = result;
+
+    analyzeResult(result);
+
+    return appModel.pointsMap;
 }
 
 function getInformation(string) {

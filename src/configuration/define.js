@@ -39,6 +39,8 @@ const shapeList = [
     'square'
 ];
 
+const reversedDependentObjRelation = ['vuông góc', 'cắt'];
+
 const RankingObjectContain = [['point'], ['segment', 'ray'], ['angle']];
 
 const objectWithPoint = ['angle', 'segment', 'ray', 'point'];
@@ -74,5 +76,6 @@ export {
     defineSentences,
     RankingObjectContain,
     objectWithPoint,
-    shapeList
+    shapeList,
+    reversedDependentObjRelation
 };
