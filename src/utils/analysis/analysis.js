@@ -21,15 +21,15 @@ export function analyzeResult(validatedResult: RelationsResultType) {
 
     relations.forEach(relation => {
         createPointsMapByRelation(relation).forEach(node => {
-            updateMap(node, appModel.PointsMap);
+            updateMap(node, appModel.pointsMap);
         });
     });
     trimPointsMap();
-    console.table(appModel.PointsMap);
+    console.table(appModel.pointsMap);
 }
 
 function trimPointsMap() {
-    appModel.PointsMap = appModel.PointsMap.map(
+    appModel.pointsMap = appModel.pointsMap.map(
         (node: NodeType): NodeType => ({
             ...node,
             dependentNode: unique(node.dependentNode)
@@ -60,8 +60,8 @@ function createPointsMapByShape(shape: any) {
 
     points = [...points].sort(
         (el1: string, el2: string): number => {
-            const index1 = findIndexByNodeId(el1, appModel.PointsMap);
-            const index2 = findIndexByNodeId(el2, appModel.PointsMap);
+            const index1 = findIndexByNodeId(el1, appModel.pointsMap);
+            const index2 = findIndexByNodeId(el2, appModel.pointsMap);
 
             if (index1 === -1 && index2 === -1) {
                 return 1;
@@ -78,7 +78,7 @@ function createPointsMapByShape(shape: any) {
     });
 
     objectPointsMap.forEach((node: NodeType) => {
-        updateMap(node, appModel.PointsMap);
+        updateMap(node, appModel.pointsMap);
     });
 }
 
@@ -95,11 +95,11 @@ function createPointsMapByRelation(relation: any) {
                     (el1: string, el2: string): number => {
                         const index1 = findIndexByNodeId(
                             el1,
-                            appModel.PointsMap
+                            appModel.pointsMap
                         );
                         const index2 = findIndexByNodeId(
                             el2,
-                            appModel.PointsMap
+                            appModel.pointsMap
                         );
 
                         if (index1 === -1 && index2 === -1) {
@@ -134,8 +134,8 @@ function createPointsMapByRelation(relation: any) {
 
     RelationPointsMap = [...RelationPointsMap].sort(
         (nodeOne: NodeType, nodeTwo: NodeType): number => {
-            const index1 = findIndexByNodeId(nodeOne.id, appModel.PointsMap);
-            const index2 = findIndexByNodeId(nodeTwo.id, appModel.PointsMap);
+            const index1 = findIndexByNodeId(nodeOne.id, appModel.pointsMap);
+            const index2 = findIndexByNodeId(nodeTwo.id, appModel.pointsMap);
             if (index1 === -1 && index2 === -1) return 1;
             if (index1 >= 0 && index2 >= 0) return index1 - index2;
             return index2 - index1;

@@ -27,7 +27,7 @@ function _isExecutedRelation(relation: any): boolean {
 }
 
 function _updateStaticNode() {
-    appModel.PointsMap = appModel.PointsMap.map(
+    appModel.pointsMap = appModel.pointsMap.map(
         (node: NodeType): NodeType => {
             node.isStatic = _isStaticNode(node);
             return node;
