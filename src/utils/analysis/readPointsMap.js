@@ -1,13 +1,32 @@
 import type {
     NodeType,
     NodeRelationType,
-    CoordinateType
+    DrawingNodeType
 } from '../../types/types';
 import appModel from '../../appModel';
 
 const executedRelations = [];
 
-function readPointsMap(): Array<CoordinateType> {}
+function readPointsMap(): Array<DrawingNodeType> {
+    while (!_isPointsMapStatic()) {
+        //update static Node
+        _updateStaticNode();
+        //get node to calculate
+        const executedNode = _getNextExcuteNode();
+
+        for (let i = 0; i < executedNode.dependentNode.length; i++) {
+            //executing current relation
+            //check previos relation
+        }
+        //Update calculated value to pointsMap
+        _updatePointsMap();
+    }
+
+    return appModel.pointsMap.map(node => ({
+        id: node.id,
+        coordinate: node.coordinate
+    }));
+}
 
 function _isStaticNode(node: NodeType): boolean {
     if (node.isStatic) return true;
@@ -35,8 +54,22 @@ function _updateStaticNode() {
     );
 }
 
-function _getNextExcutionNode(): NodeType {
-    const clonePointsMap = [...appModel.pointsMap].sort(sortNodeByPriority);
+function _updatePointsMap(node: NodeType) {
+    let index = _getIndexOfNodeInPointsMapById(node.id);
+    appModel.pointsMap[index] = node;
+}
+
+function _isPointsMapStatic(): boolean {
+    let count = 0;
+    appModel.pointsMap.forEach(node => {
+        if (_isStaticNode(node)) count++;
+    });
+
+    return count === appModel.pointsMap.length();
+}
+
+function _getNextExcuteNode(): NodeType {
+    const clonePointsMap = [...appModel.pointsMap].sort(sortNodeByPerior);
     return clonePointsMap[0];
 }
 
@@ -131,6 +164,13 @@ function _getDependentStaticNodeCount(node: NodeType): number {
 function _getIndexOfNodeInPointsMap(node): number {
     for (let i = 0; i < appModel.pointsMap.length; i++) {
         if (node === appModel.pointsMap[i]) return i;
+    }
+    return 99;
+}
+
+function _getIndexOfNodeInPointsMapById(id: string): number {
+    for (let i = 0; i < appModel.pointsMap.length; i++) {
+        if (id === appModel.pointsMap[i].id) return i;
     }
     return 99;
 }

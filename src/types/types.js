@@ -4,7 +4,12 @@ export type CoordinateType = {
     z: number
 };
 
-export type NodeRelationType = {
+export type DrawingNodeType = {
+    id: string,
+    coordinate: CoordinateType
+};
+
+type NodeRelationType = {
     id: string,
     relation: any
 };
