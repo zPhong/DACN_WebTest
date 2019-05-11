@@ -1,8 +1,9 @@
 // @flow
 
-import type {LinearEquation, CoordinateType, Vector, CircleEquation} from '../../types/types';
+import type {CircleEquation, CoordinateType, LinearEquation, Vector} from '../../types/types';
 
-export function getAnchorPoint(): CoordinateType {
+export function getStartPoint(): CoordinateType {
+  return {x: 0, y: 0, z: 0};
 }
 
 export function calculateMiddlePoint(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
