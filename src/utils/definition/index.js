@@ -4,6 +4,7 @@ import { definePointType } from './definePointType';
 import { defineShapeType } from './defineShapeType';
 import { reversedDependentObjRelation } from '../../configuration/define';
 
+
 function defineInformation(data) {
     let result;
     switch (data.outputType) {

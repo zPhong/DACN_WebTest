@@ -6,6 +6,6 @@ export function definePointType(data) {
         } else {
             result[key] = data[key]
         }
-    })
+    });
     return result
 }

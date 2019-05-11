@@ -4,7 +4,7 @@ function isLowerCaseChar(char)
     return '1'
 }
 
-function isNumberic(str)
+function isNumeric(str)
 {
     return !isNaN(str)
 }
@@ -31,7 +31,7 @@ function validateObject(str)
 
 export function defineObject(value)
 {
-    if(isNumberic(value)) return 'value';
+    if(isNumeric(value)) return 'value';
     if(!validateObject(value)) return undefined;
     const formatObj = checkFormatString(value);
     if(value.length === 3) return 'angle';

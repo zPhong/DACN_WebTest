@@ -2,7 +2,7 @@ import { validate, RankingObjectContain } from '../../configuration/define';
 import { checkFormatString } from '../definition/defineObjType';
 
 export function validateValue(value, type) {
-    const validateGeomatryType = validate.object[type];
+    const validateGeometryType = validate.object[type];
     let validateType;
     if (
         value.key === 'value' ||
@@ -12,7 +12,7 @@ export function validateValue(value, type) {
         return true;
     if (value.key === 'angle') if (!validateAngle(value.value)) return false;
 
-    if (validateGeomatryType.includes(value.key) || value.key !== 'object') {
+    if (validateGeometryType.includes(value.key) || value.key !== 'object') {
         const format = checkFormatString(value.value);
         validateType = validate[value.key];
         if (validateType && format)
