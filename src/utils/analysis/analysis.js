@@ -150,7 +150,7 @@ function createPointsMapByRelation(relation: any) {
             lastNodeDependentLength - 1
         ].relation = relation;
     } else {
-        let lastObjectPoints = getDependentededObject();
+        let lastObjectPoints = getDependentObject();
         lastObjectPoints.forEach(point => {
             const index = findIndexByNodeId(point, RelationPointsMap);
             const currentNode = RelationPointsMap[index];
@@ -174,7 +174,7 @@ function createPointsMapByRelation(relation: any) {
     return RelationPointsMap;
 }
 
-function getDependentededObject(): Array<string> {
+function getDependentObject(): Array<string> {
     let result = [];
     const lastNode = RelationPointsMap[RelationPointsMap.length - 1];
     result.push(lastNode.id);

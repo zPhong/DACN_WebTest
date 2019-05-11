@@ -9,6 +9,6 @@ export function defineShapeType(data){
         } else {
         returner[key] = data[key].toString();
         }
-    })
+    });
     return returner
 }
