@@ -12,12 +12,15 @@ function readPointsMap(): Array<DrawingNodeType> {
         //update static Node
         _updateStaticNode();
         //get node to calculate
-        const executedNode = _getNextExcuteNode();
+        const executedNode = _getNextExecuteNode();
 
-        for (let i = 0; i < executedNode.dependentNode.length; i++) {
+        const executedNodeRelation = _makeUniqueNodeRelation(executedNode.dependentNodes);
+
+        for (let i = 0; i < executedNode.dependentNodes.length; i++) {
             //executing current relation
-            //check previos relation
+            //check previous relation
         }
+
         //Update calculated value to pointsMap
         _updatePointsMap();
     }
@@ -68,7 +71,7 @@ function _isPointsMapStatic(): boolean {
     return count === appModel.pointsMap.length();
 }
 
-function _getNextExcuteNode(): NodeType {
+function _getNextExecuteNode(): NodeType {
     const clonePointsMap = [...appModel.pointsMap].sort(sortNodeByPerior);
     return clonePointsMap[0];
 }
@@ -183,3 +186,17 @@ function _isStaticNodeById(id: string): boolean {
     }
     return false;
 }
+
+function _makeUniqueNodeRelation(dependentNodes: Array<NodeRelationType>): Array<any> {
+    let result: Array<NodeRelationType> = [];
+
+    dependentNodes.forEach(node => {
+        for (let i = 0; i <= result.length - 1; i++) {
+            if (JSON.stringify(node.relation) === JSON.stringify(result[i].relation)) return;
+        }
+        result.push(node.relation);
+    });
+
+    return result;
+}
+

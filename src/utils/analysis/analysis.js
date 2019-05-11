@@ -231,16 +231,3 @@ function updateMap(node: NodeType, map: Array<NodeType>) {
     map.push(node);
   }
 }
-
-function makeUniqueNodeRelation(dependentNodes: Array<NodeRelationType>): Array<any> {
-  let result: Array<NodeRelationType> = [];
-
-  dependentNodes.forEach(node => {
-    for (let i = 0; i <= result.length - 1; i++) {
-      if (JSON.stringify(node.relation) === JSON.stringify(result[i].relation)) return;
-    }
-    result.push(node.relation);
-  });
-
-  return result;
-}
