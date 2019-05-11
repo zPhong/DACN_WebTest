@@ -12,7 +12,7 @@ function readPointsMap(): Array<CoordinateType> {}
 function _isStaticNode(node: NodeType): boolean {
     if (node.isStatic) return true;
     let count = 0;
-    node.dependentNode((dNode: NodeRelationType) => {
+    node.dependentNodes((dNode: NodeRelationType) => {
         if (!_isExecutedRelation(dNode.relation)) count++;
     });
 
@@ -44,8 +44,8 @@ function sortNodeByPriority(nodeOne: NodeType, nodeTwo: NodeType): number {
     const staticNodeOneCount = _getDependentStaticNodeCount(nodeOne);
     const nodeOneData = {
         static: staticNodeOneCount,
-        nonStatic: nodeOne.dependentNode.length - staticNodeOneCount,
-        dependence: nodeOne.dependentNode.length,
+        nonStatic: nodeOne.dependentNodes.length - staticNodeOneCount,
+        dependence: nodeOne.dependentNodes.length,
         minRelationIndex: _getMinIndexOfDependentNodeInRelationsList(nodeOne),
         index: _getIndexOfNodeInPointsMap(nodeOne)
     };
@@ -53,8 +53,8 @@ function sortNodeByPriority(nodeOne: NodeType, nodeTwo: NodeType): number {
     const staticNodeTwoCount = _getDependentStaticNodeCount(nodeTwo);
     const nodeTwoData = {
         static: staticNodeTwoCount,
-        nonStatic: nodeTwo.dependentNode.length - staticNodeTwoCount,
-        dependence: nodeTwo.dependentNode.length,
+        nonStatic: nodeTwo.dependentNodes.length - staticNodeTwoCount,
+        dependence: nodeTwo.dependentNodes.length,
         minRelationIndex: _getMinIndexOfDependentNodeInRelationsList(nodeTwo),
         index: _getIndexOfNodeInPointsMap(nodeTwo)
     };
@@ -99,9 +99,9 @@ function sortNodeByPriority(nodeOne: NodeType, nodeTwo: NodeType): number {
 
 function _getMinIndexOfDependentNodeInRelationsList(node: NodeType) {
     const indexArray = [];
-    for (let i = 0; i < node.dependentNode.length; i++) {
+    for (let i = 0; i < node.dependentNodes.length; i++) {
         indexArray.push(
-            _getIndexOfRelationInRelationsList(node.dependentNode[i])
+            _getIndexOfRelationInRelationsList(node.dependentNodes[i])
         );
     }
 
@@ -121,8 +121,8 @@ function _getIndexOfRelationInRelationsList(relation: any): number {
 
 function _getDependentStaticNodeCount(node: NodeType): number {
     let count = 0;
-    for (let i = 0; i < node.dependentNode.length; i++) {
-        if (_isStaticNodeById(node.dependentNode[i].id)) count++;
+    for (let i = 0; i < node.dependentNodes.length; i++) {
+        if (_isStaticNodeById(node.dependentNodes[i].id)) count++;
     }
 
     return count;

@@ -32,15 +32,15 @@ function trimPointsMap() {
   appModel.pointsMap = appModel.pointsMap.map(
      (node: NodeType): NodeType => ({
        ...node,
-       dependentNode: unique(node.dependentNode)
+       dependentNodes: unique(node.dependentNodes)
      })
   );
 }
 
-function unique(dependentNode: Array<NodeRelationType>): Array<NodeRelationType> {
+function unique(dependentNodes: Array<NodeRelationType>): Array<NodeRelationType> {
   let result = [];
 
-  dependentNode.forEach(node => {
+  dependentNodes.forEach(node => {
     for (let i = 0; i < result.length; i++) {
       if (JSON.stringify(node) === JSON.stringify(result[i])) return;
     }
@@ -141,12 +141,8 @@ function createPointsMapByRelation(relation: any) {
   );
 
   if (relation.operation === '=' && relation.value) {
-    const lastNodeDependentLength =
-       RelationPointsMap[RelationPointsMap.length - 1].dependentNode
-          .length;
-    RelationPointsMap[RelationPointsMap.length - 1].dependentNode[
-    lastNodeDependentLength - 1
-       ].relation = relation;
+    const lastNodeDependentLength = RelationPointsMap[RelationPointsMap.length - 1].dependentNodes.length;
+    RelationPointsMap[RelationPointsMap.length - 1].dependentNodes[lastNodeDependentLength - 1].relation = relation;
   } else {
     let lastObjectPoints = getDependentObject();
     lastObjectPoints.forEach(point => {
@@ -156,8 +152,8 @@ function createPointsMapByRelation(relation: any) {
         if (node.id !== point) {
           RelationPointsMap[index] = {
             ...currentNode,
-            dependentNode: [
-              ...currentNode.dependentNode,
+            dependentNodes: [
+              ...currentNode.dependentNodes,
               ...createDependentNodeOfRelation(
                  node.id,
                  relation,
@@ -177,27 +173,20 @@ function getDependentObject(): Array<string> {
   const lastNode = RelationPointsMap[RelationPointsMap.length - 1];
   result.push(lastNode.id);
 
-  lastNode.dependentNode.forEach(node => {
+  lastNode.dependentNodes.forEach(node => {
     if (!result.includes(node.id)) result.push(node.id);
   });
   return result;
 }
 
-function findIndexByNodeId(
-   id: string,
-   map: Array<NodeType | NodeRelationType>
-): number {
+function findIndexByNodeId(id: string, map: Array<NodeType | NodeRelationType>): number {
   for (let i = 0; i < map.length; i++) {
     if (map[i].id === id) return i;
   }
   return -1;
 }
 
-function createDependentNodeOfRelation(
-   point: string,
-   relation: any,
-   exception: Array<string>
-): Array<NodeRelationType> {
+function createDependentNodeOfRelation(point: string, relation: any, exception: Array<string>): Array<NodeRelationType> {
   const result: Array<NodeRelationType> = [];
   RelationPointsMap.forEach((node: NodeType, index: number) => {
     if (exception.includes(node.id)) return;
@@ -207,11 +196,7 @@ function createDependentNodeOfRelation(
   return result;
 }
 
-function createDependentNodeOfObject(
-   objectType: string,
-   objectName: string,
-   points: Array<string>
-): Array<NodeRelationType> {
+function createDependentNodeOfObject(objectType: string, objectName: string, points: Array<string>): Array<NodeRelationType> {
   const result: Array<NodeRelationType> = [];
   let relation = {};
   relation[objectType] = objectName;
@@ -224,25 +209,38 @@ function createDependentNodeOfObject(
   return result;
 }
 
-function createNode(id: string, dependentNode?: Array<NodeRelationType>): any {
+function createNode(id: string, dependentNodes?: Array<NodeRelationType>): any {
   const node = {id, coordinate: {x: 0, y: 0, z: 0}, isStatic: false};
-  const _dependentNode = dependentNode
-     ? {dependentNode}
-     : {dependentNode: []};
+  const _dependentNodes = dependentNodes
+     ? {dependentNodes}
+     : {dependentNodes: []};
 
-  return {...node, ..._dependentNode};
+  return {...node, ..._dependentNodes};
 }
 
 function updateMap(node: NodeType, map: Array<NodeType>) {
   const index = findIndexByNodeId(node.id, map);
   if (index !== -1) {
-    //merge dependentNode
+    //merge dependentNodes
     const oldNode = map[index];
     map[index] = {
       ...oldNode,
-      dependentNode: [...oldNode.dependentNode, ...node.dependentNode]
+      dependentNodes: [...oldNode.dependentNodes, ...node.dependentNodes]
     };
   } else {
     map.push(node);
   }
+}
+
+function makeUniqueNodeRelation(dependentNodes: Array<NodeRelationType>): Array<any> {
+  let result: Array<NodeRelationType> = [];
+
+  dependentNodes.forEach(node => {
+    for (let i = 0; i <= result.length - 1; i++) {
+      if (JSON.stringify(node.relation) === JSON.stringify(result[i].relation)) return;
+    }
+    result.push(node.relation);
+  });
+
+  return result;
 }

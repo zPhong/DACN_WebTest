@@ -13,7 +13,7 @@ export type NodeType = {
     id: string,
     isStatic: boolean,
     coordinate: CoordinateType,
-    dependentNode: Array<NodeRelationType>
+    dependentNodes: Array<NodeRelationType>
 };
 
 export type RelationsResultType = {
