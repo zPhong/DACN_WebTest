@@ -1,13 +1,13 @@
 import type {
     NodeType,
-    ResultType,
-    NodeRelationType,
-    CoordinateType
+        ResultType,
+        NodeRelationType,
+        CoordinateType
 } from './types/types';
 
 class AppModel {
     relationsResult: RelationsResultType = {};
-    pointsMap: Array<NodeType> = [];
+    PointsMap: Array<NodeType> = [];
 }
 
 const appModel = new AppModel();

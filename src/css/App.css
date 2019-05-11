@@ -23,6 +23,24 @@
   color: #61dafb;
 }
 
+.geometry-scene {
+  stroke: white;
+  fill: none; }
+  .geometry-scene .point {
+    fill: white;
+    stroke: none; }
+  .geometry-scene .free-point {
+    fill: blue;
+    stroke: none;
+    cursor: pointer; }
+  .geometry-scene .handle {
+    fill: none;
+    stroke: rgba(0, 0, 0, 0);
+    stroke-width: 20; }
+  .geometry-scene .active {
+    stroke-width: 2px;
+    cursor: pointer; }
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

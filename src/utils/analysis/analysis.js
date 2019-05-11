@@ -3,8 +3,8 @@
 import { objectWithPoint } from '../../configuration/define';
 import type {
     NodeType,
-    RelationsResultType,
-    NodeRelationType
+        RelationsResultType,
+        NodeRelationType
 } from '../../types/types';
 import appModel from '../../appModel';
 
@@ -114,13 +114,13 @@ function createPointsMapByRelation(relation: any) {
                     (point: string, index: number) => {
                         return index === points.length - 1
                             ? createNode(
-                                  point,
-                                  createDependentNodeOfObject(
-                                      objectType,
-                                      object,
-                                      points
-                                  )
-                              )
+                                point,
+                                createDependentNodeOfObject(
+                                    objectType,
+                                    object,
+                                    points
+                                )
+                            )
                             : createNode(point);
                     }
                 );

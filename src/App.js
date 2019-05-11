@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import './css/App.css';
 import { analyzeInput } from './RegexFunction';
 import { defineSentences } from './configuration/define';
+import { Scene } from './euclid'
+import { renderGeometry, renderPoints } from './euclid/render';
 
 // eslint-disable-next-line react/prefer-stateless-function
 class App extends Component {
@@ -12,6 +14,48 @@ class App extends Component {
             result: ''
         };
     }
+
+    componentDidMount() {
+        this.renderGeometry();
+    }
+
+    renderGeometry() {
+        const svg = document.getElementById('geometry');
+        const points = document.getElementById('points')
+        const viewBox = svg.viewBox.baseVal;
+        const width = viewBox.width;
+        const height = viewBox.height;
+
+        const scene = new Scene({
+            left: viewBox.x,
+            top: viewBox.y,
+            right: viewBox.x + width,
+            bottom: viewBox.y + height
+        })
+
+
+        scene
+            .point('A', width / 7 * 3, height / 3)
+            .point('B', width / 7 * 5, height / 3)
+            .segment('S', 'A', 'B')
+            .circle('M', 'A', 'B')
+            .circle('N', 'B', 'A')
+            .intersection('C', 'M', 'N', 0)
+            .intersection('D', 'M', 'N', 1)
+            .line('T', 'A', 'C')
+            .segment('U', 'A', 'D')
+            .intersection('E', 'T', 'M', scene.isnt('C'))
+            .segment('V', 'E', 'B')
+            .intersection('F', 'V', 'U')
+            .segment('W', 'F', 'C')
+            .intersection('W', 'S')
+
+        scene.update();
+        renderGeometry(scene, svg);
+        renderGeometry(scene, svg);
+        renderPoints(scene, points);
+    }
+
     render() {
         const { input, result } = this.state;
         return (
@@ -81,13 +125,17 @@ class App extends Component {
                             )}
                         </div>
                     </div>
-                    <span style={{ flex: 1 }}>
+                    {/* <span style={{ flex: 1 }}>
                         {Object.keys(result).map((value, index) => (
                             <p key={index}>{`${value} : ${JSON.stringify(
                                 result[value]
                             )}`}</p>
                         ))}
-                    </span>
+                    </span> */}
+                    <div style={{ flex: 1 }}>
+                        <svg id="geometry" class="geometry-scene" viewBox="0 0 800 800"></svg>
+                        <svg id="points" class="geometry-scene" viewBox="0 0 800 800"></svg>
+                    </div>
                 </header>
             </div>
         );
