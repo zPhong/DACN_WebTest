@@ -132,12 +132,14 @@ class App extends Component {
                             )}`}</p>
                         ))}
                     </span> */}
-                    <div style={{ flex: 1 }}>
-                        <svg id="geometry" class="geometry-scene" viewBox="0 0 800 800"></svg>
-                        <svg id="points" class="geometry-scene" viewBox="0 0 800 800"></svg>
+                    <div class="geometry-container">
+                        <div class="geometry-container">
+                            <svg id="geometry" class="geometry-scene" viewBox="0 0 800 800"></svg>
+                            <svg id="points" class="geometry-scene" viewBox="0 0 800 800"></svg>
+                        </div>
                     </div>
                 </header>
-            </div>
+            </div >
         );
     }
 }
