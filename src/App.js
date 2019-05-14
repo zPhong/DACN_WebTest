@@ -44,7 +44,6 @@ class App extends Component {
                                 <textarea
                                     row={5}
                                     style={{ flex: 1, height: 100 }}
-                                    numberOfLine
                                     type='text'
                                     name='title'
                                     value={input}

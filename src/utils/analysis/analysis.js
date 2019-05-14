@@ -3,8 +3,8 @@
 import { objectWithPoint } from '../../configuration/define';
 import type {
     NodeType,
-    RelationsResultType,
-    NodeRelationType
+        RelationsResultType,
+        NodeRelationType
 } from '../../types/types';
 import appModel from '../../appModel';
 
@@ -114,13 +114,13 @@ function createPointsMapByRelation(relation: any) {
                     (point: string, index: number) => {
                         return index === points.length - 1
                             ? createNode(
-                                  point,
-                                  createDependentNodeOfObject(
-                                      objectType,
-                                      object,
-                                      points
-                                  )
-                              )
+                                point,
+                                createDependentNodeOfObject(
+                                    objectType,
+                                    object,
+                                    points
+                                )
+                            )
                             : createNode(point);
                     }
                 );
@@ -180,7 +180,7 @@ function getDependentObject(): Array<string> {
     result.push(lastNode.id);
 
     lastNode.dependentNode.forEach(node => {
-        if (!result.includes(node.id)) result.push(node.id);
+        if (!result.includes(node.id) && !appModel.PointsMap[findIndexByNodeId(node.id, appModel.PointsMap)].isStatic) result.push(node.id);
     });
     return result;
 }
@@ -246,5 +246,7 @@ function updateMap(node: NodeType, map: Array<NodeType>) {
         };
     } else {
         map.push(node);
+        if (map.length === 1)
+            map[0].isStatic = true;
     }
 }
