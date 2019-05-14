@@ -11,7 +11,9 @@ class App extends Component {
         super(props);
         this.state = {
             input: '',
-            result: ''
+            result: '',
+            pointsArray: [{ id: 'A', coordinate: { x: 300, y: 300 } }, { id: 'B', coordinate: { x: 120, y: 490 } }, { id: 'C', coordinate: { x: 290, y: 170 } }, { id: 'H', coordinate: { x: 306, y: 470 } }, { id: 'D', coordinate: { x: 150, y: 150 } }],
+            segments: ['AB', 'AC', 'BC', 'AD', "BH"]
         };
     }
 
@@ -19,7 +21,7 @@ class App extends Component {
         this.renderGeometry();
     }
 
-    renderGeometry() {
+    renderGeometry = () => {
         const svg = document.getElementById('geometry');
         const points = document.getElementById('points')
         const viewBox = svg.viewBox.baseVal;
@@ -33,22 +35,31 @@ class App extends Component {
             bottom: viewBox.y + height
         })
 
+        const { pointsArray, segments } = this.state;
 
-        scene
-            .point('A', width / 7 * 3, height / 3)
-            .point('B', width / 7 * 5, height / 3)
-            .segment('S', 'A', 'B')
-            .circle('M', 'A', 'B')
-            .circle('N', 'B', 'A')
-            .intersection('C', 'M', 'N', 0)
-            .intersection('D', 'M', 'N', 1)
-            .line('T', 'A', 'C')
-            .segment('U', 'A', 'D')
-            .intersection('E', 'T', 'M', scene.isnt('C'))
-            .segment('V', 'E', 'B')
-            .intersection('F', 'V', 'U')
-            .segment('W', 'F', 'C')
-            .intersection('W', 'S')
+        pointsArray.forEach(point => {
+            scene.point(point.id, point.coordinate.x, point.coordinate.y)
+        })
+
+        segments.forEach(segment => {
+            scene.segment(segment, segment[0], segment[1])
+        })
+
+        // scene
+        //     .point('A', width / 7 * 3, height / 3)
+        //     .point('B', width / 7 * 5, height / 3)
+        //     .segment('S', 'A', 'B')
+        //     .circle('M', 'A', 'B')
+        //     .circle('N', 'B', 'A')
+        //     .intersection('C', 'M', 'N', 0)
+        //     .intersection('D', 'M', 'N', 1)
+        //     .line('T', 'A', 'C')
+        //     .segment('U', 'A', 'D')
+        //     .intersection('E', 'T', 'M', scene.isnt('C'))
+        //     .segment('V', 'E', 'B')
+        //     .intersection('F', 'V', 'U')
+        //     .segment('W', 'F', 'C')
+        //     .intersection('W', 'S')
 
         scene.update();
         renderGeometry(scene, svg);
