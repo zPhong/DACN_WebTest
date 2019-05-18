@@ -306,5 +306,6 @@ function updateMap(node: NodeType, map: Array<NodeType>) {
         };
     } else {
         map.push(node);
+        if (map.length === 1) map[0].isStatic = true;
     }
 }
