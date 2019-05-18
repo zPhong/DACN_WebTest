@@ -1,9 +1,10 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import './css/App.css';
 import { analyzeInput } from './RegexFunction';
 import { defineSentences } from './configuration/define';
 import { Scene } from './euclid';
 import { renderGeometry, renderPoints } from './euclid/render';
+import appModel from './appModel';
 
 function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
@@ -24,8 +25,14 @@ class App extends Component {
 
     onResult = () => {
         const { input } = this.state;
-        const { points, segments } = analyzeInput(input);
+        const { points, segments, Error } = analyzeInput(input);
+        console.table(appModel.pointsMap);
         console.log(points, segments);
+
+        if (Error) {
+            alert(Error);
+            return;
+        }
         points.forEach(point => {
             point.coordinate = { ...getRandomPoint() };
         });
