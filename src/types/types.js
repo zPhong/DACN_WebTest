@@ -1,29 +1,36 @@
 export type CoordinateType = {
-    x: number,
-    y: number,
-    z: number
+  x: number,
+  y: number,
+  z: number
 };
 
+export type HasFixedCoordinateType = {
+  fixedX: boolean,
+  fixedY: boolean,
+  fixedZ: boolean,
+}
+
 export type DrawingNodeType = {
-    id: string,
-    coordinate: CoordinateType
+  id: string,
+  coordinate: CoordinateType
 };
 
 export type NodeRelationType = {
-    id: string,
-    relation: any
+  id: string,
+  relation: any
 };
 
 export type NodeType = {
-    id: string,
-    isStatic: boolean,
-    coordinate: CoordinateType,
-    dependentNodes: Array<NodeRelationType>
+  id: string,
+  isStatic: boolean,
+  coordinate: CoordinateType,
+  hasFixedCoordinate: HasFixedCoordinateType,
+  dependentNodes: Array<NodeRelationType>
 };
 
 export type RelationsResultType = {
-    shapes: Array<mixed>,
-    relations: Array<mixed>
+  shapes: Array<mixed>,
+  relations: Array<mixed>
 };
 
 export type LinearEquation = {
