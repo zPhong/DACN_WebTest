@@ -26,6 +26,11 @@ export type RelationsResultType = {
     relations: Array<mixed>
 };
 
+export type DrawingDataType = {
+    points: Array<DrawingNodeType>,
+    segment: Array<string>
+};
+
 export type LinearEquation = {
   coefficientX: number,
   coefficientY: number,
