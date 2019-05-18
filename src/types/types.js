@@ -9,7 +9,7 @@ export type DrawingNodeType = {
     coordinate: CoordinateType
 };
 
-type NodeRelationType = {
+export type NodeRelationType = {
     id: string,
     relation: any
 };
@@ -18,7 +18,7 @@ export type NodeType = {
     id: string,
     isStatic: boolean,
     coordinate: CoordinateType,
-    dependentNode: Array<NodeRelationType>
+    dependentNodes: Array<NodeRelationType>
 };
 
 export type RelationsResultType = {

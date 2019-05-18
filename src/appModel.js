@@ -5,7 +5,7 @@ import type {
 
 class AppModel {
   relationsResult: RelationsResultType = {};
-  PointsMap: Array<NodeType> = [];
+  pointsMap: Array<NodeType> = [];
 }
 
 const appModel = new AppModel();
