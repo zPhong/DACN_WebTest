@@ -185,6 +185,7 @@ function _isStaticNodeById(id: string): boolean {
 
 export function _makeUniqueNodeRelation(dependentNodes: Array<NodeRelationType>): Array<any> {
   let result: Array<NodeRelationType> = [];
+
   for (let index = 0; index < dependentNodes.length; index++) {
     let temp = true;
 
@@ -197,10 +198,20 @@ export function _makeUniqueNodeRelation(dependentNodes: Array<NodeRelationType>)
 
     if (temp) result.push(dependentNodes[index].relation);
   }
-  console.log(result);
+
   return result;
 }
 
-function _calculatePointCoordinate(): CoordinateType {
+function _calculatePointCoordinate(node: NodeType): CoordinateType {
+  if (node.isStatic) {
+    return node.coordinate;
+  }
 
+  const executingNodeRelation = _makeUniqueNodeRelation(node.dependentNodes);
+  for (let i = 0; i < executingNodeRelation; i++) {
+    // TODO: calculate point
+  }
+
+  node.isStatic = true;
+  return node;
 }
