@@ -173,8 +173,8 @@ function getDependentObject(): Array<string> {
   const lastNode = RelationPointsMap[RelationPointsMap.length - 1];
   result.push(lastNode.id);
 
-  lastNode.dependentNodes.forEach(node => {
-    if (!result.includes(node.id)) result.push(node.id);
+  lastNode.dependentNode.forEach(node => {
+    if (!result.includes(node.id) && !appModel.PointsMap[findIndexByNodeId(node.id, appModel.PointsMap)].isStatic) result.push(node.id);
   });
   return result;
 }
