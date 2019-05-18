@@ -3,14 +3,18 @@
 import { objectWithPoint } from '../../configuration/define';
 import type {
     NodeType,
-        RelationsResultType,
-        NodeRelationType
+    RelationsResultType,
+    NodeRelationType,
+    DrawingNodeType,
+    DrawingDataType
 } from '../../types/types';
 import appModel from '../../appModel';
 
 let RelationPointsMap: Array<NodeType> = [];
 
-export function analyzeResult(validatedResult: RelationsResultType) {
+export function analyzeResult(
+    validatedResult: RelationsResultType
+): DrawingDataType {
     const shapes = validatedResult.shapes;
 
     shapes.forEach(shape => {
@@ -26,6 +30,59 @@ export function analyzeResult(validatedResult: RelationsResultType) {
     });
     trimPointsMap();
     console.table(appModel.PointsMap);
+
+    let result = {};
+
+    result.points = appModel.PointsMap.map(
+        (node: NodeType): DrawingNodeType => ({
+            id: node.id,
+            coordinate: node.coordinate
+        })
+    );
+
+    result.segments = getArraySegments(validatedResult);
+
+    console.log(result);
+    return result;
+}
+
+function getArraySegments(validatedResult: RelationsResultType): Array<string> {
+    let result: Array<string> = [];
+
+    const shapes = validatedResult.shapes;
+
+    shapes.forEach(shape => {
+        result = result.concat(getShapeSegments(shape));
+    });
+
+    const relations = validatedResult.relations;
+
+    relations.forEach(relation => {
+        if (relation.segment) {
+            result = result.concat(relation.segment);
+        }
+    });
+
+    return result.filter((item, index, array) => array.indexOf(item) === index);
+}
+
+function getShapeSegments(shape: any): Array<string> {
+    const shapeName = Object.keys(shape).filter(key => key !== 'type')[0];
+    let points = shape[shapeName]
+        .split('')
+        .filter(point => point === point.toUpperCase());
+
+    const result = [];
+
+    for (let i = 0; i < points.length; i++) {
+        if (i === points.length - 1) {
+            result.push(points[0] + points[i]);
+        } else {
+            result.push(points[i] + points[i + 1]);
+        }
+    }
+
+    return result;
 }
 
 function trimPointsMap() {
@@ -114,13 +171,13 @@ function createPointsMapByRelation(relation: any) {
                     (point: string, index: number) => {
                         return index === points.length - 1
                             ? createNode(
-                                point,
-                                createDependentNodeOfObject(
-                                    objectType,
-                                    object,
-                                    points
-                                )
-                            )
+                                  point,
+                                  createDependentNodeOfObject(
+                                      objectType,
+                                      object,
+                                      points
+                                  )
+                              )
                             : createNode(point);
                     }
                 );

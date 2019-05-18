@@ -2,28 +2,46 @@ import React, { Component } from 'react';
 import './css/App.css';
 import { analyzeInput } from './RegexFunction';
 import { defineSentences } from './configuration/define';
-import { Scene } from './euclid'
+import { Scene } from './euclid';
 import { renderGeometry, renderPoints } from './euclid/render';
 
+function getRandomArbitrary(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+function getRandomPoint() {
+    return { x: getRandomArbitrary(0, 800), y: getRandomArbitrary(0, 800) };
+}
 // eslint-disable-next-line react/prefer-stateless-function
 class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
             input: '',
-            result: '',
-            pointsArray: [{ id: 'A', coordinate: { x: 300, y: 300 } }, { id: 'B', coordinate: { x: 120, y: 490 } }, { id: 'C', coordinate: { x: 290, y: 170 } }, { id: 'H', coordinate: { x: 306, y: 470 } }, { id: 'D', coordinate: { x: 150, y: 150 } }],
-            segments: ['AB', 'AC', 'BC', 'AD', "BH"]
+            result: ''
         };
     }
 
-    componentDidMount() {
-        this.renderGeometry();
-    }
+    onResult = () => {
+        const { input } = this.state;
+        const { points, segments } = analyzeInput(input);
+        console.log(points, segments);
+        points.forEach(point => {
+            point.coordinate = { ...getRandomPoint() };
+        });
 
-    renderGeometry = () => {
+        this.renderGeometry(points, segments);
+    };
+
+    renderGeometry = (_points, _segments) => {
         const svg = document.getElementById('geometry');
-        const points = document.getElementById('points')
+        while (svg.firstChild) {
+            svg.firstChild.remove();
+        }
+        const points = document.getElementById('points');
+        while (points.firstChild) {
+            points.firstChild.remove();
+        }
         const viewBox = svg.viewBox.baseVal;
         const width = viewBox.width;
         const height = viewBox.height;
@@ -33,17 +51,15 @@ class App extends Component {
             top: viewBox.y,
             right: viewBox.x + width,
             bottom: viewBox.y + height
-        })
+        });
 
-        const { pointsArray, segments } = this.state;
+        _points.forEach(point => {
+            scene.point(point.id, point.coordinate.x, point.coordinate.y);
+        });
 
-        pointsArray.forEach(point => {
-            scene.point(point.id, point.coordinate.x, point.coordinate.y)
-        })
-
-        segments.forEach(segment => {
-            scene.segment(segment, segment[0], segment[1])
-        })
+        _segments.forEach(segment => {
+            scene.segment(segment, segment[0], segment[1]);
+        });
 
         // scene
         //     .point('A', width / 7 * 3, height / 3)
@@ -65,10 +81,10 @@ class App extends Component {
         renderGeometry(scene, svg);
         renderGeometry(scene, svg);
         renderPoints(scene, points);
-    }
+    };
 
     render() {
-        const { input, result } = this.state;
+        const { input } = this.state;
         return (
             <div className='App'>
                 <header className='App-header' style={{ flexDirection: 'row' }}>
@@ -113,11 +129,7 @@ class App extends Component {
                             <button
                                 type='button'
                                 className='btn btn-success'
-                                onClick={() => {
-                                    this.setState({
-                                        result: analyzeInput(input)
-                                    });
-                                }}
+                                onClick={this.onResult}
                             >
                                 Success
                             </button>
@@ -143,14 +155,22 @@ class App extends Component {
                             )}`}</p>
                         ))}
                     </span> */}
-                    <div class="geometry-container">
-                        <div class="geometry-container">
-                            <svg id="geometry" class="geometry-scene" viewBox="0 0 800 800"></svg>
-                            <svg id="points" class="geometry-scene" viewBox="0 0 800 800"></svg>
+                    <div class='geometry-container'>
+                        <div class='geometry-container'>
+                            <svg
+                                id='geometry'
+                                class='geometry-scene'
+                                viewBox='0 0 800 800'
+                            />
+                            <svg
+                                id='points'
+                                class='geometry-scene'
+                                viewBox='0 0 800 800'
+                            />
                         </div>
                     </div>
                 </header>
-            </div >
+            </div>
         );
     }
 }

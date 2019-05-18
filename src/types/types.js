@@ -25,3 +25,8 @@ export type RelationsResultType = {
     shapes: Array<mixed>,
     relations: Array<mixed>
 };
+
+export type DrawingDataType = {
+    points: Array<DrawingNodeType>,
+    segment: Array<string>
+};

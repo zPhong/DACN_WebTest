@@ -48,6 +48,7 @@
     stroke: none; }
   .geometry-scene .point-name
     {
+      font-size: 2rem;
       font-weight: bolder;
       font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
       fill: black !important;

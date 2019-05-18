@@ -38,7 +38,7 @@ export function analyzeInput(input) {
 
     analyzeResult(result);
 
-    return appModel.pointsMap;
+    return analyzeResult(result);
 }
 
 function getInformation(string) {
