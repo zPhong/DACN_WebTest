@@ -185,20 +185,17 @@ function _isStaticNodeById(id: string): boolean {
 
 export function _makeUniqueNodeRelation(dependentNodes: Array<NodeRelationType>): Array<any> {
   let result: Array<NodeRelationType> = [];
+  for (let index = 0; index < dependentNodes.length; index++) {
+    let temp = true;
 
-  // dependentNodes.forEach(node => {
-  //   for (let i = 0; i <= result.length - 1; i++) {
-  //     if (node.relation === result[i]) break;
-  //     if (i === result.length) result.push(node.relation);
-  //   }
-  // });
-
-  for (let index = 0; index < dependentNodes.length; index++)
-  {
     for (let i = 0; i < result.length; i++) {
-      if (dependentNodes[index].relation === result[i]) break;
-      if (i === result.length) result.push(dependentNodes[index].relation);
+      if (dependentNodes[index].relation === result[i]) {
+        temp = false;
+        break;
+      }
     }
+
+    if (temp) result.push(dependentNodes[index].relation);
   }
   console.log(result);
   return result;
