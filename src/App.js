@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import './css/App.css';
 import {analyzeInput} from './RegexFunction';
 import {defineSentences} from './configuration/define';
+import {_makeUniqueNodeRelation} from "./utils/analysis/readPointsMap";
 
 // eslint-disable-next-line react/prefer-stateless-function
 class App extends Component {
@@ -25,7 +26,7 @@ class App extends Component {
              borderRight: 'solid red'
            }}>
              <div style={{
-               height: '50%',
+               height: '70%',
                display: 'flex',
                flexDirection: 'column',
                justifyContent: 'center',
@@ -33,11 +34,11 @@ class App extends Component {
              }}>
                <div style={{
                  width: '100%',
-                 height: '50%',
+                 height: '80%',
                  marginBottom: '1rem'
                }}>
                                 <textarea
-                                   style={{flex: 1, height: '100%'}}
+                                   style={{width: '80%', height: '100%'}}
                                    name='title'
                                    value={input}
                                    onChange={event => {
@@ -59,7 +60,7 @@ class App extends Component {
              </div>
 
              <div style={{
-               height: '50%',
+               height: '30%',
                maxHeight: '50%',
                overflowX: 'scroll'
              }}>
@@ -71,11 +72,13 @@ class App extends Component {
              </div>
            </div>
            <span style={{flex: 1}}>
-                        {Object.keys(result).map((value, index) => (
-                           <p key={index}>{`${value} : ${JSON.stringify(
-                              result[value]
-                           )}`}</p>
-                        ))}
+                        {Object.keys(result).map((value, index) => {
+                          if (result[value].id === 'H')
+                            _makeUniqueNodeRelation(result[value].dependentNodes);
+                          return (<p key={index}>
+                            {`${value} : ${JSON.stringify(result[value])}`}
+                          </p>)
+                        })}
                     </span>
          </header>
        </div>
