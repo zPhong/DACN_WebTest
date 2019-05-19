@@ -71,11 +71,43 @@ const validate = {
     }
 };
 
+/*
+    | song song,
+    ^ vuông góc,
+    = cân
+ */
+const shapeRules = {
+    triangle: {
+        right: '01^02', // Ex: AB vuong goc AC
+        isosceles: '01=02',
+        right_isosceles: '01^02&01=02',
+        equilateral: '01=02&01=12'
+    },
+    trapezoid: {
+        normal: '01|23',
+        right: '01|23&01^03',
+        isosceles: '01|23&03=12'
+    },
+    parallelogram: {
+        normal: '01|23&03|12'
+    },
+    rectangle: {
+        normal: '01|23&03|12&01^03'
+    },
+    rhombus: {
+        normal: '02^13'
+    },
+    square: {
+        normal: '01|23&03|12&01^03&01=03'
+    }
+};
+
 export {
     validate,
     defineSentences,
     RankingObjectContain,
     objectWithPoint,
     shapeList,
-    reversedDependentObjRelation
+    reversedDependentObjRelation,
+    shapeRules
 };

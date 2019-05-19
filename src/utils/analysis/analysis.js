@@ -9,7 +9,7 @@ import type {
     DrawingDataType
 } from '../../types/types';
 import appModel from '../../appModel';
-
+import { readPointsMap } from './readPointsMap';
 let RelationPointsMap: Array<NodeType> = [];
 
 export function analyzeResult(
@@ -41,6 +41,7 @@ export function analyzeResult(
     );
 
     result.segments = getArraySegments(validatedResult);
+    readPointsMap();
     return result;
 }
 

@@ -26,8 +26,6 @@ class App extends Component {
     onResult = () => {
         const { input } = this.state;
         const { points, segments, Error } = analyzeInput(input);
-        console.table(appModel.pointsMap);
-        console.log(points, segments);
 
         if (Error) {
             alert(Error);
