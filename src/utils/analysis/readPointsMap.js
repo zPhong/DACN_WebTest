@@ -7,6 +7,7 @@ import type {
 import appModel from '../../appModel';
 
 const executedRelations = [];
+const NOT_FOUND = 99;
 
 function readPointsMap(): Array<DrawingNodeType> {
   while (!_isPointsMapStatic()) {
@@ -25,6 +26,13 @@ function readPointsMap(): Array<DrawingNodeType> {
     id: node.id,
     coordinate: node.coordinate
   }));
+}
+
+export function updateCoordinate(nodeId: string, coordinate: CoordinateType): void {
+  const index = _getIndexOfNodeInPointsMapById(nodeId);
+  if (index !== NOT_FOUND) {
+    appModel.pointsMap[index].coordinate = coordinate;
+  }
 }
 
 function _isStaticNode(node: NodeType): boolean {
@@ -148,7 +156,7 @@ function _getIndexOfRelationInRelationsList(relation: any): number {
   for (let i = 0; i < list.length; i++) {
     if (relation === list[i]) return i;
   }
-  return 99;
+  return NOT_FOUND;
 }
 
 function _getDependentStaticNodeCount(node: NodeType): number {
@@ -164,14 +172,14 @@ function _getIndexOfNodeInPointsMap(node): number {
   for (let i = 0; i < appModel.pointsMap.length; i++) {
     if (node === appModel.pointsMap[i]) return i;
   }
-  return 99;
+  return NOT_FOUND;
 }
 
 function _getIndexOfNodeInPointsMapById(id: string): number {
   for (let i = 0; i < appModel.pointsMap.length; i++) {
     if (id === appModel.pointsMap[i].id) return i;
   }
-  return 99;
+  return NOT_FOUND;
 }
 
 function _isStaticNodeById(id: string): boolean {
@@ -210,6 +218,17 @@ function _calculatePointCoordinate(node: NodeType): CoordinateType {
   const executingNodeRelation = _makeUniqueNodeRelation(node.dependentNodes);
   for (let i = 0; i < executingNodeRelation; i++) {
     // TODO: calculate point
+    if(executingNodeRelation[i].relation.outputType === 'shape') {
+      if (!_isExecutedRelation(executingNodeRelation[i].relation)) {
+        // generate point
+        // ...
+        executedRelations.push(executingNodeRelation[i].relation);
+      }
+    }
+
+    if(node.dependentNodes[i].relation.outputType === 'define') {
+
+    }
   }
 
   node.isStatic = true;
