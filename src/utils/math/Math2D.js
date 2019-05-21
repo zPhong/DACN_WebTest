@@ -18,7 +18,7 @@ export function calculateMiddlePoint(firstPoint: CoordinateType, secondPoint: Co
   return middlePoint;
 }
 
-export function calculateLinearPointFromTwoPoints(firstPoint: CoordinateType, secondPoint: CoordinateType): LinearEquation {
+export function calculateLinearEquationFromTwoPoints(firstPoint: CoordinateType, secondPoint: CoordinateType): LinearEquation {
   let directionVector: Vector = {z: 0};
   directionVector.a = secondPoint.x - firstPoint.x;
   directionVector.b = secondPoint.y - firstPoint.y;
@@ -27,7 +27,7 @@ export function calculateLinearPointFromTwoPoints(firstPoint: CoordinateType, se
   normalVector.a = directionVector.b;
   normalVector.b = -directionVector.a;
 
-  const constantTerm = Math.floor(Math.random() * 100) - 50;
+  const constantTerm = firstPoint.y - normalVector.a * firstPoint.x;
 
   let linearEquation: LinearEquation = {};
   linearEquation.coefficientX = normalVector.a;
