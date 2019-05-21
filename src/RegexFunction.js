@@ -27,7 +27,7 @@ export function analyzeInput(input) {
         if (item.Error) return item;
 
         if (item.outputType === 'shape') {
-            delete item.outputType;
+            // delete item.outputType;
             result.shapes.push(item);
         } else {
             result.relations.push(item);
