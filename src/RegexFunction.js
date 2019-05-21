@@ -12,7 +12,7 @@ export function analyzeInput(input) {
     const data = input
         .replace(new RegExp('(\r?\n)', 'g'), '')
         .split(';')
-        .filter(sentence => (!!sentence))
+        .filter(sentence => !!sentence)
         .map(sentence => {
             return getInformation(sentence);
         });
@@ -27,7 +27,6 @@ export function analyzeInput(input) {
         if (item.Error) return item;
 
         if (item.outputType === 'shape') {
-            // delete item.outputType;
             result.shapes.push(item);
         } else {
             result.relations.push(item);
@@ -38,7 +37,7 @@ export function analyzeInput(input) {
 
     analyzeResult(result);
 
-    return appModel.pointsMap;
+    return analyzeResult(result);
 }
 
 function getInformation(string) {

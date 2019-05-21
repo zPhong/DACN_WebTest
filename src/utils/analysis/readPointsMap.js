@@ -2,24 +2,48 @@ import type {
   NodeType,
   NodeRelationType,
   DrawingNodeType,
-  CoordinateType,
+  CoordinateType
 } from '../../types/types';
 import appModel from '../../appModel';
 
 const executedRelations = [];
+const executedNode = [];
 const NOT_FOUND = 99;
 
-function readPointsMap(): Array<DrawingNodeType> {
+export function readPointsMap(): Array<DrawingNodeType> {
   while (!_isPointsMapStatic()) {
-    //update static Node
-    _updateStaticNode();
     //get node to calculate
     const executingNode = _getNextExecuteNode();
+    if (!executingNode) break;
 
-    const executingNodeRelation = _makeUniqueNodeRelation(executingNode.dependentNodes);
+    const executingNodeRelations = _makeUniqueNodeRelation(
+       executingNode.dependentNodes
+    );
+
+    executingNodeRelations.forEach(relation => {
+      if (relation.outputType === 'shape') {
+        const shapeName = Object.keys(relation).filter(
+           key => key !== 'type'
+        )[0];
+
+        makeCorrectShape(
+           relation[shapeName],
+           '01^02&01=02',
+           executingNode.id
+        );
+      }
+      if (!_isExecutedRelation(relation)) {
+        // calculate
+        executedRelations.push(relation);
+      }
+    });
 
     //Update calculated value to pointsMap
-    _updatePointsMap();
+    _updatePointsMap(executingNode);
+    executedNode.push(executingNode.id);
+
+    //update static Node
+    _updateStaticNode();
   }
 
   return appModel.pointsMap.map(node => ({
@@ -37,12 +61,11 @@ export function updateCoordinate(nodeId: string, coordinate: CoordinateType): vo
 
 function _isStaticNode(node: NodeType): boolean {
   if (node.isStatic) return true;
-  let count = 0;
-  node.dependentNodes((dNode: NodeRelationType) => {
-    if (!_isExecutedRelation(dNode.relation)) count++;
-  });
+  for (let i = 0; i < node.dependentNodes.length; i++) {
+    if (!_isExecutedRelation(node.dependentNodes[i].relation)) return false;
+  }
 
-  return count === 0;
+  return executedNode.includes(node.id);
 }
 
 function _isExecutedRelation(relation: any): boolean {
@@ -67,17 +90,20 @@ function _updatePointsMap(node: NodeType) {
 }
 
 function _isPointsMapStatic(): boolean {
-  let count = 0;
-  appModel.pointsMap.forEach(node => {
-    if (_isStaticNode(node)) count++;
-  });
-
-  return count === appModel.pointsMap.length();
+  for (let i = 0; i < appModel.pointsMap.length; i++) {
+    if (!appModel.pointsMap[i].isStatic) return false;
+  }
+  return true;
 }
 
 function _getNextExecuteNode(): NodeType {
-  const clonePointsMap = [...appModel.pointsMap].sort(sortNodeByPriority);
-  return clonePointsMap[0];
+  const clonePointsMap = [...appModel.pointsMap]
+     .filter(node => !executedNode.includes(node.id))
+     .sort(sortNodeByPriority);
+
+  console.log(clonePointsMap);
+  if (clonePointsMap.length > 0) return clonePointsMap[0];
+  return null;
 }
 
 function sortNodeByPriority(nodeOne: NodeType, nodeTwo: NodeType): number {
@@ -183,9 +209,9 @@ function _getIndexOfNodeInPointsMapById(id: string): number {
 }
 
 function _isStaticNodeById(id: string): boolean {
-  for (let i = 0; i < appModel.pointsMap; i++) {
+  for (let i = 0; i < appModel.pointsMap.length; i++) {
     if (id === appModel.pointsMap[i].id) {
-      return _isStaticNode(appModel.pointsMap[i].id);
+      return _isStaticNode(appModel.pointsMap[i]);
     }
   }
   return false;
@@ -206,8 +232,31 @@ export function _makeUniqueNodeRelation(dependentNodes: Array<NodeRelationType>)
 
     if (temp) result.push(dependentNodes[index].relation);
   }
-
   return result;
+}
+
+function makeCorrectShape(shape: string, rule: string, point: string) {
+  let staticPoints = shape.replace(point, '').split('');
+
+  // check all other points are static
+  for (let i = 0; i < staticPoints.length; i++) {
+    if (!_isStaticNodeById(staticPoints[i])) {
+      console.log('error', staticPoints[i]);
+      return;
+    }
+  }
+
+  // get node infomation
+  staticPoints = staticPoints.map(
+     (staticPoint: string): NodeType =>
+        appModel.pointsMap[_getIndexOfNodeInPointsMapById(staticPoint)]
+  );
+
+  const nonStaticPoint =
+     appModel.pointsMap[_getIndexOfNodeInPointsMapById(point)];
+
+  const rules = rule.split(new RegExp('&', 'g'));
+  console.log(rules);
 }
 
 function _calculatePointCoordinate(node: NodeType): CoordinateType {
@@ -218,7 +267,7 @@ function _calculatePointCoordinate(node: NodeType): CoordinateType {
   const executingNodeRelation = _makeUniqueNodeRelation(node.dependentNodes);
   for (let i = 0; i < executingNodeRelation; i++) {
     // TODO: calculate point
-    if(executingNodeRelation[i].relation.outputType === 'shape') {
+    if (executingNodeRelation[i].relation.outputType === 'shape') {
       if (!_isExecutedRelation(executingNodeRelation[i].relation)) {
         // generate point
         // ...
@@ -226,7 +275,7 @@ function _calculatePointCoordinate(node: NodeType): CoordinateType {
       }
     }
 
-    if(node.dependentNodes[i].relation.outputType === 'define') {
+    if (node.dependentNodes[i].relation.outputType === 'define') {
 
     }
   }

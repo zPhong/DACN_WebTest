@@ -2,6 +2,8 @@ import { validate, RankingObjectContain } from '../../configuration/define';
 import { checkFormatString } from '../definition/defineObjType';
 
 export function validateValue(value, type) {
+    if (!_validateName(value.value)) return false;
+
     const validateGeometryType = validate.object[type];
     let validateType;
     if (
@@ -49,7 +51,7 @@ function validateShape(shape) {
     const type = shape.type || '';
     const shapeTypeCheck = validateShapeType.includes(type);
 
-    return shapeFormatCheck && shapeTypeCheck;
+    return shapeFormatCheck && shapeTypeCheck && _validateName(shape[keys[0]]);
 }
 
 function validateDataRelationship(data) {
@@ -118,6 +120,17 @@ function checkObjectRelationship(obj1, obj2) {
     if (obj2.length === 3) {
         return !(check.indexOf(true) === 0 || check.indexOf(true) === 2);
     }
+}
+
+// check validate name not duplicate Ex: ABB
+function _validateName(string) {
+    return (
+        string.split('').length ===
+        string
+            .split('')
+            .filter((item, index, array) => array.indexOf(item) === index)
+            .length
+    );
 }
 
 export function validateInformation(info) {

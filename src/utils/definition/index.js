@@ -4,7 +4,6 @@ import { definePointType } from './definePointType';
 import { defineShapeType } from './defineShapeType';
 import { reversedDependentObjRelation } from '../../configuration/define';
 
-
 function defineInformation(data) {
     let result;
     switch (data.outputType) {
@@ -25,10 +24,18 @@ function defineInformation(data) {
             result[key].forEach(value => {
                 const type = defineObject(value);
                 if (!result[type]) result[type] = [];
+                if (type === 'segment') {
+                    value = sortString(value);
+                }
                 result[type].push(value);
             });
         }
     });
+
+    if (data.outputType === 'shape') {
+        const shapeName = Object.keys(result).filter(key => key !== 'type')[0];
+        result[shapeName] = sortString(result[shapeName]);
+    }
 
     delete result.object;
     const validate = validateInformation(result);
@@ -36,6 +43,12 @@ function defineInformation(data) {
     if (validate) {
         return result;
     }
+}
+
+function sortString(str) {
+    var arr = str.split('');
+    var sorted = arr.sort();
+    return sorted.join('');
 }
 
 export { defineInformation };
