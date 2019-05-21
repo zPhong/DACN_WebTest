@@ -102,6 +102,13 @@ const shapeRules = {
     }
 };
 
+const mappingShapeType = {
+    vuông: 'right',
+    cân: 'isosceles',
+    'vuông cân': 'right_isosceles',
+    đều: 'equilateral'
+};
+
 export {
     validate,
     defineSentences,
@@ -109,5 +116,6 @@ export {
     objectWithPoint,
     shapeList,
     reversedDependentObjRelation,
-    shapeRules
+    shapeRules,
+    mappingShapeType
 };

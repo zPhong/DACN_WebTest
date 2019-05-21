@@ -2,9 +2,16 @@ import type {
     NodeType,
     NodeRelationType,
     DrawingNodeType,
-    CoordinateType
+    CoordinateType,
+    LinearEquation
 } from '../../types/types';
 import appModel from '../../appModel';
+import {
+    calculateLinearPointFromTwoPoints,
+    calculateParallelLineByPointAndLine,
+    calculatePerpendicularLineByPointAndLine
+} from '../math/Math2D';
+import { shapeRules, mappingShapeType } from '../../configuration/define';
 
 const executedRelations = [];
 const executedNode = [];
@@ -24,12 +31,15 @@ export function readPointsMap(): Array<DrawingNodeType> {
                 const shapeName = Object.keys(relation).filter(
                     key => key !== 'type'
                 )[0];
-
-                makeCorrectShape(
-                    relation[shapeName],
-                    '01^02&01=02',
-                    executingNode.id
-                );
+                const shapeType = mappingShapeType[relation.type] || 'normal';
+                console.log(shapeType);
+                if (shapeRules[shapeName][shapeType]) {
+                    makeCorrectShape(
+                        relation[shapeName],
+                        shapeRules[shapeName][shapeType],
+                        executingNode.id
+                    );
+                }
             }
             if (!_isExecutedRelation(relation)) {
                 // calculate
@@ -228,28 +238,113 @@ export function _makeUniqueNodeRelation(
     return result;
 }
 
-function makeCorrectShape(shape: string, rule: string, point: string) {
-    let staticPoints = shape.replace(point, '').split('');
+function makeCorrectShape(
+    shape: string,
+    rules: string,
+    nonStaticPoint: string
+) {
+    let staticPoints = shape.replace(nonStaticPoint, '').split('');
 
     // check all other points are static
     for (let i = 0; i < staticPoints.length; i++) {
         if (!_isStaticNodeById(staticPoints[i])) {
-            console.log('error', staticPoints[i]);
             return;
         }
     }
 
     // get node infomation
-    staticPoints = staticPoints.map(
-        (staticPoint: string): NodeType =>
-            appModel.pointsMap[_getIndexOfNodeInPointsMapById(staticPoint)]
+    const points = shape
+        .split('')
+        .map(
+            (point: string): NodeType =>
+                appModel.pointsMap[_getIndexOfNodeInPointsMapById(point)]
+        );
+    const arrayRules = rules.split(new RegExp('&', 'g'));
+
+    const nonStaticIndex = shape.indexOf(nonStaticPoint);
+
+    if (arrayRules.length > 0) {
+        arrayRules.forEach(rule => {
+            const relationType = rule[2];
+            if (rule.includes(nonStaticIndex))
+                // eslint-disable-next-line default-case
+                switch (relationType) {
+                    case '|':
+                        console.log(
+                            getLinearEquationByParallelRule(
+                                rule,
+                                points,
+                                nonStaticIndex
+                            )
+                        );
+                        break;
+                    case '^':
+                        console.log(
+                            getLinearPerpendicularByParallelRule(
+                                rule,
+                                points,
+                                nonStaticIndex
+                            )
+                        );
+                        break;
+                    case '=':
+                        console.log('equal');
+                        break;
+                }
+        });
+    }
+}
+
+function getLinearEquationByParallelRule(
+    rule: string,
+    arrayPoints: Array<NodeType>,
+    nonStaticIndex: number
+): LinearEquation {
+    const lines = rule.split('|');
+    let staticLine, nonStaticLine;
+    lines.forEach(line => {
+        if (line.includes(nonStaticIndex)) {
+            nonStaticLine = line;
+        } else {
+            staticLine = line;
+        }
+    });
+
+    return calculateParallelLineByPointAndLine(
+        //point
+        arrayPoints[nonStaticLine.replace(nonStaticIndex, '')].coordinate,
+        //line
+        calculateLinearPointFromTwoPoints(
+            arrayPoints[staticLine[0]].coordinate,
+            arrayPoints[staticLine[1]].coordinate
+        )
     );
+}
 
-    const nonStaticPoint =
-        appModel.pointsMap[_getIndexOfNodeInPointsMapById(point)];
+function getLinearPerpendicularByParallelRule(
+    rule: string,
+    arrayPoints: Array<NodeType>,
+    nonStaticIndex: number
+): LinearEquation {
+    const lines = rule.split('|');
+    let staticLine, nonStaticLine;
+    lines.forEach(line => {
+        if (line.includes(nonStaticIndex)) {
+            nonStaticLine = line;
+        } else {
+            staticLine = line;
+        }
+    });
 
-    const rules = rule.split(new RegExp('&', 'g'));
-    console.log(rules);
+    return calculatePerpendicularLineByPointAndLine(
+        //point
+        arrayPoints[nonStaticLine.replace(nonStaticIndex, '')].coordinate,
+        //line
+        calculateLinearPointFromTwoPoints(
+            arrayPoints[staticLine[0]].coordinate,
+            arrayPoints[staticLine[1]].coordinate
+        )
+    );
 }
 
 function _calculatePointCoordinate(): CoordinateType {}
