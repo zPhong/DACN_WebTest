@@ -3,8 +3,12 @@ export function defineShapeType(data) {
   Object.keys(data).forEach((key) => {
     if (key.includes('type')) {
       const result = data[key].toString().split(' ');
-      returner[key.split(' ')[1]] = result[1] || result[0];
-      returner['type'] = result.length > 1 ? result[0] : '';
+      const shape = result[result.length - 1];
+      returner[key.split(' ')[1]] = shape;
+      returner['type'] = data[key]
+        .toString()
+        .replace(shape, '')
+        .trim();
     } else {
       returner[key] = data[key].toString();
     }

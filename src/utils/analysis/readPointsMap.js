@@ -1,19 +1,22 @@
 import type { NodeType, NodeRelationType, DrawingNodeType, CoordinateType, LinearEquation } from '../../types/types';
 import appModel from '../../appModel';
 import {
-  calculateLinearPointFromTwoPoints,
+  calculateLinearEquationFromTwoPoints,
   calculateParallelLineByPointAndLine,
   calculatePerpendicularLineByPointAndLine,
   calculateDistanceTwoPoints,
   calculateCircleEquationByCenterPoint
 } from '../math/Math2D';
 import { shapeRules, mappingShapeType, TwoStaticPointRequireShape } from '../../configuration/define';
+import { generateGeometry } from './GenerateGeometry';
 
-const executedRelations = [];
-const executedNode = [];
+let executedRelations = [];
+let executedNode = [];
 const NOT_FOUND = 99;
 
 export function readPointsMap(): Array<DrawingNodeType> {
+  executedRelations = [];
+  executedNode = [];
   while (!_isPointsMapStatic()) {
     //get node to calculate
     const executingNode = _getNextExecuteNode();
@@ -25,7 +28,11 @@ export function readPointsMap(): Array<DrawingNodeType> {
       if (relation.outputType === 'shape') {
         const shapeName = Object.keys(relation).filter((key) => key !== 'type')[0];
         const shapeType = mappingShapeType[relation.type] || 'normal';
-        console.log(shapeType);
+
+        if (!_isExecutedRelation(relation)) {
+          generateGeometry(relation[shapeName], shapeName, relation.type);
+        }
+
         if (shapeRules[shapeName][shapeType]) {
           makeCorrectShape(
             relation[shapeName],
@@ -43,7 +50,7 @@ export function readPointsMap(): Array<DrawingNodeType> {
     });
 
     //Update calculated value to pointsMap
-    _updatePointsMap(executingNode);
+    //_updatePointsMap(executingNode);
     executedNode.push(executingNode.id);
 
     //update static Node
@@ -59,6 +66,7 @@ export function readPointsMap(): Array<DrawingNodeType> {
 export function updateCoordinate(nodeId: string, coordinate: CoordinateType): void {
   const index = _getIndexOfNodeInPointsMapById(nodeId);
   if (index !== NOT_FOUND) {
+    console.log(nodeId, coordinate);
     appModel.pointsMap[index].coordinate = coordinate;
   }
 }
@@ -344,7 +352,7 @@ function getLinearEquationByParallelRule(
     //point
     arrayPoints[nonStaticLine.replace(nonStaticIndex, '')].coordinate,
     //line
-    calculateLinearPointFromTwoPoints(arrayPoints[staticLine[0]].coordinate, arrayPoints[staticLine[1]].coordinate)
+    calculateLinearEquationFromTwoPoints(arrayPoints[staticLine[0]].coordinate, arrayPoints[staticLine[1]].coordinate)
   );
 }
 
@@ -372,7 +380,7 @@ function getLinearPerpendicularByParallelRule(
       //point
       arrayPoints[nonStaticLines[0].replace(nonStaticIndex, '')].coordinate,
       //line
-      calculateLinearPointFromTwoPoints(arrayPoints[staticLine[0]].coordinate, arrayPoints[staticLine[1]].coordinate)
+      calculateLinearEquationFromTwoPoints(arrayPoints[staticLine[0]].coordinate, arrayPoints[staticLine[1]].coordinate)
     );
   }
 }

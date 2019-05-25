@@ -18,7 +18,7 @@ export function calculateMiddlePoint(firstPoint: CoordinateType, secondPoint: Co
   return middlePoint;
 }
 
-export function calculateLinearPointFromTwoPoints(
+export function calculateLinearEquationFromTwoPoints(
   firstPoint: CoordinateType,
   secondPoint: CoordinateType
 ): LinearEquation {

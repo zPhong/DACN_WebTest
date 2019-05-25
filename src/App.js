@@ -25,15 +25,14 @@ class App extends Component {
 
   onResult = () => {
     const { input } = this.state;
+    appModel.clear();
+
     const { points, segments, Error } = analyzeInput(input);
 
     if (Error) {
       alert(Error);
       return;
     }
-    points.forEach((point) => {
-      point.coordinate = { ...getRandomPoint() };
-    });
 
     this.renderGeometry(points, segments);
   };
@@ -59,7 +58,7 @@ class App extends Component {
     });
 
     _points.forEach((point) => {
-      scene.point(point.id, point.coordinate.x, point.coordinate.y);
+      scene.point(point.id, point.coordinate.x * 10 + width / 4, point.coordinate.y * 10 + height / 4);
     });
 
     _segments.forEach((segment) => {
