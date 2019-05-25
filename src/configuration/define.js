@@ -84,13 +84,13 @@ const shapeRules = {
     normal: '01|23&03|12'
   },
   rectangle: {
-    normal: '01|23&03|12&01^03'
+    normal: '01|23&03|12&01^12&&12^23&23^03'
   },
   rhombus: {
-    normal: '02^13'
+    normal: '01|23&03|12&02^13'
   },
   square: {
-    normal: '01|23&03|12&01^03&01=03'
+    normal: '01|23&03|12&01^12&&12^23&23^03&01=03&&01=12&12=23'
   }
 };
 
@@ -101,8 +101,11 @@ const mappingShapeType = {
   đều: 'equilateral'
 };
 
+const TwoStaticPointRequireShape = ['triangle', 'rhombus', 'rectangle', 'square'];
+
 export {
   validate,
+  TwoStaticPointRequireShape,
   defineSentences,
   RankingObjectContain,
   objectWithPoint,
