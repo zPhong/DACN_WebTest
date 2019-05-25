@@ -99,8 +99,7 @@ class App extends Component {
               height: '100vh',
               maxHeight: '100vh',
               borderRight: 'solid red'
-            }}
-          >
+            }}>
             <div
               style={{
                 height: '50%',
@@ -108,15 +107,13 @@ class App extends Component {
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center'
-              }}
-            >
+              }}>
               <div
                 style={{
                   width: '100%',
                   height: '50%',
                   marginBottom: '1rem'
-                }}
-              >
+                }}>
                 <textarea
                   row={5}
                   style={{ flex: 1, height: 100 }}
@@ -140,8 +137,7 @@ class App extends Component {
                 height: '50%',
                 maxHeight: '50%',
                 overflowX: 'scroll'
-              }}
-            >
+              }}>
               {Object.keys(defineSentences).map((type) =>
                 defineSentences[type].map((value, index) => <p key={index}>{`${value}`}</p>)
               )}
