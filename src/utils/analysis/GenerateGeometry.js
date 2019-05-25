@@ -1,6 +1,6 @@
-import type { CoordinateType, LinearEquation } from '../../types/types';
-import { updateCoordinate } from './readPointsMap';
-import { calculateDistanceTwoPoints, calculateLinearEquationFromTwoPoints, getRandomValue } from '../math/Math2D';
+import type { CoordinateType, LinearEquation } from "../../types/types";
+import { updateCoordinate } from "./readPointsMap";
+import { calculateDistanceTwoPoints, calculateLinearEquationFromTwoPoints, getRandomValue } from "../math/Math2D";
 
 const geometricObj = {
   triangle: generateTriangle,
@@ -27,7 +27,7 @@ function generateTriangle(name: string, type: string) {
 
     updateCoordinate(name[0], p1);
     switch (type) {
-      case '': {
+      case "": {
         p3.y = p1.y;
         p3.x = getRandomValue(p1.x + 1, p1.x + 50);
         updateCoordinate(name[2], p3);
@@ -37,7 +37,7 @@ function generateTriangle(name: string, type: string) {
         break;
       }
 
-      case 'vuông': {
+      case "vuông": {
         p2.y = getRandomValue(p1.y + 1, p1.y + 50);
         p2.x = p1.x;
         updateCoordinate(name[1], p2);
@@ -47,7 +47,7 @@ function generateTriangle(name: string, type: string) {
         break;
       }
 
-      case 'cân': {
+      case "cân": {
         /*
          *             B
          *          *    *
@@ -66,7 +66,7 @@ function generateTriangle(name: string, type: string) {
         break;
       }
 
-      case 'vuông cân': {
+      case "vuông cân": {
         /*  B
          *  * *
          *  *   *
@@ -85,7 +85,7 @@ function generateTriangle(name: string, type: string) {
         break;
       }
 
-      case 'đều': {
+      case "đều": {
         /*
          *       [B]
          *      *   *
@@ -152,21 +152,21 @@ function generateTrapezoid(name: string) {
     // p2 represents point B
     const p2: CoordinateType = {
       x: getRandomValue(p1.x + 1, p1.x + 50),
-      y: getRandomValue(p1.y + 1, p1.y + 50)
+      y: p1.y
     };
     updateCoordinate(name[1], p2);
 
     // p3 represents point C
     const p3: CoordinateType = {
       x: getRandomValue(p2.x + 1, p2.x + 50),
-      y: p2.y
+      y: getRandomValue(p1.y + 1, p1.y + 50)
     };
     updateCoordinate(name[2], p3);
 
     // p4 represents point D
     const p4: CoordinateType = {
-      x: getRandomValue(p1.x + 1, p1.x + 50),
-      y: p1.y
+      x: getRandomValue(p1.x - 50, p3.x - 1),
+      y: p3.y
     };
     updateCoordinate(name[3], p4);
   }
