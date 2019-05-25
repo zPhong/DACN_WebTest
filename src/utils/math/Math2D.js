@@ -142,9 +142,9 @@ function _calculateBisectLineEquation(lineOne: LinearEquation, lineTwo: LinearEq
 
   // Represent for [sqrt(a*a + b*b) / sqrt(a'*a' + b'*b')]
   let coefficient =
-     Math.sqrt(lineOne.coefficientX * lineOne.coefficientX + lineOne.coefficientY * lineOne.coefficientY)
-     /
-     Math.sqrt(lineTwo.coefficientX * lineTwo.coefficientX + lineTwo.coefficientY * lineTwo.coefficientY);
+    Math.sqrt(lineOne.coefficientX * lineOne.coefficientX + lineOne.coefficientY * lineOne.coefficientY)
+    /
+    Math.sqrt(lineTwo.coefficientX * lineTwo.coefficientX + lineTwo.coefficientY * lineTwo.coefficientY);
 
   /*
    * Two results:
@@ -186,9 +186,9 @@ function _getPointInLine(line: LinearEquation): CoordinateType {
 
 function _getPointInLineWithCondition(line: LinearEquation, axis: string, comparison: string, point: CoordinateType): CoordinateType {
   if (axis !== 'vertical'
-     || axis !== 'horizontal'
-     || comparison !== 'bigger'
-     || comparison !== 'smaller') {
+    || axis !== 'horizontal'
+    || comparison !== 'bigger'
+    || comparison !== 'smaller') {
     return {};
   }
 

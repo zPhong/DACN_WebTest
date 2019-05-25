@@ -7,9 +7,9 @@ export function validateValue(value, type) {
   const validateGeometryType = validate.object[type];
   let validateType;
   if (
-     value.key === 'value' ||
-     value.key === 'relation' ||
-     value.key === 'undefined'
+    value.key === 'value' ||
+    value.key === 'relation' ||
+    value.key === 'undefined'
   )
     return true;
   if (value.key === 'angle') if (!validateAngle(value.value)) return false;
@@ -20,8 +20,8 @@ export function validateValue(value, type) {
     if (validateType && format)
       if (validateType.format) {
         if (
-           format === validateType.format &&
-           value.value.length === validateType.length
+          format === validateType.format &&
+          value.value.length === validateType.length
         )
           return true;
       } else if (value.value.length === validateType.length) {
@@ -44,8 +44,8 @@ function validateShape(shape) {
   const value = shape[keys[0]];
   const format = checkFormatString(shape[keys[0]]);
   const shapeFormatCheck =
-     format === validateShapeFormat.format &&
-     value.length === validateShapeFormat.length;
+    format === validateShapeFormat.format &&
+    value.length === validateShapeFormat.length;
 
   //check type of shape
   const type = shape.type || '';
@@ -58,47 +58,47 @@ function validateDataRelationship(data) {
   const keys = Object.keys(data);
 
   for (
-     let indexOfRankingLevel = 0;
-     indexOfRankingLevel < RankingObjectContain.length - 1;
-     indexOfRankingLevel++
+    let indexOfRankingLevel = 0;
+    indexOfRankingLevel < RankingObjectContain.length - 1;
+    indexOfRankingLevel++
   ) {
     for (
-       let indexOfObjectCurrentLevel = 0;
-       indexOfObjectCurrentLevel <
-       RankingObjectContain[indexOfRankingLevel].length;
-       indexOfObjectCurrentLevel++
+      let indexOfObjectCurrentLevel = 0;
+      indexOfObjectCurrentLevel <
+      RankingObjectContain[indexOfRankingLevel].length;
+      indexOfObjectCurrentLevel++
     ) {
       for (
-         let indexOfObjectNextLevel = 0;
-         indexOfObjectNextLevel <
-         RankingObjectContain[indexOfRankingLevel + 1].length;
-         indexOfObjectNextLevel++
+        let indexOfObjectNextLevel = 0;
+        indexOfObjectNextLevel <
+        RankingObjectContain[indexOfRankingLevel + 1].length;
+        indexOfObjectNextLevel++
       )
         if (
-           keys.includes(
-              RankingObjectContain[indexOfRankingLevel][
-                 indexOfObjectCurrentLevel
-                 ]
-           )
+          keys.includes(
+            RankingObjectContain[indexOfRankingLevel][
+              indexOfObjectCurrentLevel
+              ]
+          )
         ) {
           if (
-             data[
-                RankingObjectContain[indexOfRankingLevel + 1][
-                   indexOfObjectNextLevel
-                   ]
+            data[
+              RankingObjectContain[indexOfRankingLevel + 1][
+                indexOfObjectNextLevel
                 ]
+              ]
           )
             return checkObjectRelationship(
-               data[
-                  RankingObjectContain[indexOfRankingLevel][
-                     indexOfObjectCurrentLevel
-                     ]
-                  ][0],
-               data[
-                  RankingObjectContain[indexOfRankingLevel + 1][
-                     indexOfObjectNextLevel
-                     ]
-                  ][0]
+              data[
+                RankingObjectContain[indexOfRankingLevel][
+                  indexOfObjectCurrentLevel
+                  ]
+                ][0],
+              data[
+                RankingObjectContain[indexOfRankingLevel + 1][
+                  indexOfObjectNextLevel
+                  ]
+                ][0]
             );
         }
     }
@@ -125,11 +125,11 @@ function checkObjectRelationship(obj1, obj2) {
 // check validate name not duplicate Ex: ABB
 function _validateName(string) {
   return (
-     string.split('').length ===
-     string
-        .split('')
-        .filter((item, index, array) => array.indexOf(item) === index)
-        .length
+    string.split('').length ===
+    string
+      .split('')
+      .filter((item, index, array) => array.indexOf(item) === index)
+      .length
   );
 }
 

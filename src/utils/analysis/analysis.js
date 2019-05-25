@@ -14,7 +14,7 @@ import {readPointsMap} from './readPointsMap';
 let RelationPointsMap: Array<NodeType> = [];
 
 export function analyzeResult(
-   validatedResult: RelationsResultType
+  validatedResult: RelationsResultType
 ): DrawingDataType {
   const shapes = validatedResult.shapes;
 
@@ -35,10 +35,10 @@ export function analyzeResult(
   let result = {};
 
   result.points = appModel.pointsMap.map(
-     (node: NodeType): DrawingNodeType => ({
-       id: node.id,
-       coordinate: node.coordinate
-     })
+    (node: NodeType): DrawingNodeType => ({
+      id: node.id,
+      coordinate: node.coordinate
+    })
   );
 
   result.segments = getArraySegments(validatedResult);
@@ -69,8 +69,8 @@ function getArraySegments(validatedResult: RelationsResultType): Array<string> {
 function getShapeSegments(shape: any): Array<string> {
   const shapeName = Object.keys(shape).filter(key => key !== 'type')[0];
   let points = shape[shapeName]
-     .split('')
-     .filter(point => point === point.toUpperCase());
+    .split('')
+    .filter(point => point === point.toUpperCase());
 
   const result = [];
 
@@ -87,15 +87,15 @@ function getShapeSegments(shape: any): Array<string> {
 
 function trimPointsMap() {
   appModel.pointsMap = appModel.pointsMap.map(
-     (node: NodeType): NodeType => ({
-       ...node,
-       dependentNodes: unique(node.dependentNodes)
-     })
+    (node: NodeType): NodeType => ({
+      ...node,
+      dependentNodes: unique(node.dependentNodes)
+    })
   );
 }
 
 function unique(
-   dependentNodes: Array<NodeRelationType>
+  dependentNodes: Array<NodeRelationType>
 ): Array<NodeRelationType> {
   let result = [];
 
@@ -112,26 +112,26 @@ function unique(
 function createPointsMapByShape(shape: any) {
   const shapeName = Object.keys(shape).filter(key => key !== 'type')[0];
   let points = shape[shapeName]
-     .split('')
-     .filter(point => point === point.toUpperCase());
+    .split('')
+    .filter(point => point === point.toUpperCase());
 
   points = [...points].sort(
-     (el1: string, el2: string): number => {
-       const index1 = findIndexByNodeId(el1, appModel.pointsMap);
-       const index2 = findIndexByNodeId(el2, appModel.pointsMap);
+    (el1: string, el2: string): number => {
+      const index1 = findIndexByNodeId(el1, appModel.pointsMap);
+      const index2 = findIndexByNodeId(el2, appModel.pointsMap);
 
-       if (index1 === -1 && index2 === -1) {
-         return 1;
-       }
-       if (index1 >= 0 && index2 >= 0) return 1;
-       return index2 - index1;
-     }
+      if (index1 === -1 && index2 === -1) {
+        return 1;
+      }
+      if (index1 >= 0 && index2 >= 0) return 1;
+      return index2 - index1;
+    }
   );
 
   const objectPointsMap = points.map((point: string, index: number) => {
     return index !== 0
-       ? createNode(point, [{id: points[0], relation: shape}])
-       : createNode(point);
+      ? createNode(point, [{id: points[0], relation: shape}])
+      : createNode(point);
   });
 
   objectPointsMap.forEach((node: NodeType) => {
@@ -145,41 +145,41 @@ function createPointsMapByRelation(relation: any) {
     if (relation[objectType]) {
       relation[objectType].forEach(object => {
         let points = object
-           .split('')
-           .filter(point => point === point.toUpperCase());
+          .split('')
+          .filter(point => point === point.toUpperCase());
 
         points = [...points].sort(
-           (el1: string, el2: string): number => {
-             const index1 = findIndexByNodeId(
-                el1,
-                appModel.pointsMap
-             );
-             const index2 = findIndexByNodeId(
-                el2,
-                appModel.pointsMap
-             );
+          (el1: string, el2: string): number => {
+            const index1 = findIndexByNodeId(
+              el1,
+              appModel.pointsMap
+            );
+            const index2 = findIndexByNodeId(
+              el2,
+              appModel.pointsMap
+            );
 
-             if (index1 === -1 && index2 === -1) {
-               return 1;
-             }
-             if (index1 >= 0 && index2 >= 0) return 1;
-             return index2 - index1;
-           }
+            if (index1 === -1 && index2 === -1) {
+              return 1;
+            }
+            if (index1 >= 0 && index2 >= 0) return 1;
+            return index2 - index1;
+          }
         );
 
         const objectPointsMap = points.map(
-           (point: string, index: number) => {
-             return index === points.length - 1
-                ? createNode(
-                   point,
-                   createDependentNodeOfObject(
-                      objectType,
-                      object,
-                      points
-                   )
+          (point: string, index: number) => {
+            return index === points.length - 1
+              ? createNode(
+                point,
+                createDependentNodeOfObject(
+                  objectType,
+                  object,
+                  points
                 )
-                : createNode(point);
-           }
+              )
+              : createNode(point);
+          }
         );
 
         objectPointsMap.forEach((node: NodeType) => {
@@ -190,22 +190,22 @@ function createPointsMapByRelation(relation: any) {
   });
 
   RelationPointsMap = [...RelationPointsMap].sort(
-     (nodeOne: NodeType, nodeTwo: NodeType): number => {
-       const index1 = findIndexByNodeId(nodeOne.id, appModel.pointsMap);
-       const index2 = findIndexByNodeId(nodeTwo.id, appModel.pointsMap);
-       if (index1 === -1 && index2 === -1) return 1;
-       if (index1 >= 0 && index2 >= 0) return index1 - index2;
-       return index2 - index1;
-     }
+    (nodeOne: NodeType, nodeTwo: NodeType): number => {
+      const index1 = findIndexByNodeId(nodeOne.id, appModel.pointsMap);
+      const index2 = findIndexByNodeId(nodeTwo.id, appModel.pointsMap);
+      if (index1 === -1 && index2 === -1) return 1;
+      if (index1 >= 0 && index2 >= 0) return index1 - index2;
+      return index2 - index1;
+    }
   );
 
   if (relation.operation === '=' && relation.value) {
     const lastNodeDependentLength =
-       RelationPointsMap[RelationPointsMap.length - 1].dependentNodes
-          .length;
+      RelationPointsMap[RelationPointsMap.length - 1].dependentNodes
+        .length;
     RelationPointsMap[RelationPointsMap.length - 1].dependentNodes[
     lastNodeDependentLength - 1
-       ].relation = relation;
+      ].relation = relation;
   } else {
     let lastObjectPoints = getDependentObject();
     lastObjectPoints.forEach(point => {
@@ -218,9 +218,9 @@ function createPointsMapByRelation(relation: any) {
             dependentNodes: [
               ...currentNode.dependentNodes,
               ...createDependentNodeOfRelation(
-                 node.id,
-                 relation,
-                 lastObjectPoints
+                node.id,
+                relation,
+                lastObjectPoints
               )
             ]
           };
@@ -238,9 +238,9 @@ function getDependentObject(): Array<string> {
 
   lastNode.dependentNodes.forEach(node => {
     if (
-       !result.includes(node.id) &&
-       !appModel.pointsMap[findIndexByNodeId(node.id, appModel.pointsMap)]
-          .isStatic
+      !result.includes(node.id) &&
+      !appModel.pointsMap[findIndexByNodeId(node.id, appModel.pointsMap)]
+        .isStatic
     )
       result.push(node.id);
   });
@@ -248,8 +248,8 @@ function getDependentObject(): Array<string> {
 }
 
 function findIndexByNodeId(
-   id: string,
-   map: Array<NodeType | NodeRelationType>
+  id: string,
+  map: Array<NodeType | NodeRelationType>
 ): number {
   for (let i = 0; i < map.length; i++) {
     if (map[i].id === id) return i;
@@ -258,9 +258,9 @@ function findIndexByNodeId(
 }
 
 function createDependentNodeOfRelation(
-   point: string,
-   relation: any,
-   exception: Array<string>
+  point: string,
+  relation: any,
+  exception: Array<string>
 ): Array<NodeRelationType> {
   const result: Array<NodeRelationType> = [];
   RelationPointsMap.forEach((node: NodeType, index: number) => {
@@ -272,9 +272,9 @@ function createDependentNodeOfRelation(
 }
 
 function createDependentNodeOfObject(
-   objectType: string,
-   objectName: string,
-   points: Array<string>
+  objectType: string,
+  objectName: string,
+  points: Array<string>
 ): Array<NodeRelationType> {
   const result: Array<NodeRelationType> = [];
   let relation = {};
@@ -291,8 +291,8 @@ function createDependentNodeOfObject(
 function createNode(id: string, dependentNodes?: Array<NodeRelationType>): any {
   const node = {id, coordinate: {x: 0, y: 0, z: 0}, isStatic: false};
   const _dependentNodes = dependentNodes
-     ? {dependentNodes}
-     : {dependentNodes: []};
+    ? {dependentNodes}
+    : {dependentNodes: []};
 
   return {...node, ..._dependentNodes};
 }

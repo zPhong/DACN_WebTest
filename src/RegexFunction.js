@@ -10,12 +10,12 @@ const operations = ['+', '-', '*', '<', '>', '='];
 
 export function analyzeInput(input) {
   const data = input
-     .replace(new RegExp('(\r?\n)', 'g'), '')
-     .split(';')
-     .filter(sentence => !!sentence)
-     .map(sentence => {
-       return getInformation(sentence);
-     });
+    .replace(new RegExp('(\r?\n)', 'g'), '')
+    .split(';')
+    .filter(sentence => !!sentence)
+    .map(sentence => {
+      return getInformation(sentence);
+    });
 
   let result = {
     shapes: [],
@@ -87,15 +87,15 @@ export function regex(string, _defineSentence, type) {
 
   for (let i = 0; i < params.length; i++) {
     let start =
-       others[i]
-          .replace('+', '\\+')
-          .replace('-', '\\-')
-          .replace('*', '\\*') || '';
+      others[i]
+        .replace('+', '\\+')
+        .replace('-', '\\-')
+        .replace('*', '\\*') || '';
     let end =
-       others[i + 1]
-          .replace('+', '\\+')
-          .replace('-', '\\-')
-          .replace('*', '\\*') || '';
+      others[i + 1]
+        .replace('+', '\\+')
+        .replace('-', '\\-')
+        .replace('*', '\\*') || '';
 
     let param = string.match(new RegExp(start + '(.*)' + end));
 
