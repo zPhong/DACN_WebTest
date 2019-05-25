@@ -8,4 +8,4 @@ class Geom {
   }
 }
 
-export { Geom };
+export {Geom};

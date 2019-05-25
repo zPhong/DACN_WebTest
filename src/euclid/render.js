@@ -1,6 +1,5 @@
-
 import * as d3 from "d3";
-import { Point, Circle, Segment, Line } from './model'
+import {Circle, Line, Point, Segment} from './model'
 
 
 function klasses() {
@@ -84,4 +83,4 @@ function renderPoints(scene, svgElement) {
   points.exit().remove();
 }
 
-export { renderGeometry, renderPoints }
+export {renderGeometry, renderPoints}

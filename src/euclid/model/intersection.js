@@ -1,12 +1,12 @@
-import { Point } from './point'
-import { Geom } from './geom'
+import {Point} from './point'
+import {Geom} from './geom'
 
-import { intersect } from '../intersection'
+import {intersect} from '../intersection'
 
 class Intersection extends Point {
 
 
-  /**  
+  /**
    * @param {string} name
    * @param {...Geom} objects to be intersected
    * @param {number|Geom~boolean} [which] optional array index or filter callback in case there are multiple intersections.
@@ -32,9 +32,8 @@ class Intersection extends Point {
       result = result[this.which];
 
     if (result) {
-      ({ x: this.x, y: this.y } = result);
-    }
-    else {
+      ({x: this.x, y: this.y} = result);
+    } else {
       this.x = this.y = null;
     }
   }
@@ -46,4 +45,4 @@ class Intersection extends Point {
   }
 }
 
-export { Intersection }
+export {Intersection}

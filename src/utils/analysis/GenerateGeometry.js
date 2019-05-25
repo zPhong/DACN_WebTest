@@ -1,5 +1,5 @@
 import appModel from "../../appModel";
-import type {CoordinateType, LinearEquation, NodeType} from "../../types/types";
+import type {CoordinateType, LinearEquation} from "../../types/types";
 import {updateCoordinate} from "./readPointsMap";
 import {calculateDistanceTwoPoints, calculateLinearEquationFromTwoPoints, getRandomValue} from "../math/Math2D";
 

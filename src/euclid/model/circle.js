@@ -1,6 +1,6 @@
-import { Geom } from './geom'
-import { Point } from './point'
-import { distance, distanceSquared } from '../calc';
+import {Geom} from './geom'
+import {Point} from './point'
+import {distance, distanceSquared} from '../calc';
 
 class Circle extends Geom {
 
@@ -65,4 +65,4 @@ class Circle extends Geom {
   }
 }
 
-export { Circle }
+export {Circle}

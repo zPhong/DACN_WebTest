@@ -1,17 +1,11 @@
-import type {
-  NodeType,
-  NodeRelationType,
-  DrawingNodeType,
-  CoordinateType,
-  LinearEquation
-} from '../../types/types';
+import type {CoordinateType, DrawingNodeType, LinearEquation, NodeRelationType, NodeType} from '../../types/types';
 import appModel from '../../appModel';
 import {
   calculateLinearPointFromTwoPoints,
   calculateParallelLineByPointAndLine,
   calculatePerpendicularLineByPointAndLine
 } from '../math/Math2D';
-import {shapeRules, mappingShapeType} from '../../configuration/define';
+import {mappingShapeType, shapeRules} from '../../configuration/define';
 
 const executedRelations = [];
 const executedNode = [];

@@ -1,6 +1,7 @@
-import { Line } from './line'
-import { Point } from './point'
-import { distanceSquared, distance } from '../calc';
+import {Line} from './line'
+import {Point} from './point'
+import {distance, distanceSquared} from '../calc';
+
 const P = Point.P;
 
 class Segment extends Line {
@@ -80,4 +81,4 @@ class Segment extends Line {
   }
 }
 
-export { Segment }
+export {Segment}

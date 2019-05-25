@@ -1,13 +1,5 @@
-
 import * as d3 from "d3";
-import {
-  Point,
-  Circle,
-  Segment,
-  Line,
-  equalWithin,
-  Intersection
-} from './model';
+import {Circle, equalWithin, Intersection, Line, Point, Segment} from './model';
 
 function addClass(obj, klass) {
   obj.classes = obj.classes || d3.set();
@@ -47,25 +39,29 @@ class Scene {
     return null;
   }
 
-  /**  
-   * is - Get an equality-testing callback for the given object.  
-   *    
+  /**
+   * is - Get an equality-testing callback for the given object.
+   *
    * @param  {Geom|string} obj Either the name of the object to test or the object itself.
    * @return {Geom~boolean} a function that tests whether its argument is geometrically equal to obj.
    */
   is(obj) {
-    if (typeof obj === 'string') { obj = this.get(obj); }
+    if (typeof obj === 'string') {
+      obj = this.get(obj);
+    }
     return (secondObj) => (obj && this.equal(obj, secondObj));
   }
 
-  /**  
-  * is - Get an NON-equality-testing callback for the given object.  
-  *    
-  * @param  {Geom|string} obj Either the name of the object to test or the object itself.
-  * @return {Geom~boolean} a function that tests whether its argument is NOT geometrically equal to obj.
-  */
+  /**
+   * is - Get an NON-equality-testing callback for the given object.
+   *
+   * @param  {Geom|string} obj Either the name of the object to test or the object itself.
+   * @return {Geom~boolean} a function that tests whether its argument is NOT geometrically equal to obj.
+   */
   isnt(obj) {
-    if (typeof obj === 'string') { obj = this.get(obj); }
+    if (typeof obj === 'string') {
+      obj = this.get(obj);
+    }
     return (secondObj) => (obj && !this.equal(obj, secondObj));
   }
 
@@ -145,15 +141,15 @@ class Scene {
   freeName() {
     let keys = this._objects.keys(),
       id = 0;
-    for (; keys.indexOf('object' + id) >= 0; id++);
+    for (; keys.indexOf('object' + id) >= 0; id++) ;
     return 'object' + id;
   }
 
-  /**  
+  /**
    * update - Update objects to reflect changes in dependent objects. (E.g.,
    * update Intersection coordinates when the intersected objects have changed.)
-   *    
-   * @param {Geom} root The object from which to start walking the dependency graph.  
+   *
+   * @param {Geom} root The object from which to start walking the dependency graph.
    */
   // TODO: respect `root` parameter, and do an actual DAG walk.
   update(root) {
@@ -176,4 +172,4 @@ class Scene {
   }
 }
 
-export { Scene }
+export {Scene}

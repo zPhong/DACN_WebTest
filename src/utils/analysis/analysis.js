@@ -2,11 +2,11 @@
 
 import {objectWithPoint} from '../../configuration/define';
 import type {
-  NodeType,
-  RelationsResultType,
-  NodeRelationType,
+  DrawingDataType,
   DrawingNodeType,
-  DrawingDataType
+  NodeRelationType,
+  NodeType,
+  RelationsResultType
 } from '../../types/types';
 import appModel from '../../appModel';
 import {readPointsMap} from './readPointsMap';

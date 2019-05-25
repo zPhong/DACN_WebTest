@@ -1,9 +1,8 @@
-
-import { Point } from './point';
-import { Circle } from './circle';
-import { Line } from './line';
-import { Segment } from './segment';
-import { Intersection } from './intersection'
+import {Point} from './point';
+import {Circle} from './circle';
+import {Line} from './line';
+import {Segment} from './segment';
+import {Intersection} from './intersection'
 
 const P = Point.P
 export {

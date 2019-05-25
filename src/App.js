@@ -4,7 +4,6 @@ import {analyzeInput} from './RegexFunction';
 import {defineSentences} from './configuration/define';
 import {Scene} from './euclid';
 import {renderGeometry, renderPoints} from './euclid/render';
-import appModel from './appModel';
 
 function getRandomArbitrary(min, max) {
   return Math.random() * (max - min) + min;
@@ -119,10 +118,7 @@ class App extends Component {
                 }}
               >
                                 <textarea
-                                  row={5}
                                   style={{flex: 1, height: 100}}
-                                  numberOfLine
-                                  type='text'
                                   name='title'
                                   value={input}
                                   onChange={event => {
@@ -135,8 +131,7 @@ class App extends Component {
               <button
                 type='button'
                 className='btn btn-success'
-                onClick={this.onResult}
-              >
+                onClick={this.onResult}>
                 Success
               </button>
             </div>
@@ -145,8 +140,7 @@ class App extends Component {
                 height: '50%',
                 maxHeight: '50%',
                 overflowX: 'scroll'
-              }}
-            >
+              }}>
               {Object.keys(defineSentences).map(type =>
                 defineSentences[type].map((value, index) => (
                   <p key={index}>{`${value}`}</p>
@@ -161,16 +155,16 @@ class App extends Component {
                             )}`}</p>
                         ))}
                     </span> */}
-          <div class='geometry-container'>
-            <div class='geometry-container'>
+          <div className='geometry-container'>
+            <div className='geometry-container'>
               <svg
                 id='geometry'
-                class='geometry-scene'
+                className='geometry-scene'
                 viewBox='0 0 800 800'
               />
               <svg
                 id='points'
-                class='geometry-scene'
+                className='geometry-scene'
                 viewBox='0 0 800 800'
               />
             </div>

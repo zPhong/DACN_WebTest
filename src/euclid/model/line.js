@@ -1,5 +1,4 @@
-
-import { Geom } from './geom'
+import {Geom} from './geom'
 
 class Line extends Geom {
   constructor(name, p1, p2) {
@@ -43,16 +42,24 @@ class Line extends Geom {
       },
 
       left: {
-        get() { return this._clip ? Math.min(this._p[0].x, this._p[1].x) : null; }
+        get() {
+          return this._clip ? Math.min(this._p[0].x, this._p[1].x) : null;
+        }
       },
       right: {
-        get() { return this._clip ? Math.max(this._p[0].x, this._p[1].x) : null; }
+        get() {
+          return this._clip ? Math.max(this._p[0].x, this._p[1].x) : null;
+        }
       },
       top: {
-        get() { return this._clip ? Math.min(this._p[0].y, this._p[1].y) : null; }
+        get() {
+          return this._clip ? Math.min(this._p[0].y, this._p[1].y) : null;
+        }
       },
       bottom: {
-        get() { return this._clip ? Math.max(this._p[0].y, this._p[1].y) : null; }
+        get() {
+          return this._clip ? Math.max(this._p[0].y, this._p[1].y) : null;
+        }
       }
 
     })
@@ -86,4 +93,4 @@ class Line extends Geom {
   }
 }
 
-export { Line }
+export {Line}
