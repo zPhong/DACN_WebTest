@@ -1,6 +1,9 @@
 // @flow
 
-import type { CircleEquation, CoordinateType, LinearEquation, Vector } from '../../types/types';
+import type { CircleEquation, CoordinateType, FirstDegreeEquation, LinearEquation, Vector } from '../../types/types';
+
+const INFINITY = 'vô cực';
+const IMPOSSIBLE = 'vô nghiệm';
 
 export function getStartPoint(): CoordinateType {
   return { x: 0, y: 0, z: 0 };
@@ -75,6 +78,7 @@ export function calculateDistanceFromPointToLine(point: CoordinateType, line: Li
   let numerator = Math.abs(line.coefficientX * point.x + line.coefficientY * point.y + line.constantTerm);
   let denominator = Math.sqrt(line.coefficientX * line.coefficientX + line.coefficientY * line.coefficientY);
 
+  if (denominator === 0) return INFINITY;
   return numerator / denominator;
 }
 
@@ -203,5 +207,92 @@ function _getPointInLineWithCondition(
 
   if (axis === 'horizontal') {
   } else {
+  }
+}
+
+export function calculateTwoVariablesFirstDegreeEquations(e1: FirstDegreeEquation, e2: FirstDegreeEquation) {
+  let y = (e1.a * e2.c - e2.a * e1.c) / (e1.a * e2.b - e2.a * e1.b);
+  let x = (e1.c - e1.b * y) / e1.a;
+
+  return { x, y };
+}
+
+/*
+ *  Find point(s) of intersection between a linear equation and a circle equation.
+ *  @params:
+ *        + d (LinearEquation): a line.
+ *        + c (CircleEquation): a circle.
+ *  @return:
+ *        + IMPOSSIBLE: if distance from center point of the circle to the line is greater than the radius.
+ *        + (Array<Object>): if the line intersects the circle.
+ *          + length = 1;
+ *          + length = 2;
+ */
+export function calculateIntersectionLinearEquationWithCircleEquation(
+  d: LinearEquation,
+  c: CircleEquation
+): Array<Object> {
+  const centerPoint: CoordinateType = { x: c.a, y: c.b };
+  let results: Array<Object> = [];
+
+  const distanceFromCenterPointToLine = calculateDistanceFromPointToLine(centerPoint, d);
+
+  if (distanceFromCenterPointToLine > c.r) {
+    return IMPOSSIBLE;
+  } else {
+    const u = d.coefficientX * d.coefficientX + d.coefficientY * d.coefficientY;
+    const v =
+      2 * d.coefficientX * d.coefficientY * c.b -
+      2 * d.coefficientX * d.constantTerm -
+      2 * c.a * d.coefficientY * d.coefficientY;
+    const w =
+      d.coefficientY * d.coefficientY * c.r * c.r -
+      d.coefficientY * d.coefficientY * c.a * c.a -
+      d.coefficientY * d.coefficientY * c.b * c.b +
+      2 * d.coefficientY * d.constantTerm * c.b -
+      d.constantTerm * d.constantTerm;
+
+    // solves x. Unneeded check IMPOSSIBLE.
+    const root = calculateQuadraticEquation(u, v, -w);
+
+    if (typeof root === 'number') {
+      results.push(Object({ x: root, y: (d.constantTerm - d.coefficientX * root) / d.coefficientY }));
+    } else {
+      results.push(
+        Object({ x: root.x1, y: (d.constantTerm - d.coefficientX * root.x1) / d.coefficientY }),
+        Object({ x: root.x2, y: (d.constantTerm - d.coefficientX * root.x2) / d.coefficientY })
+      );
+    }
+
+    return results;
+  }
+}
+
+/*
+ * Solves a quadratic equation. This equation is defined: Ax2 + Bx + C = 0
+ *  @params:
+ *        + a (number): represents x's coefficient.
+ *        + b (number): represents y's coefficient.
+ *        + c (number): represents constant term.
+ * @return:
+ *        + IMPOSSIBLE (string): if the equation is no root.
+ *        + (number): if the equation has only ONE root.
+ *        + x1, x2 (Object): if the equation has TWO root.
+ */
+export function calculateQuadraticEquation(a: number, b: number, c: number) {
+  const delta = b * b - 4 * a * c;
+  let x1,
+    x2: number = undefined;
+
+  if (a === 0) {
+    return -c / b;
+  } else if (delta < 0) {
+    return IMPOSSIBLE;
+  } else if (delta === 0) {
+    return -b / (2 * a);
+  } else {
+    x1 = (-b + Math.sqrt(delta)) / (2 * a);
+    x2 = (-b - Math.sqrt(delta)) / (2 * a);
+    return { x1, x2 };
   }
 }
