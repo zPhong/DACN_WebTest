@@ -38,6 +38,7 @@ export type DrawingDataType = {
   segment: Array<string>
 };
 
+// Ax + By + Cz + D = 0
 export type LinearEquation = {
   coefficientX: number,
   coefficientY: number,
@@ -57,3 +58,10 @@ export type CircleEquation = {
   b: number,
   r: number
 };
+
+// Ax + By = C
+export type FirstDegreeEquation = {
+  a: number,
+  b: number,
+  c: number
+}
