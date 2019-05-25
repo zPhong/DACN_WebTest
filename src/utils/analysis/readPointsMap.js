@@ -1,350 +1,365 @@
-import type {
-    NodeType,
-    NodeRelationType,
-    DrawingNodeType,
-    CoordinateType,
-    LinearEquation
-} from '../../types/types';
+import type { NodeType, NodeRelationType, DrawingNodeType, CoordinateType, LinearEquation } from '../../types/types';
 import appModel from '../../appModel';
 import {
-    calculateLinearPointFromTwoPoints,
-    calculateParallelLineByPointAndLine,
-    calculatePerpendicularLineByPointAndLine
+  calculateLinearPointFromTwoPoints,
+  calculateParallelLineByPointAndLine,
+  calculatePerpendicularLineByPointAndLine,
+  calculateDistanceTwoPoints,
+  calculateCircleEquationByCenterPoint
 } from '../math/Math2D';
-import { shapeRules, mappingShapeType } from '../../configuration/define';
+import { shapeRules, mappingShapeType, TwoStaticPointRequireShape } from '../../configuration/define';
 
 const executedRelations = [];
 const executedNode = [];
 
 export function readPointsMap(): Array<DrawingNodeType> {
-    while (!_isPointsMapStatic()) {
-        //get node to calculate
-        const executingNode = _getNextExecuteNode();
-        if (!executingNode) break;
+  while (!_isPointsMapStatic()) {
+    //get node to calculate
+    const executingNode = _getNextExecuteNode();
+    if (!executingNode) break;
 
-        const executingNodeRelations = _makeUniqueNodeRelation(
-            executingNode.dependentNodes
-        );
+    const executingNodeRelations = _makeUniqueNodeRelation(executingNode.dependentNodes);
 
-        executingNodeRelations.forEach(relation => {
-            if (relation.outputType === 'shape') {
-                const shapeName = Object.keys(relation).filter(
-                    key => key !== 'type'
-                )[0];
-                const shapeType = mappingShapeType[relation.type] || 'normal';
-                console.log(shapeType);
-                if (shapeRules[shapeName][shapeType]) {
-                    makeCorrectShape(
-                        relation[shapeName],
-                        shapeRules[shapeName][shapeType],
-                        executingNode.id
-                    );
-                }
-            }
-            if (!_isExecutedRelation(relation)) {
-                // calculate
-                executedRelations.push(relation);
-            }
-        });
+    executingNodeRelations.forEach((relation) => {
+      if (relation.outputType === 'shape') {
+        const shapeName = Object.keys(relation).filter((key) => key !== 'type')[0];
+        const shapeType = mappingShapeType[relation.type] || 'normal';
+        console.log(shapeType);
+        if (shapeRules[shapeName][shapeType]) {
+          makeCorrectShape(
+            relation[shapeName],
+            shapeName,
+            shapeRules[shapeName][shapeType],
+            executingNode.id,
+            relation[shapeName].split('').filter((string) => !_isStaticNodeById(string) && string !== executingNode.id)
+          );
+        }
+      }
+      if (!_isExecutedRelation(relation)) {
+        // calculate
+        executedRelations.push(relation);
+      }
+    });
 
-        //Update calculated value to pointsMap
-        _updatePointsMap(executingNode);
-        executedNode.push(executingNode.id);
+    //Update calculated value to pointsMap
+    _updatePointsMap(executingNode);
+    executedNode.push(executingNode.id);
 
-        //update static Node
-        _updateStaticNode();
-    }
+    //update static Node
+    _updateStaticNode();
+  }
 
-    return appModel.pointsMap.map(node => ({
-        id: node.id,
-        coordinate: node.coordinate
-    }));
+  return appModel.pointsMap.map((node) => ({
+    id: node.id,
+    coordinate: node.coordinate
+  }));
 }
 
 function _isStaticNode(node: NodeType): boolean {
-    if (node.isStatic) return true;
-    for (let i = 0; i < node.dependentNodes.length; i++) {
-        if (!_isExecutedRelation(node.dependentNodes[i].relation)) return false;
-    }
+  if (node.isStatic) return true;
+  for (let i = 0; i < node.dependentNodes.length; i++) {
+    if (!_isExecutedRelation(node.dependentNodes[i].relation)) return false;
+  }
 
-    return executedNode.includes(node.id);
+  return executedNode.includes(node.id);
 }
 
 function _isExecutedRelation(relation: any): boolean {
-    for (let i = 0; i < executedRelations.length; i++) {
-        if (relation === executedRelations[i]) return true;
-    }
-    return false;
+  for (let i = 0; i < executedRelations.length; i++) {
+    if (relation === executedRelations[i]) return true;
+  }
+  return false;
 }
 
 function _updateStaticNode() {
-    appModel.pointsMap = appModel.pointsMap.map(
-        (node: NodeType): NodeType => {
-            node.isStatic = _isStaticNode(node);
-            return node;
-        }
-    );
+  appModel.pointsMap = appModel.pointsMap.map(
+    (node: NodeType): NodeType => {
+      node.isStatic = _isStaticNode(node);
+      return node;
+    }
+  );
 }
 
 function _updatePointsMap(node: NodeType) {
-    let index = _getIndexOfNodeInPointsMapById(node.id);
-    appModel.pointsMap[index] = node;
+  let index = _getIndexOfNodeInPointsMapById(node.id);
+  appModel.pointsMap[index] = node;
 }
 
 function _isPointsMapStatic(): boolean {
-    for (let i = 0; i < appModel.pointsMap.length; i++) {
-        if (!appModel.pointsMap[i].isStatic) return false;
-    }
-    return true;
+  for (let i = 0; i < appModel.pointsMap.length; i++) {
+    if (!appModel.pointsMap[i].isStatic) return false;
+  }
+  return true;
 }
 
 function _getNextExecuteNode(): NodeType {
-    const clonePointsMap = [...appModel.pointsMap]
-        .filter(node => !executedNode.includes(node.id))
-        .sort(sortNodeByPriority);
+  const clonePointsMap = [...appModel.pointsMap]
+    .filter((node) => !executedNode.includes(node.id))
+    .sort(sortNodeByPriority);
 
-    console.log(clonePointsMap);
-    if (clonePointsMap.length > 0) return clonePointsMap[0];
-    return null;
+  console.log(clonePointsMap);
+  if (clonePointsMap.length > 0) return clonePointsMap[0];
+  return null;
 }
 
 function sortNodeByPriority(nodeOne: NodeType, nodeTwo: NodeType): number {
-    const staticNodeOneCount = _getDependentStaticNodeCount(nodeOne);
-    const nodeOneData = {
-        static: staticNodeOneCount,
-        nonStatic: nodeOne.dependentNodes.length - staticNodeOneCount,
-        dependence: nodeOne.dependentNodes.length,
-        minRelationIndex: _getMinIndexOfDependentNodeInRelationsList(nodeOne),
-        index: _getIndexOfNodeInPointsMap(nodeOne)
-    };
+  const staticNodeOneCount = _getDependentStaticNodeCount(nodeOne);
+  const nodeOneData = {
+    static: staticNodeOneCount,
+    nonStatic: nodeOne.dependentNodes.length - staticNodeOneCount,
+    dependence: nodeOne.dependentNodes.length,
+    minRelationIndex: _getMinIndexOfDependentNodeInRelationsList(nodeOne),
+    index: _getIndexOfNodeInPointsMap(nodeOne)
+  };
 
-    const staticNodeTwoCount = _getDependentStaticNodeCount(nodeTwo);
-    const nodeTwoData = {
-        static: staticNodeTwoCount,
-        nonStatic: nodeTwo.dependentNodes.length - staticNodeTwoCount,
-        dependence: nodeTwo.dependentNodes.length,
-        minRelationIndex: _getMinIndexOfDependentNodeInRelationsList(nodeTwo),
-        index: _getIndexOfNodeInPointsMap(nodeTwo)
-    };
+  const staticNodeTwoCount = _getDependentStaticNodeCount(nodeTwo);
+  const nodeTwoData = {
+    static: staticNodeTwoCount,
+    nonStatic: nodeTwo.dependentNodes.length - staticNodeTwoCount,
+    dependence: nodeTwo.dependentNodes.length,
+    minRelationIndex: _getMinIndexOfDependentNodeInRelationsList(nodeTwo),
+    index: _getIndexOfNodeInPointsMap(nodeTwo)
+  };
 
-    //get Max
-    const rankingOrderDesc = ['dependence', 'static'];
+  //get Max
+  const rankingOrderDesc = ['dependence', 'static'];
 
-    //get Min
-    const rankingOrderAsc = ['nonStatic', 'minRelationIndex', 'index'];
+  //get Min
+  const rankingOrderAsc = ['nonStatic', 'minRelationIndex', 'index'];
 
-    let rankOne = nodeOneData.static === nodeOneData.dependence ? '1' : '0';
-    let rankTwo = nodeTwoData.static === nodeTwoData.dependence ? '1' : '0';
+  let rankOne = nodeOneData.static === nodeOneData.dependence ? '1' : '0';
+  let rankTwo = nodeTwoData.static === nodeTwoData.dependence ? '1' : '0';
 
-    rankingOrderDesc.forEach(key => {
-        if (nodeOneData[key] > nodeTwoData[key]) {
-            rankOne += '1';
-            rankTwo += '0';
-        } else if (nodeOneData[key] === nodeTwoData[key]) {
-            rankOne += '1';
-            rankTwo += '1';
-        } else {
-            rankOne += '0';
-            rankTwo += '1';
-        }
-    });
+  rankingOrderDesc.forEach((key) => {
+    if (nodeOneData[key] > nodeTwoData[key]) {
+      rankOne += '1';
+      rankTwo += '0';
+    } else if (nodeOneData[key] === nodeTwoData[key]) {
+      rankOne += '1';
+      rankTwo += '1';
+    } else {
+      rankOne += '0';
+      rankTwo += '1';
+    }
+  });
 
-    rankingOrderAsc.forEach(key => {
-        if (nodeOneData[key] < nodeTwoData[key]) {
-            rankOne += '1';
-            rankTwo += '0';
-        } else if (nodeOneData[key] === nodeTwoData[key]) {
-            rankOne += '1';
-            rankTwo += '1';
-        } else {
-            rankOne += '0';
-            rankTwo += '1';
-        }
-    });
+  rankingOrderAsc.forEach((key) => {
+    if (nodeOneData[key] < nodeTwoData[key]) {
+      rankOne += '1';
+      rankTwo += '0';
+    } else if (nodeOneData[key] === nodeTwoData[key]) {
+      rankOne += '1';
+      rankTwo += '1';
+    } else {
+      rankOne += '0';
+      rankTwo += '1';
+    }
+  });
 
-    return parseInt(rankTwo) - parseInt(rankOne);
+  return parseInt(rankTwo) - parseInt(rankOne);
 }
 
 function _getMinIndexOfDependentNodeInRelationsList(node: NodeType) {
-    const indexArray = [];
-    for (let i = 0; i < node.dependentNodes.length; i++) {
-        indexArray.push(
-            _getIndexOfRelationInRelationsList(node.dependentNodes[i])
-        );
-    }
+  const indexArray = [];
+  for (let i = 0; i < node.dependentNodes.length; i++) {
+    indexArray.push(_getIndexOfRelationInRelationsList(node.dependentNodes[i]));
+  }
 
-    return Math.min(...indexArray);
+  return Math.min(...indexArray);
 }
 
 function _getIndexOfRelationInRelationsList(relation: any): number {
-    const list = [
-        ...appModel.relationsResult.shapes,
-        ...appModel.relationsResult.relations
-    ];
-    for (let i = 0; i < list.length; i++) {
-        if (relation === list[i]) return i;
-    }
-    return 99;
+  const list = [...appModel.relationsResult.shapes, ...appModel.relationsResult.relations];
+  for (let i = 0; i < list.length; i++) {
+    if (relation === list[i]) return i;
+  }
+  return 99;
 }
 
 function _getDependentStaticNodeCount(node: NodeType): number {
-    let count = 0;
-    for (let i = 0; i < node.dependentNodes.length; i++) {
-        if (_isStaticNodeById(node.dependentNodes[i].id)) count++;
-    }
+  let count = 0;
+  for (let i = 0; i < node.dependentNodes.length; i++) {
+    if (_isStaticNodeById(node.dependentNodes[i].id)) count++;
+  }
 
-    return count;
+  return count;
 }
 
 function _getIndexOfNodeInPointsMap(node): number {
-    for (let i = 0; i < appModel.pointsMap.length; i++) {
-        if (node === appModel.pointsMap[i]) return i;
-    }
-    return 99;
+  for (let i = 0; i < appModel.pointsMap.length; i++) {
+    if (node === appModel.pointsMap[i]) return i;
+  }
+  return 99;
 }
 
 function _getIndexOfNodeInPointsMapById(id: string): number {
-    for (let i = 0; i < appModel.pointsMap.length; i++) {
-        if (id === appModel.pointsMap[i].id) return i;
-    }
-    return 99;
+  for (let i = 0; i < appModel.pointsMap.length; i++) {
+    if (id === appModel.pointsMap[i].id) return i;
+  }
+  return 99;
 }
 
 function _isStaticNodeById(id: string): boolean {
-    for (let i = 0; i < appModel.pointsMap.length; i++) {
-        if (id === appModel.pointsMap[i].id) {
-            return _isStaticNode(appModel.pointsMap[i]);
-        }
+  for (let i = 0; i < appModel.pointsMap.length; i++) {
+    if (id === appModel.pointsMap[i].id) {
+      return _isStaticNode(appModel.pointsMap[i]);
     }
-    return false;
+  }
+  return false;
 }
 
-export function _makeUniqueNodeRelation(
-    dependentNodes: Array<NodeRelationType>
-): Array<any> {
-    let result: Array<NodeRelationType> = [];
-    for (let index = 0; index < dependentNodes.length; index++) {
-        let temp = true;
+export function _makeUniqueNodeRelation(dependentNodes: Array<NodeRelationType>): Array<any> {
+  let result: Array<NodeRelationType> = [];
+  for (let index = 0; index < dependentNodes.length; index++) {
+    let temp = true;
 
-        for (let i = 0; i < result.length; i++) {
-            if (dependentNodes[index].relation === result[i]) {
-                temp = false;
-                break;
-            }
-        }
-
-        if (temp) result.push(dependentNodes[index].relation);
+    for (let i = 0; i < result.length; i++) {
+      if (dependentNodes[index].relation === result[i]) {
+        temp = false;
+        break;
+      }
     }
-    return result;
+
+    if (temp) result.push(dependentNodes[index].relation);
+  }
+  return result;
 }
 
 function makeCorrectShape(
-    shape: string,
-    rules: string,
-    nonStaticPoint: string
+  shape: string,
+  shapeName: string,
+  rules: string,
+  nonStaticPoint: string,
+  exceptionPoints: string[]
 ) {
-    let staticPoints = shape.replace(nonStaticPoint, '').split('');
+  const staticPointCountRequire = TwoStaticPointRequireShape.includes(shapeName) ? 2 : 1;
+  let staticPoints = shape.replace(nonStaticPoint, '').split('');
 
-    // check all other points are static
-    for (let i = 0; i < staticPoints.length; i++) {
-        if (!_isStaticNodeById(staticPoints[i])) {
-            return;
+  // check other points are static
+  let count = 0;
+  for (let i = 0; i < staticPoints.length; i++) {
+    if (_isStaticNodeById(staticPoints[i])) {
+      count++;
+    }
+  }
+  if (count < staticPointCountRequire) {
+    return;
+  }
+
+  // get node infomation
+  const points = shape
+    .split('')
+    .map((point: string): NodeType => appModel.pointsMap[_getIndexOfNodeInPointsMapById(point)]);
+  let arrayRules = rules.split(new RegExp('&', 'g'));
+
+  const nonStaticIndex = shape.indexOf(nonStaticPoint);
+
+  const exceptionIndexArray = exceptionPoints.map((point: string): number => shape.indexOf(point));
+  arrayRules = arrayRules.filter((rule) => {
+    for (let index in exceptionIndexArray) {
+      if (rule.includes(exceptionIndexArray[index])) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  console.log('---------------------------');
+  if (arrayRules.length > 0) {
+    arrayRules.forEach((rule) => {
+      const relationType = rule[2];
+      console.log(rule, nonStaticIndex);
+      if (rule.includes(nonStaticIndex))
+        // eslint-disable-next-line default-case
+        switch (relationType) {
+          case '|':
+            console.log(getLinearEquationByParallelRule(rule, points, nonStaticIndex));
+            break;
+          case '^':
+            console.log(getLinearPerpendicularByParallelRule(rule, points, nonStaticIndex));
+            break;
+          case '=':
+            console.log('equal');
+            break;
         }
+    });
+  }
+}
+
+function getLinearEquationsByEqualRule(rule: string, arrayPoints: Array<NodeType>, nonStaticIndex: number) {
+  const lines = rule.split('|');
+  let staticLine;
+  let nonStaticLines = [];
+  // points with non-static point;
+  let staticPoints = [];
+  lines.forEach((line) => {
+    if (line.includes(nonStaticIndex)) {
+      nonStaticLines.push(line);
+      staticPoints.push(line.replace(nonStaticIndex, ''));
+    } else {
+      staticLine = line;
     }
+  });
 
-    // get node infomation
-    const points = shape
-        .split('')
-        .map(
-            (point: string): NodeType =>
-                appModel.pointsMap[_getIndexOfNodeInPointsMapById(point)]
-        );
-    const arrayRules = rules.split(new RegExp('&', 'g'));
+  //1 circle equation
+  if (staticLine) {
+    const radius = calculateDistanceTwoPoints(staticLine[0].coordinate, staticLine[1].coordinate);
 
-    const nonStaticIndex = shape.indexOf(nonStaticPoint);
+    return calculateCircleEquationByCenterPoint(staticPoints[0], radius);
+  }
 
-    if (arrayRules.length > 0) {
-        arrayRules.forEach(rule => {
-            const relationType = rule[2];
-            if (rule.includes(nonStaticIndex))
-                // eslint-disable-next-line default-case
-                switch (relationType) {
-                    case '|':
-                        console.log(
-                            getLinearEquationByParallelRule(
-                                rule,
-                                points,
-                                nonStaticIndex
-                            )
-                        );
-                        break;
-                    case '^':
-                        console.log(
-                            getLinearPerpendicularByParallelRule(
-                                rule,
-                                points,
-                                nonStaticIndex
-                            )
-                        );
-                        break;
-                    case '=':
-                        console.log('equal');
-                        break;
-                }
-        });
-    }
+  // tam giác đều
+  const radius = calculateDistanceTwoPoints(staticPoints[0].coordinate, staticPoints[1].coordinate);
+
+  const circleOne = calculateCircleEquationByCenterPoint(staticPoints[0], radius);
+
+  const circleTwo = calculateCircleEquationByCenterPoint(staticPoints[1], radius);
 }
 
 function getLinearEquationByParallelRule(
-    rule: string,
-    arrayPoints: Array<NodeType>,
-    nonStaticIndex: number
+  rule: string,
+  arrayPoints: Array<NodeType>,
+  nonStaticIndex: number
 ): LinearEquation {
-    const lines = rule.split('|');
-    let staticLine, nonStaticLine;
-    lines.forEach(line => {
-        if (line.includes(nonStaticIndex)) {
-            nonStaticLine = line;
-        } else {
-            staticLine = line;
-        }
-    });
+  const lines = rule.split('|');
+  let staticLine, nonStaticLine;
+  lines.forEach((line) => {
+    if (line.includes(nonStaticIndex)) {
+      nonStaticLine = line;
+    } else {
+      staticLine = line;
+    }
+  });
 
-    return calculateParallelLineByPointAndLine(
-        //point
-        arrayPoints[nonStaticLine.replace(nonStaticIndex, '')].coordinate,
-        //line
-        calculateLinearPointFromTwoPoints(
-            arrayPoints[staticLine[0]].coordinate,
-            arrayPoints[staticLine[1]].coordinate
-        )
-    );
+  return calculateParallelLineByPointAndLine(
+    //point
+    arrayPoints[nonStaticLine.replace(nonStaticIndex, '')].coordinate,
+    //line
+    calculateLinearPointFromTwoPoints(arrayPoints[staticLine[0]].coordinate, arrayPoints[staticLine[1]].coordinate)
+  );
 }
 
 function getLinearPerpendicularByParallelRule(
-    rule: string,
-    arrayPoints: Array<NodeType>,
-    nonStaticIndex: number
+  rule: string,
+  arrayPoints: Array<NodeType>,
+  nonStaticIndex: number
 ): LinearEquation {
-    const lines = rule.split('|');
-    let staticLine, nonStaticLine;
-    lines.forEach(line => {
-        if (line.includes(nonStaticIndex)) {
-            nonStaticLine = line;
-        } else {
-            staticLine = line;
-        }
-    });
+  const lines = rule.split('|');
+  let staticLine, nonStaticLine;
+  lines.forEach((line) => {
+    if (line.includes(nonStaticIndex)) {
+      nonStaticLine = line;
+    } else {
+      staticLine = line;
+    }
+  });
 
-    return calculatePerpendicularLineByPointAndLine(
-        //point
-        arrayPoints[nonStaticLine.replace(nonStaticIndex, '')].coordinate,
-        //line
-        calculateLinearPointFromTwoPoints(
-            arrayPoints[staticLine[0]].coordinate,
-            arrayPoints[staticLine[1]].coordinate
-        )
-    );
+  return calculatePerpendicularLineByPointAndLine(
+    //point
+    arrayPoints[nonStaticLine.replace(nonStaticIndex, '')].coordinate,
+    //line
+    calculateLinearPointFromTwoPoints(arrayPoints[staticLine[0]].coordinate, arrayPoints[staticLine[1]].coordinate)
+  );
 }
 
 function _calculatePointCoordinate(): CoordinateType {}

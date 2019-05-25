@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 import './css/App.css';
-import type {CoordinateType, LinearEquation} from "./types/types";
+import type {CoordinateType, LinearEquation} from './types/types';
 import {
   calculateDistanceTwoPoints,
   calculateLinearPointFromTwoPoints,
   calculateParallelEquation
-} from "./utils/math/Math2D";
+} from './utils/math/Math2D';
 
 class TestMath extends Component {
   render() {
@@ -15,25 +15,16 @@ class TestMath extends Component {
 
     const equation = calculateParallelEquation(linearEquation);
     return (
-       <div className="container">
-         <div className="row">
-           {console.log(equation.constantTerm)}
-           {equation.coefficientX}x
-
-           {equation.coefficientY === 0 ? '' :
-              equation.coefficientY > 0 ? '+' : ''}
-           {equation.coefficientY === 0 ? '' : `${equation.coefficientY}y`}
-
-           {equation.constantTerm === 0 ? '' :
-              equation.constantTerm > 0 ? '+' : ''}
-           {equation.constantTerm === 0 ? '' : `${equation.constantTerm}`}
-
-           = 0
-         </div>
-         <div>
-           {calculateDistanceTwoPoints(firstPoint, secondPoint)}
-         </div>
-       </div>
+      <div className="container">
+        <div className="row">
+          {console.log(equation.constantTerm)}
+          {equation.coefficientX}x{equation.coefficientY === 0 ? '' : equation.coefficientY > 0 ? '+' : ''}
+          {equation.coefficientY === 0 ? '' : `${equation.coefficientY}y`}
+          {equation.constantTerm === 0 ? '' : equation.constantTerm > 0 ? '+' : ''}
+          {equation.constantTerm === 0 ? '' : `${equation.constantTerm}`}= 0
+        </div>
+        <div>{calculateDistanceTwoPoints(firstPoint, secondPoint)}</div>
+      </div>
     );
   }
 }
