@@ -1,4 +1,3 @@
-import appModel from '../../appModel';
 import type { CoordinateType, LinearEquation } from '../../types/types';
 import { updateCoordinate } from './readPointsMap';
 import { calculateDistanceTwoPoints, calculateLinearEquationFromTwoPoints, getRandomValue } from '../math/Math2D';
@@ -242,13 +241,13 @@ function generateRhombus(name: string) {
     // p2 represents point B
     const p2: CoordinateType = {
       x: getRandomValue(p1.x + 1, p1.x + 50),
-      y: getRandomValue(p1.y + 1, p1.y + 50)
+      y: -getRandomValue(p1.y + 1, p1.y + 50)
     };
     updateCoordinate(name[1], p2);
 
     // p3 represents point C
     const p3: CoordinateType = {
-      x: 2 * (p2.x - p1.x),
+      x: 2 * Math.abs(p2.x - p1.x),
       y: p1.y
     };
     updateCoordinate(name[2], p3);
@@ -256,7 +255,7 @@ function generateRhombus(name: string) {
     // p4 represents point D
     const p4: CoordinateType = {
       x: p2.x,
-      y: 2 * (p2.y - p1.y)
+      y: Math.abs(-p2.y - p1.y)
     };
     updateCoordinate(name[3], p4);
   }
