@@ -6,6 +6,10 @@ export function getStartPoint(): CoordinateType {
   return { x: 0, y: 0, z: 0 };
 }
 
+export function getRandomValue(min: number, max: number): number {
+  return Math.floor(Math.random() * max) + min;
+}
+
 export function calculateMiddlePoint(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
   let middlePoint: CoordinateType = { z: 0 };
   middlePoint.x = (firstPoint.x + secondPoint.x) / 2;
@@ -26,7 +30,7 @@ export function calculateLinearPointFromTwoPoints(
   normalVector.a = directionVector.b;
   normalVector.b = -directionVector.a;
 
-  const constantTerm = Math.floor(Math.random() * 100) - 50;
+  const constantTerm = firstPoint.y - normalVector.a * firstPoint.x;
 
   let linearEquation: LinearEquation = {};
   linearEquation.coefficientX = normalVector.a;

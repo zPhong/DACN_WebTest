@@ -1,17 +1,17 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import './css/App.css';
-import type {CoordinateType, LinearEquation} from './types/types';
+import type { CoordinateType, LinearEquation } from './types/types';
 import {
   calculateDistanceTwoPoints,
-  calculateLinearPointFromTwoPoints,
+  calculateLinearEquationFromTwoPoints,
   calculateParallelEquation
 } from './utils/math/Math2D';
 
 class TestMath extends Component {
   render() {
-    const firstPoint: CoordinateType = {x: 1, y: 2, z: 0};
-    const secondPoint: CoordinateType = {x: 7, y: 3, z: 0};
-    const linearEquation: LinearEquation = calculateLinearPointFromTwoPoints(firstPoint, secondPoint);
+    const firstPoint: CoordinateType = { x: 1, y: 2, z: 0 };
+    const secondPoint: CoordinateType = { x: 7, y: 3, z: 0 };
+    const linearEquation: LinearEquation = calculateLinearEquationFromTwoPoints(firstPoint, secondPoint);
 
     const equation = calculateParallelEquation(linearEquation);
     return (

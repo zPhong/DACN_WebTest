@@ -4,6 +4,12 @@ export type CoordinateType = {
   z: number
 };
 
+export type HasFixedCoordinateType = {
+  fixedX: boolean,
+  fixedY: boolean,
+  fixedZ: boolean
+};
+
 export type DrawingNodeType = {
   id: string,
   coordinate: CoordinateType
@@ -18,6 +24,7 @@ export type NodeType = {
   id: string,
   isStatic: boolean,
   coordinate: CoordinateType,
+  hasFixedCoordinate: HasFixedCoordinateType,
   dependentNodes: Array<NodeRelationType>
 };
 

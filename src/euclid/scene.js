@@ -1,13 +1,5 @@
-
-import * as d3 from "d3";
-import {
-  Point,
-  Circle,
-  Segment,
-  Line,
-  equalWithin,
-  Intersection
-} from './model';
+import * as d3 from 'd3';
+import { Circle, equalWithin, Intersection, Line, Point, Segment } from './model';
 
 function addClass(obj, klass) {
   obj.classes = obj.classes || d3.set();
@@ -15,7 +7,6 @@ function addClass(obj, klass) {
 }
 
 class Scene {
-
   constructor(bounds) {
     this.bounds = bounds;
     this.bounds.width = this.bounds.right - this.bounds.left;
@@ -29,7 +20,7 @@ class Scene {
 
   /* return an array of all Points in the scene */
   points() {
-    return this._objects.values().filter(o => o instanceof Point)
+    return this._objects.values().filter((o) => o instanceof Point);
   }
 
   /* return an array of all objects in the scene */
@@ -47,26 +38,30 @@ class Scene {
     return null;
   }
 
-  /**  
-   * is - Get an equality-testing callback for the given object.  
-   *    
+  /**
+   * is - Get an equality-testing callback for the given object.
+   *
    * @param  {Geom|string} obj Either the name of the object to test or the object itself.
    * @return {Geom~boolean} a function that tests whether its argument is geometrically equal to obj.
    */
   is(obj) {
-    if (typeof obj === 'string') { obj = this.get(obj); }
-    return (secondObj) => (obj && this.equal(obj, secondObj));
+    if (typeof obj === 'string') {
+      obj = this.get(obj);
+    }
+    return (secondObj) => obj && this.equal(obj, secondObj);
   }
 
-  /**  
-  * is - Get an NON-equality-testing callback for the given object.  
-  *    
-  * @param  {Geom|string} obj Either the name of the object to test or the object itself.
-  * @return {Geom~boolean} a function that tests whether its argument is NOT geometrically equal to obj.
-  */
+  /**
+   * is - Get an NON-equality-testing callback for the given object.
+   *
+   * @param  {Geom|string} obj Either the name of the object to test or the object itself.
+   * @return {Geom~boolean} a function that tests whether its argument is NOT geometrically equal to obj.
+   */
   isnt(obj) {
-    if (typeof obj === 'string') { obj = this.get(obj); }
-    return (secondObj) => (obj && !this.equal(obj, secondObj));
+    if (typeof obj === 'string') {
+      obj = this.get(obj);
+    }
+    return (secondObj) => obj && !this.equal(obj, secondObj);
   }
 
   last() {
@@ -117,7 +112,7 @@ class Scene {
     // if we already have this object, and it's the same type, then update the
     // existing one in place.
     let existing = this._objects.get(object.name);
-    if (existing && (existing.constructor.name === object.constructor.name)) {
+    if (existing && existing.constructor.name === object.constructor.name) {
       for (let prop in object) existing[prop] = object[prop];
       object = existing;
     }
@@ -149,17 +144,18 @@ class Scene {
     return 'object' + id;
   }
 
-  /**  
+  /**
    * update - Update objects to reflect changes in dependent objects. (E.g.,
    * update Intersection coordinates when the intersected objects have changed.)
-   *    
-   * @param {Geom} root The object from which to start walking the dependency graph.  
+   *
+   * @param {Geom} root The object from which to start walking the dependency graph.
    */
   // TODO: respect `root` parameter, and do an actual DAG walk.
   update(root) {
-    this._objects.values()
-      .filter(obj => obj instanceof Intersection)
-      .forEach(obj => obj.update())
+    this._objects
+      .values()
+      .filter((obj) => obj instanceof Intersection)
+      .forEach((obj) => obj.update());
   }
 
   logState(label) {
@@ -169,11 +165,11 @@ class Scene {
 
     let state = {
       label,
-      time: (new Date()).toString(),
-      objects: objects.map(o => o.toString()),
-    }
+      time: new Date().toString(),
+      objects: objects.map((o) => o.toString())
+    };
     this.log.push(state);
   }
 }
 
-export { Scene }
+export { Scene };

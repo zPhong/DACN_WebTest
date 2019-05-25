@@ -1,9 +1,8 @@
-import { Geom } from './geom'
-import { Point } from './point'
+import { Geom } from './geom';
+import { Point } from './point';
 import { distance, distanceSquared } from '../calc';
 
 class Circle extends Geom {
-
   constructor(name, center, a) {
     if (typeof a === 'undefined') {
       a = center;
@@ -44,7 +43,7 @@ class Circle extends Geom {
           return distanceSquared(this.boundaryPoint, this.center);
         }
       }
-    })
+    });
   }
 
   y(x) {
@@ -65,4 +64,4 @@ class Circle extends Geom {
   }
 }
 
-export { Circle }
+export { Circle };

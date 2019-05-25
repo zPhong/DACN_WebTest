@@ -11,6 +11,7 @@ import { shapeRules, mappingShapeType, TwoStaticPointRequireShape } from '../../
 
 const executedRelations = [];
 const executedNode = [];
+const NOT_FOUND = 99;
 
 export function readPointsMap(): Array<DrawingNodeType> {
   while (!_isPointsMapStatic()) {
@@ -53,6 +54,13 @@ export function readPointsMap(): Array<DrawingNodeType> {
     id: node.id,
     coordinate: node.coordinate
   }));
+}
+
+export function updateCoordinate(nodeId: string, coordinate: CoordinateType): void {
+  const index = _getIndexOfNodeInPointsMapById(nodeId);
+  if (index !== NOT_FOUND) {
+    appModel.pointsMap[index].coordinate = coordinate;
+  }
 }
 
 function _isStaticNode(node: NodeType): boolean {
@@ -173,7 +181,7 @@ function _getIndexOfRelationInRelationsList(relation: any): number {
   for (let i = 0; i < list.length; i++) {
     if (relation === list[i]) return i;
   }
-  return 99;
+  return NOT_FOUND;
 }
 
 function _getDependentStaticNodeCount(node: NodeType): number {
@@ -189,14 +197,14 @@ function _getIndexOfNodeInPointsMap(node): number {
   for (let i = 0; i < appModel.pointsMap.length; i++) {
     if (node === appModel.pointsMap[i]) return i;
   }
-  return 99;
+  return NOT_FOUND;
 }
 
 function _getIndexOfNodeInPointsMapById(id: string): number {
   for (let i = 0; i < appModel.pointsMap.length; i++) {
     if (id === appModel.pointsMap[i].id) return i;
   }
-  return 99;
+  return NOT_FOUND;
 }
 
 function _isStaticNodeById(id: string): boolean {
@@ -210,6 +218,7 @@ function _isStaticNodeById(id: string): boolean {
 
 export function _makeUniqueNodeRelation(dependentNodes: Array<NodeRelationType>): Array<any> {
   let result: Array<NodeRelationType> = [];
+
   for (let index = 0; index < dependentNodes.length; index++) {
     let temp = true;
 
@@ -344,22 +353,50 @@ function getLinearPerpendicularByParallelRule(
   arrayPoints: Array<NodeType>,
   nonStaticIndex: number
 ): LinearEquation {
-  const lines = rule.split('|');
-  let staticLine, nonStaticLine;
+  const lines = rule.split('^');
+  let staticLine;
+  let nonStaticLines = [];
+  // points with non-static point;
+  let staticPoints = [];
   lines.forEach((line) => {
     if (line.includes(nonStaticIndex)) {
-      nonStaticLine = line;
+      nonStaticLines.push(line);
+      staticPoints.push(line.replace(nonStaticIndex, ''));
     } else {
       staticLine = line;
     }
   });
 
-  return calculatePerpendicularLineByPointAndLine(
-    //point
-    arrayPoints[nonStaticLine.replace(nonStaticIndex, '')].coordinate,
-    //line
-    calculateLinearPointFromTwoPoints(arrayPoints[staticLine[0]].coordinate, arrayPoints[staticLine[1]].coordinate)
-  );
+  if (staticLine) {
+    return calculatePerpendicularLineByPointAndLine(
+      //point
+      arrayPoints[nonStaticLines[0].replace(nonStaticIndex, '')].coordinate,
+      //line
+      calculateLinearPointFromTwoPoints(arrayPoints[staticLine[0]].coordinate, arrayPoints[staticLine[1]].coordinate)
+    );
+  }
 }
 
-function _calculatePointCoordinate(): CoordinateType {}
+function _calculatePointCoordinate(node: NodeType): CoordinateType {
+  if (node.isStatic) {
+    return node.coordinate;
+  }
+
+  const executingNodeRelation = _makeUniqueNodeRelation(node.dependentNodes);
+  for (let i = 0; i < executingNodeRelation; i++) {
+    // TODO: calculate point
+    if (executingNodeRelation[i].relation.outputType === 'shape') {
+      if (!_isExecutedRelation(executingNodeRelation[i].relation)) {
+        // generate point
+        // ...
+        executedRelations.push(executingNodeRelation[i].relation);
+      }
+    }
+
+    if (node.dependentNodes[i].relation.outputType === 'define') {
+    }
+  }
+
+  node.isStatic = true;
+  return node;
+}
