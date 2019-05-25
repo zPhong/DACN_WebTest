@@ -1,4 +1,4 @@
-import type {NodeType, RelationsResultType} from './types/types';
+import type { NodeType, RelationsResultType } from './types/types';
 
 class AppModel {
   relationsResult: RelationsResultType = {};

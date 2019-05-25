@@ -1,17 +1,12 @@
-import {RankingObjectContain, validate} from '../../configuration/define';
-import {checkFormatString} from '../definition/defineObjType';
+import { RankingObjectContain, validate } from '../../configuration/define';
+import { checkFormatString } from '../definition/defineObjType';
 
 export function validateValue(value, type) {
   if (!_validateName(value.value)) return false;
 
   const validateGeometryType = validate.object[type];
   let validateType;
-  if (
-    value.key === 'value' ||
-    value.key === 'relation' ||
-    value.key === 'undefined'
-  )
-    return true;
+  if (value.key === 'value' || value.key === 'relation' || value.key === 'undefined') return true;
   if (value.key === 'angle') if (!validateAngle(value.value)) return false;
 
   if (validateGeometryType.includes(value.key) || value.key !== 'object') {
@@ -19,11 +14,7 @@ export function validateValue(value, type) {
     validateType = validate[value.key];
     if (validateType && format)
       if (validateType.format) {
-        if (
-          format === validateType.format &&
-          value.value.length === validateType.length
-        )
-          return true;
+        if (format === validateType.format && value.value.length === validateType.length) return true;
       } else if (value.value.length === validateType.length) {
         return true;
       }
@@ -43,9 +34,7 @@ function validateShape(shape) {
   //check format of shape value
   const value = shape[keys[0]];
   const format = checkFormatString(shape[keys[0]]);
-  const shapeFormatCheck =
-    format === validateShapeFormat.format &&
-    value.length === validateShapeFormat.length;
+  const shapeFormatCheck = format === validateShapeFormat.format && value.length === validateShapeFormat.length;
 
   //check type of shape
   const type = shape.type || '';
@@ -57,48 +46,22 @@ function validateShape(shape) {
 function validateDataRelationship(data) {
   const keys = Object.keys(data);
 
-  for (
-    let indexOfRankingLevel = 0;
-    indexOfRankingLevel < RankingObjectContain.length - 1;
-    indexOfRankingLevel++
-  ) {
+  for (let indexOfRankingLevel = 0; indexOfRankingLevel < RankingObjectContain.length - 1; indexOfRankingLevel++) {
     for (
       let indexOfObjectCurrentLevel = 0;
-      indexOfObjectCurrentLevel <
-      RankingObjectContain[indexOfRankingLevel].length;
+      indexOfObjectCurrentLevel < RankingObjectContain[indexOfRankingLevel].length;
       indexOfObjectCurrentLevel++
     ) {
       for (
         let indexOfObjectNextLevel = 0;
-        indexOfObjectNextLevel <
-        RankingObjectContain[indexOfRankingLevel + 1].length;
+        indexOfObjectNextLevel < RankingObjectContain[indexOfRankingLevel + 1].length;
         indexOfObjectNextLevel++
       )
-        if (
-          keys.includes(
-            RankingObjectContain[indexOfRankingLevel][
-              indexOfObjectCurrentLevel
-              ]
-          )
-        ) {
-          if (
-            data[
-              RankingObjectContain[indexOfRankingLevel + 1][
-                indexOfObjectNextLevel
-                ]
-              ]
-          )
+        if (keys.includes(RankingObjectContain[indexOfRankingLevel][indexOfObjectCurrentLevel])) {
+          if (data[RankingObjectContain[indexOfRankingLevel + 1][indexOfObjectNextLevel]])
             return checkObjectRelationship(
-              data[
-                RankingObjectContain[indexOfRankingLevel][
-                  indexOfObjectCurrentLevel
-                  ]
-                ][0],
-              data[
-                RankingObjectContain[indexOfRankingLevel + 1][
-                  indexOfObjectNextLevel
-                  ]
-                ][0]
+              data[RankingObjectContain[indexOfRankingLevel][indexOfObjectCurrentLevel]][0],
+              data[RankingObjectContain[indexOfRankingLevel + 1][indexOfObjectNextLevel]][0]
             );
         }
     }
@@ -108,7 +71,7 @@ function validateDataRelationship(data) {
 }
 
 function checkObjectRelationship(obj1, obj2) {
-  let check = obj2.split('').map(char => {
+  let check = obj2.split('').map((char) => {
     return obj1.includes(char);
   });
   const result = [...new Set(check)];
@@ -125,11 +88,7 @@ function checkObjectRelationship(obj1, obj2) {
 // check validate name not duplicate Ex: ABB
 function _validateName(string) {
   return (
-    string.split('').length ===
-    string
-      .split('')
-      .filter((item, index, array) => array.indexOf(item) === index)
-      .length
+    string.split('').length === string.split('').filter((item, index, array) => array.indexOf(item) === index).length
   );
 }
 
@@ -146,7 +105,7 @@ export function validateInformation(info) {
       let key = keys[i];
       for (let j = 0; j < array.length; j++) {
         let value = array[j];
-        const check = validateValue({key, value}, type);
+        const check = validateValue({ key, value }, type);
 
         if (!check) return check;
       }

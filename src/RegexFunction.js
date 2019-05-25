@@ -1,6 +1,6 @@
-import {defineSentences} from './configuration/define';
-import {defineInformation} from './utils/definition/index';
-import {analyzeResult} from './utils/analysis/analysis';
+import { defineSentences } from './configuration/define';
+import { defineInformation } from './utils/definition/index';
+import { analyzeResult } from './utils/analysis/analysis';
 import appModel from './appModel';
 
 const get_key_regex = '[^{\\}]+(?=})';
@@ -12,8 +12,8 @@ export function analyzeInput(input) {
   const data = input
     .replace(new RegExp('(\r?\n)', 'g'), '')
     .split(';')
-    .filter(sentence => !!sentence)
-    .map(sentence => {
+    .filter((sentence) => !!sentence)
+    .map((sentence) => {
       return getInformation(sentence);
     });
 
@@ -23,7 +23,7 @@ export function analyzeInput(input) {
   };
   for (let i = 0; i < data.length; i++) {
     let item = data[i];
-    if (!item) return {Error: 'lỗi'};
+    if (!item) return { Error: 'lỗi' };
     if (item.Error) return item;
 
     if (item.outputType === 'shape') {
@@ -44,8 +44,8 @@ function getInformation(string) {
   const _string = '_ '.concat(string.concat(' _'));
   let isMatching = false;
   let preProgress = [];
-  Object.keys(defineSentences).forEach(key => {
-    defineSentences[key].forEach(sentence => {
+  Object.keys(defineSentences).forEach((key) => {
+    defineSentences[key].forEach((sentence) => {
       sentence = '_ '.concat(sentence.concat(' _'));
 
       if (isMatching) return;
@@ -61,11 +61,11 @@ function getInformation(string) {
 
   const result = defineInformation(preProgress);
 
-  if (!result) return {Error: 'Sai định dạng'};
+  if (!result) return { Error: 'Sai định dạng' };
 
   // add operation for define type
   if (type === 'define') {
-    operations.forEach(operation => {
+    operations.forEach((operation) => {
       if (result.operation) return;
       if (string.includes(operation)) {
         result.operation = operation;
@@ -81,7 +81,7 @@ export function regex(string, _defineSentence, type) {
 
   let result = {};
 
-  params.forEach(key => {
+  params.forEach((key) => {
     result[key] = [];
   });
 
@@ -108,8 +108,7 @@ export function regex(string, _defineSentence, type) {
   }
 
   if (getLength(result) === params.length) {
-    if (type === 'relation')
-      result[type] = others[1].replace('_', '').trim();
+    if (type === 'relation') result[type] = others[1].replace('_', '').trim();
     return result;
   }
 
@@ -118,7 +117,7 @@ export function regex(string, _defineSentence, type) {
 
 function getLength(dictionary) {
   let count = 0;
-  Object.keys(dictionary).forEach(key => {
+  Object.keys(dictionary).forEach((key) => {
     count += dictionary[key].length;
   });
   return count;

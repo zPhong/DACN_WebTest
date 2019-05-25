@@ -1,7 +1,4 @@
-export {
-  distance,
-  distanceSquared
-}
+export { distance, distanceSquared };
 
 /* returns the Euclidean distance between (p1.x, p1.y) and (p2.x, p2.y) */
 function distance(p1, p2) {

@@ -1,9 +1,9 @@
 // @flow
 
-import type {CircleEquation, CoordinateType, LinearEquation, Vector} from '../../types/types';
+import type { CircleEquation, CoordinateType, LinearEquation, Vector } from '../../types/types';
 
 export function getStartPoint(): CoordinateType {
-  return {x: 0, y: 0, z: 0};
+  return { x: 0, y: 0, z: 0 };
 }
 
 export function getRandomValue(min: number, max: number): number {
@@ -11,19 +11,22 @@ export function getRandomValue(min: number, max: number): number {
 }
 
 export function calculateMiddlePoint(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
-  let middlePoint: CoordinateType = {z: 0};
+  let middlePoint: CoordinateType = { z: 0 };
   middlePoint.x = (firstPoint.x + secondPoint.x) / 2;
   middlePoint.y = (firstPoint.y + secondPoint.y) / 2;
 
   return middlePoint;
 }
 
-export function calculateLinearEquationFromTwoPoints(firstPoint: CoordinateType, secondPoint: CoordinateType): LinearEquation {
-  let directionVector: Vector = {z: 0};
+export function calculateLinearEquationFromTwoPoints(
+  firstPoint: CoordinateType,
+  secondPoint: CoordinateType
+): LinearEquation {
+  let directionVector: Vector = { z: 0 };
   directionVector.a = secondPoint.x - firstPoint.x;
   directionVector.b = secondPoint.y - firstPoint.y;
 
-  let normalVector: Vector = {z: 0};
+  let normalVector: Vector = { z: 0 };
   normalVector.a = directionVector.b;
   normalVector.b = -directionVector.a;
 
@@ -41,7 +44,7 @@ export function calculateParallelEquation(linearEquation: LinearEquation): Linea
   // Random a constance term from -50 -> 50
   const constantTerm = Math.floor(Math.random() * 100) - 50;
 
-  let parallelEquation: LinearEquation = {coefficientZ: 0};
+  let parallelEquation: LinearEquation = { coefficientZ: 0 };
   parallelEquation.coefficientX = linearEquation.coefficientX;
   parallelEquation.coefficientY = linearEquation.coefficientY;
   parallelEquation.constantTerm = constantTerm;
@@ -53,7 +56,7 @@ export function calculatePerpendicularEquation(linearEquation: LinearEquation): 
   // Random a constance term from -50 -> 50
   const constantTerm = Math.floor(Math.random() * 100) - 50;
 
-  let perpendicularEquation: LinearEquation = {coefficientZ: 0};
+  let perpendicularEquation: LinearEquation = { coefficientZ: 0 };
   perpendicularEquation.coefficientX = -linearEquation.coefficientX;
   perpendicularEquation.coefficientY = linearEquation.coefficientY;
   perpendicularEquation.constantTerm = constantTerm;
@@ -131,7 +134,10 @@ export function calculateInternalBisectLineEquation(lineOne: LinearEquation, lin
   return _getInternalBisectLineEquation();
 }
 
-function _calculateBisectLineEquation(lineOne: LinearEquation, lineTwo: LinearEquation): [LinearEquation, LinearEquation] {
+function _calculateBisectLineEquation(
+  lineOne: LinearEquation,
+  lineTwo: LinearEquation
+): [LinearEquation, LinearEquation] {
   let resultOne: LinearEquation = {};
   let resultTwo: LinearEquation = {};
 
@@ -142,8 +148,7 @@ function _calculateBisectLineEquation(lineOne: LinearEquation, lineTwo: LinearEq
 
   // Represent for [sqrt(a*a + b*b) / sqrt(a'*a' + b'*b')]
   let coefficient =
-    Math.sqrt(lineOne.coefficientX * lineOne.coefficientX + lineOne.coefficientY * lineOne.coefficientY)
-    /
+    Math.sqrt(lineOne.coefficientX * lineOne.coefficientX + lineOne.coefficientY * lineOne.coefficientY) /
     Math.sqrt(lineTwo.coefficientX * lineTwo.coefficientX + lineTwo.coefficientY * lineTwo.coefficientY);
 
   /*
@@ -163,14 +168,16 @@ function _calculateBisectLineEquation(lineOne: LinearEquation, lineTwo: LinearEq
 }
 
 /*
-*   Line one and line two is 2 lines are the result of _calculateBisectLineEquation function
-*   Point one and point two are 2 points that each point located in each line
-*             which is equivalent each argument in _calculateBisectLineEquation function
-*/
-function _getInternalBisectLineEquation(lineOne: LinearEquation,
-                                        lineTwo: LinearEquation,
-                                        pointOne: CoordinateType,
-                                        pointTwo: CoordinateType): LinearEquation {
+ *   Line one and line two is 2 lines are the result of _calculateBisectLineEquation function
+ *   Point one and point two are 2 points that each point located in each line
+ *             which is equivalent each argument in _calculateBisectLineEquation function
+ */
+function _getInternalBisectLineEquation(
+  lineOne: LinearEquation,
+  lineTwo: LinearEquation,
+  pointOne: CoordinateType,
+  pointTwo: CoordinateType
+): LinearEquation {
   let firstEquation = pointOne.x * lineOne.coefficientX + pointOne.y * lineOne.coefficientY + lineOne.constantTerm;
   let secondEquation = pointTwo.x * lineOne.coefficientX + pointTwo.y * lineOne.coefficientY + lineOne.constantTerm;
   return firstEquation * secondEquation > 0 ? lineOne : lineTwo;
@@ -184,17 +191,17 @@ function _getPointInLine(line: LinearEquation): CoordinateType {
   return point;
 }
 
-function _getPointInLineWithCondition(line: LinearEquation, axis: string, comparison: string, point: CoordinateType): CoordinateType {
-  if (axis !== 'vertical'
-    || axis !== 'horizontal'
-    || comparison !== 'bigger'
-    || comparison !== 'smaller') {
+function _getPointInLineWithCondition(
+  line: LinearEquation,
+  axis: string,
+  comparison: string,
+  point: CoordinateType
+): CoordinateType {
+  if (axis !== 'vertical' || axis !== 'horizontal' || comparison !== 'bigger' || comparison !== 'smaller') {
     return {};
   }
 
   if (axis === 'horizontal') {
-
   } else {
-
   }
 }

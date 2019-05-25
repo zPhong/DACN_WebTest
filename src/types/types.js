@@ -7,8 +7,8 @@ export type CoordinateType = {
 export type HasFixedCoordinateType = {
   fixedX: boolean,
   fixedY: boolean,
-  fixedZ: boolean,
-}
+  fixedZ: boolean
+};
 
 export type DrawingNodeType = {
   id: string,
@@ -42,18 +42,18 @@ export type LinearEquation = {
   coefficientX: number,
   coefficientY: number,
   coefficientZ: number,
-  constantTerm: number,
-}
+  constantTerm: number
+};
 
 export type Vector = {
   a: number,
   b: number,
-  c: number,
-}
+  c: number
+};
 
 // (x − a)2 + (y − b)2 = r2
 export type CircleEquation = {
   a: number,
   b: number,
-  r: number,
-}
+  r: number
+};

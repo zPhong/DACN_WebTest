@@ -1,16 +1,16 @@
-import {Point} from './model/point'
-import {Line} from './model/line';
-import {Segment} from './model/segment';
-import {Circle} from './model/circle'
-import {distanceSquared as dd} from './calc'
+import { Point } from './model/point';
+import { Line } from './model/line';
+import { Segment } from './model/segment';
+import { Circle } from './model/circle';
+import { distanceSquared as dd } from './calc';
 
-import uniq from 'uniq'
+import uniq from 'uniq';
 
-let P = Point.P
+let P = Point.P;
 
 /* helpers */
 function comparePoints(p, q) {
-  return (p.x === q.x && p.y === q.y) ? 0 : 1;
+  return p.x === q.x && p.y === q.y ? 0 : 1;
 }
 
 function sq(a) {
@@ -20,7 +20,7 @@ function sq(a) {
 function between(x, a, b) {
   let left = Math.min(a, b),
     right = Math.max(a, b);
-  return (left <= x && x <= right)
+  return left <= x && x <= right;
 }
 
 /*
@@ -36,30 +36,28 @@ function between(x, a, b) {
  * @return {Array.<Point>}    Points of intersection between the two objects.
  */
 function intersect(o1, o2) {
-  if (o1 instanceof Circle && o2 instanceof Circle)        // circle-circle
+  if (o1 instanceof Circle && o2 instanceof Circle)
+    // circle-circle
     return intersectCircleCircle(o1, o2);
   // if only one is a circle, it should be first.
-  else if (o2 instanceof Circle)
-    return intersect(o2, o1);
-  else if (o1 instanceof Circle && o2 instanceof Segment)  // circle-segment
+  else if (o2 instanceof Circle) return intersect(o2, o1);
+  else if (o1 instanceof Circle && o2 instanceof Segment)
+    // circle-segment
     return intersectCircleLine(o1, o2, true);
-  else if (o1 instanceof Circle && o2 instanceof Line)     // circle-line
+  else if (o1 instanceof Circle && o2 instanceof Line)
+    // circle-line
     return intersectCircleLine(o1, o2, false);
-  else if (o1 instanceof Segment && o2 instanceof Segment) // segment-segment
+  else if (o1 instanceof Segment && o2 instanceof Segment)
+    // segment-segment
     return intersectLineLine(o1, o2, true);
   // if only one is a segment, it should be first.
-  else if (o2 instanceof Segment)
-    return intersect(o2, o1);
-  else if (o1 instanceof Line && o2 instanceof Line)       // line-line
+  else if (o2 instanceof Segment) return intersect(o2, o1);
+  else if (o1 instanceof Line && o2 instanceof Line)
+    // line-line
     return intersectLineLine(o1, o2, false);
-
   // TODO: circle-point, segment-point, point-point
-  else if (o2 instanceof Point || o1 instanceof Point)
-    return [];
-
-  else throw new Error('Cannot intersect ' +
-      o1.constructor.name + ' and ' + o2.constructor.name);
-
+  else if (o2 instanceof Point || o1 instanceof Point) return [];
+  else throw new Error('Cannot intersect ' + o1.constructor.name + ' and ' + o2.constructor.name);
 }
 
 function intersectCircleCircle(c1, c2) {
@@ -76,31 +74,29 @@ function intersectCircleCircle(c1, c2) {
 
   let a = (c1.radiussq - c2.radiussq + dsq) / (2 * d);
   let h = Math.sqrt(Math.max(c1.radiussq - sq(a), 0));
-  let cx = c1.center.x + a * (c2.center.x - c1.center.x) / d;
-  let cy = c1.center.y + a * (c2.center.y - c1.center.y) / d;
+  let cx = c1.center.x + (a * (c2.center.x - c1.center.x)) / d;
+  let cy = c1.center.y + (a * (c2.center.y - c1.center.y)) / d;
 
-  let nx = h * (c1.center.y - c2.center.y) / d;
-  let ny = h * (c1.center.x - c2.center.x) / d;
+  let nx = (h * (c1.center.y - c2.center.y)) / d;
+  let ny = (h * (c1.center.x - c2.center.x)) / d;
 
   return uniq([P(0, cx + nx, cy - ny), P(1, cx - nx, cy + ny)], comparePoints);
 }
 
 function intersectLineLine(s1, s2, clip) {
-  let [{x: x1, y: y1}, {x: x2, y: y2}] = s1._p;
-  let [{x: x3, y: y3}, {x: x4, y: y4}] = s2._p;
-  let s = (-s1.dy * (x1 - x3) + s1.dx * (y1 - y3)) / (-s2.dx * s1.dy + s1.dx * s2.dy)
-  let t = (s2.dx * (y1 - y3) - s2.dy * (x1 - x3)) / (-s2.dx * s1.dy + s1.dx * s2.dy)
+  let [{ x: x1, y: y1 }, { x: x2, y: y2 }] = s1._p;
+  let [{ x: x3, y: y3 }, { x: x4, y: y4 }] = s2._p;
+  let s = (-s1.dy * (x1 - x3) + s1.dx * (y1 - y3)) / (-s2.dx * s1.dy + s1.dx * s2.dy);
+  let t = (s2.dx * (y1 - y3) - s2.dy * (x1 - x3)) / (-s2.dx * s1.dy + s1.dx * s2.dy);
 
-  if (!clip || (between(s, 0, 1) && between(t, 0, 1)))
-    return [P(0, x1 + t * s1.dx, y1 + t * s1.dy)]
-  else
-    return []; // no collision
+  if (!clip || (between(s, 0, 1) && between(t, 0, 1))) return [P(0, x1 + t * s1.dx, y1 + t * s1.dy)];
+  else return []; // no collision
 }
 
 /* http://mathworld.wolfram.com/Circle-LineIntersection.html */
 function intersectCircleLine(c, s, clip) {
-  let [{x: x1, y: y1}, {x: x2, y: y2}] = s._p;
-  let {x: x0, y: y0} = c.center;
+  let [{ x: x1, y: y1 }, { x: x2, y: y2 }] = s._p;
+  let { x: x0, y: y0 } = c.center;
 
   // note the translation (x0, y0)->(0,0).
   let D = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
@@ -112,21 +108,15 @@ function intersectCircleLine(c, s, clip) {
     return [];
   }
 
-  let cx = D * s.dy / lensq, cy = -D * s.dx / lensq;
-  let nx = (s.dy < 0 ? -1 * s.dx : s.dx) * disc / lensq,
-    ny = Math.abs(s.dy) * disc / lensq;
+  let cx = (D * s.dy) / lensq,
+    cy = (-D * s.dx) / lensq;
+  let nx = ((s.dy < 0 ? -1 * s.dx : s.dx) * disc) / lensq,
+    ny = (Math.abs(s.dy) * disc) / lensq;
 
   // translate (0,0)->(x0, y0).
-  return uniq([P(0, cx + nx + x0, cy + ny + y0),
-    P(1, cx - nx + x0, cy - ny + y0)], comparePoints)
-    .filter(p => (clip ? between(p.x, x1, x2) && between(p.y, y1, y2) : true));
+  return uniq([P(0, cx + nx + x0, cy + ny + y0), P(1, cx - nx + x0, cy - ny + y0)], comparePoints).filter((p) =>
+    clip ? between(p.x, x1, x2) && between(p.y, y1, y2) : true
+  );
 }
 
-
-export {
-  intersect,
-  intersectCircleCircle,
-  intersectCircleLine,
-  intersectLineLine
-}
-
+export { intersect, intersectCircleCircle, intersectCircleLine, intersectLineLine };

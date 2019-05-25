@@ -1,4 +1,4 @@
-import {Geom} from './geom'
+import { Geom } from './geom';
 
 class Point extends Geom {
   constructor(name, x, y) {
@@ -23,4 +23,4 @@ class Point extends Geom {
   }
 }
 
-export {Point}
+export { Point };

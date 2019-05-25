@@ -1,7 +1,7 @@
-import appModel from "../../appModel";
-import type {CoordinateType, LinearEquation} from "../../types/types";
-import {updateCoordinate} from "./readPointsMap";
-import {calculateDistanceTwoPoints, calculateLinearEquationFromTwoPoints, getRandomValue} from "../math/Math2D";
+import appModel from '../../appModel';
+import type { CoordinateType, LinearEquation } from '../../types/types';
+import { updateCoordinate } from './readPointsMap';
+import { calculateDistanceTwoPoints, calculateLinearEquationFromTwoPoints, getRandomValue } from '../math/Math2D';
 
 const geometricObj = {
   triangle: generateTriangle,
@@ -10,16 +10,14 @@ const geometricObj = {
   parallelogram: generateParallelogram,
   rectangle: generateRectangle,
   rhombus: generateRhombus,
-  square: generateSquare,
+  square: generateSquare
 };
 
-function generateGeometry() {
-
-}
+function generateGeometry() {}
 
 function generateTriangle(type: string) {
   if (appModel.pointsMap.length === 3) {
-    let p1: CoordinateType = {x: 0, y: 0, z: 0};
+    let p1: CoordinateType = { x: 0, y: 0, z: 0 };
     let p2: CoordinateType = {};
     let p3: CoordinateType = {};
 
@@ -47,13 +45,13 @@ function generateTriangle(type: string) {
 
       case 'cân': {
         /*
-        *             B
-        *          *    *
-        *        *        *
-        *      *            *
-        *    *                *
-        * [A] * * * * * * * *  C
-        */
+         *             B
+         *          *    *
+         *        *        *
+         *      *            *
+         *    *                *
+         * [A] * * * * * * * *  C
+         */
         p2.x = getRandomValue(p1.x + 1, p1.x + 50);
         p2.y = getRandomValue(p1.y + 1, p1.y + 50);
         updateCoordinate(appModel.pointsMap[1].id, p2);
@@ -72,7 +70,7 @@ function generateTriangle(type: string) {
          *  *       *
          *  *         *
          * [A]* * * * * C
-        */
+         */
         p2.y = getRandomValue(p1.y + 1, p1.y + 50);
         p2.x = p1.x;
         updateCoordinate(appModel.pointsMap[1].id, p2);
@@ -89,7 +87,7 @@ function generateTriangle(type: string) {
          *      *   *
          *    *       *
          * [A] * * * * [C]
-        */
+         */
         p2.x = getRandomValue(p1.x + 1, p1.x + 50);
         p2.y = Math.sqrt(3) * p2.x;
         updateCoordinate(appModel.pointsMap[1].id, p2);
@@ -111,13 +109,13 @@ function generateTriangle(type: string) {
 function generateQuadrilateral() {
   if (appModel.pointsMap.length === 4) {
     // p1 represents point A
-    const p1: CoordinateType = {x: 0, y: 0, z: 0};
+    const p1: CoordinateType = { x: 0, y: 0, z: 0 };
     updateCoordinate(appModel.pointsMap[0].id, p1);
 
     // p2 represents point B
     const p2: CoordinateType = {
       x: getRandomValue(p1.x + 1, p1.x + 50),
-      y: getRandomValue(p1.y + 1, p1.y + 50),
+      y: getRandomValue(p1.y + 1, p1.y + 50)
     };
     updateCoordinate(appModel.pointsMap[1].id, p2);
 
@@ -128,14 +126,13 @@ function generateQuadrilateral() {
     do {
       p3.x = getRandomValue(p2.x + 1, p2.x + 50);
       p3.y = getRandomValue(p1.y + 1, p2.y);
-    }
-    while (p3.y === linearEquation.coefficientX * p3.x + linearEquation.constantTerm);
+    } while (p3.y === linearEquation.coefficientX * p3.x + linearEquation.constantTerm);
     updateCoordinate(appModel.pointsMap[2].id, p3);
 
     // p4 represents point D
     const p4: CoordinateType = {
       x: getRandomValue(p1.x + 1, p1.x + 50),
-      y: p1.y,
+      y: p1.y
     };
     updateCoordinate(appModel.pointsMap[3].id, p4);
   }
@@ -145,27 +142,27 @@ function generateQuadrilateral() {
 function generateTrapezoid() {
   if (appModel.pointsMap.length === 4) {
     // p1 represents point A
-    const p1: CoordinateType = {x: 0, y: 0, z: 0};
+    const p1: CoordinateType = { x: 0, y: 0, z: 0 };
     updateCoordinate(appModel.pointsMap[0].id, p1);
 
     // p2 represents point B
     const p2: CoordinateType = {
       x: getRandomValue(p1.x + 1, p1.x + 50),
-      y: getRandomValue(p1.y + 1, p1.y + 50),
+      y: getRandomValue(p1.y + 1, p1.y + 50)
     };
     updateCoordinate(appModel.pointsMap[1].id, p2);
 
     // p3 represents point C
     const p3: CoordinateType = {
       x: getRandomValue(p2.x + 1, p2.x + 50),
-      y: p2.y,
+      y: p2.y
     };
     updateCoordinate(appModel.pointsMap[2].id, p3);
 
     // p4 represents point D
     const p4: CoordinateType = {
       x: getRandomValue(p1.x + 1, p1.x + 50),
-      y: p1.y,
+      y: p1.y
     };
     updateCoordinate(appModel.pointsMap[3].id, p4);
   }
@@ -175,7 +172,7 @@ function generateTrapezoid() {
 function generateParallelogram() {
   if (appModel.pointsMap.length === 4) {
     // p1 represents point A
-    const p1: CoordinateType = {x: 0, y: 0, z: 0};
+    const p1: CoordinateType = { x: 0, y: 0, z: 0 };
     updateCoordinate(appModel.pointsMap[0].id, p1);
 
     // p2 represents point B
@@ -204,7 +201,7 @@ function generateParallelogram() {
 function generateRectangle() {
   if (appModel.pointsMap.length === 4) {
     // p1 represents point A
-    const p1: CoordinateType = {x: 0, y: 0, z: 0};
+    const p1: CoordinateType = { x: 0, y: 0, z: 0 };
     updateCoordinate(appModel.pointsMap[0].id, p1);
 
     // p2 represents point B
@@ -217,14 +214,14 @@ function generateRectangle() {
     // p3 represents point C
     const p3: CoordinateType = {
       x: getRandomValue(p2.x + 1, p2.x + 50),
-      y: p2.y,
+      y: p2.y
     };
     updateCoordinate(appModel.pointsMap[2].id, p3);
 
     // p4 represents point D
     const p4: CoordinateType = {
       x: p3.x,
-      y: p1.y,
+      y: p1.y
     };
     updateCoordinate(appModel.pointsMap[3].id, p4);
   }
@@ -234,27 +231,27 @@ function generateRectangle() {
 function generateRhombus() {
   if (appModel.pointsMap.length === 4) {
     // p1 represents point A
-    const p1: CoordinateType = {x: 0, y: 0, z: 0};
+    const p1: CoordinateType = { x: 0, y: 0, z: 0 };
     updateCoordinate(appModel.pointsMap[0].id, p1);
 
     // p2 represents point B
     const p2: CoordinateType = {
       x: getRandomValue(p1.x + 1, p1.x + 50),
-      y: getRandomValue(p1.y + 1, p1.y + 50),
+      y: getRandomValue(p1.y + 1, p1.y + 50)
     };
     updateCoordinate(appModel.pointsMap[1].id, p2);
 
     // p3 represents point C
     const p3: CoordinateType = {
       x: 2 * (p2.x - p1.x),
-      y: p1.y,
+      y: p1.y
     };
     updateCoordinate(appModel.pointsMap[2].id, p3);
 
     // p4 represents point D
     const p4: CoordinateType = {
       x: p2.x,
-      y: 2 * (p2.y - p1.y),
+      y: 2 * (p2.y - p1.y)
     };
     updateCoordinate(appModel.pointsMap[3].id, p4);
   }
@@ -263,7 +260,7 @@ function generateRhombus() {
 function generateSquare() {
   if (appModel.pointsMap.length === 4) {
     // p1 represents point A
-    const p1: CoordinateType = {x: 0, y: 0, z: 0};
+    const p1: CoordinateType = { x: 0, y: 0, z: 0 };
     updateCoordinate(appModel.pointsMap[0].id, p1);
 
     // p2 represents point B
@@ -276,14 +273,14 @@ function generateSquare() {
     // p3 represents point C
     const p3: CoordinateType = {
       x: p2.x + calculateDistanceTwoPoints(p1, p2),
-      y: p2.y,
+      y: p2.y
     };
     updateCoordinate(appModel.pointsMap[2].id, p3);
 
     // p4 represents point D
     const p4: CoordinateType = {
       x: p3.x,
-      y: p1.y,
+      y: p1.y
     };
     updateCoordinate(appModel.pointsMap[3].id, p4);
   }

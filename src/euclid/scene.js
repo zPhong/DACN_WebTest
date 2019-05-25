@@ -1,5 +1,5 @@
-import * as d3 from "d3";
-import {Circle, equalWithin, Intersection, Line, Point, Segment} from './model';
+import * as d3 from 'd3';
+import { Circle, equalWithin, Intersection, Line, Point, Segment } from './model';
 
 function addClass(obj, klass) {
   obj.classes = obj.classes || d3.set();
@@ -7,7 +7,6 @@ function addClass(obj, klass) {
 }
 
 class Scene {
-
   constructor(bounds) {
     this.bounds = bounds;
     this.bounds.width = this.bounds.right - this.bounds.left;
@@ -21,7 +20,7 @@ class Scene {
 
   /* return an array of all Points in the scene */
   points() {
-    return this._objects.values().filter(o => o instanceof Point)
+    return this._objects.values().filter((o) => o instanceof Point);
   }
 
   /* return an array of all objects in the scene */
@@ -49,7 +48,7 @@ class Scene {
     if (typeof obj === 'string') {
       obj = this.get(obj);
     }
-    return (secondObj) => (obj && this.equal(obj, secondObj));
+    return (secondObj) => obj && this.equal(obj, secondObj);
   }
 
   /**
@@ -62,7 +61,7 @@ class Scene {
     if (typeof obj === 'string') {
       obj = this.get(obj);
     }
-    return (secondObj) => (obj && !this.equal(obj, secondObj));
+    return (secondObj) => obj && !this.equal(obj, secondObj);
   }
 
   last() {
@@ -113,7 +112,7 @@ class Scene {
     // if we already have this object, and it's the same type, then update the
     // existing one in place.
     let existing = this._objects.get(object.name);
-    if (existing && (existing.constructor.name === object.constructor.name)) {
+    if (existing && existing.constructor.name === object.constructor.name) {
       for (let prop in object) existing[prop] = object[prop];
       object = existing;
     }
@@ -141,7 +140,7 @@ class Scene {
   freeName() {
     let keys = this._objects.keys(),
       id = 0;
-    for (; keys.indexOf('object' + id) >= 0; id++) ;
+    for (; keys.indexOf('object' + id) >= 0; id++);
     return 'object' + id;
   }
 
@@ -153,9 +152,10 @@ class Scene {
    */
   // TODO: respect `root` parameter, and do an actual DAG walk.
   update(root) {
-    this._objects.values()
-      .filter(obj => obj instanceof Intersection)
-      .forEach(obj => obj.update())
+    this._objects
+      .values()
+      .filter((obj) => obj instanceof Intersection)
+      .forEach((obj) => obj.update());
   }
 
   logState(label) {
@@ -165,11 +165,11 @@ class Scene {
 
     let state = {
       label,
-      time: (new Date()).toString(),
-      objects: objects.map(o => o.toString()),
-    }
+      time: new Date().toString(),
+      objects: objects.map((o) => o.toString())
+    };
     this.log.push(state);
   }
 }
 
-export {Scene}
+export { Scene };

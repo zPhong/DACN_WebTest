@@ -1,8 +1,8 @@
-import {defineObject} from './defineObjType';
-import {validateInformation} from '../validation/validation';
-import {definePointType} from './definePointType';
-import {defineShapeType} from './defineShapeType';
-import {reversedDependentObjRelation} from '../../configuration/define';
+import { defineObject } from './defineObjType';
+import { validateInformation } from '../validation/validation';
+import { definePointType } from './definePointType';
+import { defineShapeType } from './defineShapeType';
+import { reversedDependentObjRelation } from '../../configuration/define';
 
 function defineInformation(data) {
   let result;
@@ -17,11 +17,10 @@ function defineInformation(data) {
       result = data;
   }
 
-  if (reversedDependentObjRelation.includes(result.relation))
-    result.object = result.object.reverse();
-  Object.keys(result).forEach(key => {
+  if (reversedDependentObjRelation.includes(result.relation)) result.object = result.object.reverse();
+  Object.keys(result).forEach((key) => {
     if (key === 'object') {
-      result[key].forEach(value => {
+      result[key].forEach((value) => {
         const type = defineObject(value);
         if (!result[type]) result[type] = [];
         if (type === 'segment') {
@@ -33,7 +32,7 @@ function defineInformation(data) {
   });
 
   if (data.outputType === 'shape') {
-    const shapeName = Object.keys(result).filter(key => key !== 'type')[0];
+    const shapeName = Object.keys(result).filter((key) => key !== 'type')[0];
     result[shapeName] = sortString(result[shapeName]);
   }
 
@@ -51,4 +50,4 @@ function sortString(str) {
   return sorted.join('');
 }
 
-export {defineInformation};
+export { defineInformation };

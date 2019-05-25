@@ -29,15 +29,7 @@ const defineSentences = {
   ]
 };
 
-const shapeList = [
-  'triangle',
-  'quadrilateral',
-  'trapezoid',
-  'parallelogram',
-  'rectangle',
-  'rhombus',
-  'square'
-];
+const shapeList = ['triangle', 'quadrilateral', 'trapezoid', 'parallelogram', 'rectangle', 'rhombus', 'square'];
 
 const reversedDependentObjRelation = ['vuông góc', 'cắt'];
 
@@ -50,20 +42,20 @@ const validate = {
     define: ['angle', 'segment'],
     relation: ['ray', 'line', 'segment']
   },
-  point: {length: 1, format: '1'},
-  segment: {length: 2, format: '11'},
-  ray: {length: 2, format: '10'},
-  line: {length: 1, format: '0'},
-  angle: {length: 3},
+  point: { length: 1, format: '1' },
+  segment: { length: 2, format: '11' },
+  ray: { length: 2, format: '10' },
+  line: { length: 1, format: '0' },
+  angle: { length: 3 },
   shape: {
-    triangle: {length: 3, format: '111'},
-    quadrilateral: {length: 4, format: '1111'},
-    trapezoid: {length: 4, format: '1111'},
-    parallelogram: {length: 4, format: '1111'},
-    rectangle: {length: 4, format: '1111'},
-    rhombus: {length: 4, format: '1111'},
-    square: {length: 4, format: '1111'},
-    circle: {length: 1, format: '1'}
+    triangle: { length: 3, format: '111' },
+    quadrilateral: { length: 4, format: '1111' },
+    trapezoid: { length: 4, format: '1111' },
+    parallelogram: { length: 4, format: '1111' },
+    rectangle: { length: 4, format: '1111' },
+    rhombus: { length: 4, format: '1111' },
+    square: { length: 4, format: '1111' },
+    circle: { length: 1, format: '1' }
   },
   shapeType: {
     triangle: ['', 'vuông', 'cân', 'vuông cân', 'đều'],

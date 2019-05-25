@@ -1,15 +1,15 @@
 function isLowerCaseChar(char) {
   if (char === char.toLowerCase()) return '0';
-  return '1'
+  return '1';
 }
 
 function isNumeric(str) {
-  return !isNaN(str)
+  return !isNaN(str);
 }
 
 export function checkFormatString(str) {
   let result = '';
-  str.split("").forEach(element => {
+  str.split('').forEach((element) => {
     result += isLowerCaseChar(element);
   });
   return result;
@@ -22,7 +22,6 @@ function validateObject(str) {
   }
   return true;
 }
-
 
 export function defineObject(value) {
   if (isNumeric(value)) return 'value';
@@ -39,6 +38,6 @@ export function defineObject(value) {
     case '11':
       return 'segment';
     default:
-      return undefined
+      return undefined;
   }
 }

@@ -1,11 +1,11 @@
-import type {CoordinateType, DrawingNodeType, LinearEquation, NodeRelationType, NodeType} from '../../types/types';
+import type { CoordinateType, DrawingNodeType, LinearEquation, NodeRelationType, NodeType } from '../../types/types';
 import appModel from '../../appModel';
 import {
   calculateLinearPointFromTwoPoints,
   calculateParallelLineByPointAndLine,
   calculatePerpendicularLineByPointAndLine
 } from '../math/Math2D';
-import {mappingShapeType, shapeRules} from '../../configuration/define';
+import { mappingShapeType, shapeRules } from '../../configuration/define';
 
 const executedRelations = [];
 const executedNode = [];
@@ -17,23 +17,15 @@ export function readPointsMap(): Array<DrawingNodeType> {
     const executingNode = _getNextExecuteNode();
     if (!executingNode) break;
 
-    const executingNodeRelations = _makeUniqueNodeRelation(
-      executingNode.dependentNodes
-    );
+    const executingNodeRelations = _makeUniqueNodeRelation(executingNode.dependentNodes);
 
-    executingNodeRelations.forEach(relation => {
+    executingNodeRelations.forEach((relation) => {
       if (relation.outputType === 'shape') {
-        const shapeName = Object.keys(relation).filter(
-          key => key !== 'type'
-        )[0];
+        const shapeName = Object.keys(relation).filter((key) => key !== 'type')[0];
         const shapeType = mappingShapeType[relation.type] || 'normal';
         console.log(shapeType);
         if (shapeRules[shapeName][shapeType]) {
-          makeCorrectShape(
-            relation[shapeName],
-            shapeRules[shapeName][shapeType],
-            executingNode.id
-          );
+          makeCorrectShape(relation[shapeName], shapeRules[shapeName][shapeType], executingNode.id);
         }
       }
       if (!_isExecutedRelation(relation)) {
@@ -50,7 +42,7 @@ export function readPointsMap(): Array<DrawingNodeType> {
     _updateStaticNode();
   }
 
-  return appModel.pointsMap.map(node => ({
+  return appModel.pointsMap.map((node) => ({
     id: node.id,
     coordinate: node.coordinate
   }));
@@ -102,7 +94,7 @@ function _isPointsMapStatic(): boolean {
 
 function _getNextExecuteNode(): NodeType {
   const clonePointsMap = [...appModel.pointsMap]
-    .filter(node => !executedNode.includes(node.id))
+    .filter((node) => !executedNode.includes(node.id))
     .sort(sortNodeByPriority);
 
   console.log(clonePointsMap);
@@ -138,7 +130,7 @@ function sortNodeByPriority(nodeOne: NodeType, nodeTwo: NodeType): number {
   let rankOne = nodeOneData.static === nodeOneData.dependence ? '1' : '0';
   let rankTwo = nodeTwoData.static === nodeTwoData.dependence ? '1' : '0';
 
-  rankingOrderDesc.forEach(key => {
+  rankingOrderDesc.forEach((key) => {
     if (nodeOneData[key] > nodeTwoData[key]) {
       rankOne += '1';
       rankTwo += '0';
@@ -151,7 +143,7 @@ function sortNodeByPriority(nodeOne: NodeType, nodeTwo: NodeType): number {
     }
   });
 
-  rankingOrderAsc.forEach(key => {
+  rankingOrderAsc.forEach((key) => {
     if (nodeOneData[key] < nodeTwoData[key]) {
       rankOne += '1';
       rankTwo += '0';
@@ -170,19 +162,14 @@ function sortNodeByPriority(nodeOne: NodeType, nodeTwo: NodeType): number {
 function _getMinIndexOfDependentNodeInRelationsList(node: NodeType) {
   const indexArray = [];
   for (let i = 0; i < node.dependentNodes.length; i++) {
-    indexArray.push(
-      _getIndexOfRelationInRelationsList(node.dependentNodes[i])
-    );
+    indexArray.push(_getIndexOfRelationInRelationsList(node.dependentNodes[i]));
   }
 
   return Math.min(...indexArray);
 }
 
 function _getIndexOfRelationInRelationsList(relation: any): number {
-  const list = [
-    ...appModel.relationsResult.shapes,
-    ...appModel.relationsResult.relations
-  ];
+  const list = [...appModel.relationsResult.shapes, ...appModel.relationsResult.relations];
   for (let i = 0; i < list.length; i++) {
     if (relation === list[i]) return i;
   }
@@ -239,11 +226,7 @@ export function _makeUniqueNodeRelation(dependentNodes: Array<NodeRelationType>)
   return result;
 }
 
-function makeCorrectShape(
-  shape: string,
-  rules: string,
-  nonStaticPoint: string
-) {
+function makeCorrectShape(shape: string, rules: string, nonStaticPoint: string) {
   let staticPoints = shape.replace(nonStaticPoint, '').split('');
 
   // check all other points are static
@@ -256,37 +239,22 @@ function makeCorrectShape(
   // get node information
   const points = shape
     .split('')
-    .map(
-      (point: string): NodeType =>
-        appModel.pointsMap[_getIndexOfNodeInPointsMapById(point)]
-    );
+    .map((point: string): NodeType => appModel.pointsMap[_getIndexOfNodeInPointsMapById(point)]);
   const arrayRules = rules.split(new RegExp('&', 'g'));
 
   const nonStaticIndex = shape.indexOf(nonStaticPoint);
 
   if (arrayRules.length > 0) {
-    arrayRules.forEach(rule => {
+    arrayRules.forEach((rule) => {
       const relationType = rule[2];
       if (rule.includes(nonStaticIndex))
-      // eslint-disable-next-line default-case
+        // eslint-disable-next-line default-case
         switch (relationType) {
           case '|':
-            console.log(
-              getLinearEquationByParallelRule(
-                rule,
-                points,
-                nonStaticIndex
-              )
-            );
+            console.log(getLinearEquationByParallelRule(rule, points, nonStaticIndex));
             break;
           case '^':
-            console.log(
-              getLinearPerpendicularByParallelRule(
-                rule,
-                points,
-                nonStaticIndex
-              )
-            );
+            console.log(getLinearPerpendicularByParallelRule(rule, points, nonStaticIndex));
             break;
           case '=':
             console.log('equal');
@@ -296,10 +264,14 @@ function makeCorrectShape(
   }
 }
 
-function getLinearEquationByParallelRule(rule: string, arrayPoints: Array<NodeType>, nonStaticIndex: number): LinearEquation {
+function getLinearEquationByParallelRule(
+  rule: string,
+  arrayPoints: Array<NodeType>,
+  nonStaticIndex: number
+): LinearEquation {
   const lines = rule.split('|');
   let staticLine, nonStaticLine;
-  lines.forEach(line => {
+  lines.forEach((line) => {
     if (line.includes(nonStaticIndex)) {
       nonStaticLine = line;
     } else {
@@ -311,10 +283,7 @@ function getLinearEquationByParallelRule(rule: string, arrayPoints: Array<NodeTy
     //point
     arrayPoints[nonStaticLine.replace(nonStaticIndex, '')].coordinate,
     //line
-    calculateLinearPointFromTwoPoints(
-      arrayPoints[staticLine[0]].coordinate,
-      arrayPoints[staticLine[1]].coordinate
-    )
+    calculateLinearPointFromTwoPoints(arrayPoints[staticLine[0]].coordinate, arrayPoints[staticLine[1]].coordinate)
   );
 }
 
@@ -325,7 +294,7 @@ function getLinearPerpendicularByParallelRule(
 ): LinearEquation {
   const lines = rule.split('|');
   let staticLine, nonStaticLine;
-  lines.forEach(line => {
+  lines.forEach((line) => {
     if (line.includes(nonStaticIndex)) {
       nonStaticLine = line;
     } else {
@@ -337,10 +306,7 @@ function getLinearPerpendicularByParallelRule(
     //point
     arrayPoints[nonStaticLine.replace(nonStaticIndex, '')].coordinate,
     //line
-    calculateLinearPointFromTwoPoints(
-      arrayPoints[staticLine[0]].coordinate,
-      arrayPoints[staticLine[1]].coordinate
-    )
+    calculateLinearPointFromTwoPoints(arrayPoints[staticLine[0]].coordinate, arrayPoints[staticLine[1]].coordinate)
   );
 }
 
@@ -361,7 +327,6 @@ function _calculatePointCoordinate(node: NodeType): CoordinateType {
     }
 
     if (node.dependentNodes[i].relation.outputType === 'define') {
-
     }
   }
 
