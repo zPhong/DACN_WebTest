@@ -1,7 +1,7 @@
 import type { CoordinateType, DrawingNodeType, LinearEquation, NodeRelationType, NodeType } from '../../types/types';
 import appModel from '../../appModel';
 import {
-  calculateLinearPointFromTwoPoints,
+  calculateLinearEquationFromTwoPoints,
   calculateParallelLineByPointAndLine,
   calculatePerpendicularLineByPointAndLine
 } from '../math/Math2D';
@@ -283,7 +283,7 @@ function getLinearEquationByParallelRule(
     //point
     arrayPoints[nonStaticLine.replace(nonStaticIndex, '')].coordinate,
     //line
-    calculateLinearPointFromTwoPoints(arrayPoints[staticLine[0]].coordinate, arrayPoints[staticLine[1]].coordinate)
+    calculateLinearEquationFromTwoPoints(arrayPoints[staticLine[0]].coordinate, arrayPoints[staticLine[1]].coordinate)
   );
 }
 
@@ -306,7 +306,7 @@ function getLinearPerpendicularByParallelRule(
     //point
     arrayPoints[nonStaticLine.replace(nonStaticIndex, '')].coordinate,
     //line
-    calculateLinearPointFromTwoPoints(arrayPoints[staticLine[0]].coordinate, arrayPoints[staticLine[1]].coordinate)
+    calculateLinearEquationFromTwoPoints(arrayPoints[staticLine[0]].coordinate, arrayPoints[staticLine[1]].coordinate)
   );
 }
 
