@@ -115,10 +115,7 @@ class App extends Component {
                   marginBottom: '1rem'
                 }}>
                 <textarea
-                  row={5}
                   style={{ flex: 1, height: 100 }}
-                  numberOfLine
-                  type="text"
                   name="title"
                   value={input}
                   onChange={(event) => {
@@ -150,10 +147,10 @@ class App extends Component {
                             )}`}</p>
                         ))}
                     </span> */}
-          <div class="geometry-container">
-            <div class="geometry-container">
-              <svg id="geometry" class="geometry-scene" viewBox="0 0 800 800" />
-              <svg id="points" class="geometry-scene" viewBox="0 0 800 800" />
+          <div className="geometry-container">
+            <div className="geometry-container">
+              <svg id="geometry" className="geometry-scene" viewBox="0 0 800 800" />
+              <svg id="points" className="geometry-scene" viewBox="0 0 800 800" />
             </div>
           </div>
         </header>
