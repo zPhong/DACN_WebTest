@@ -182,21 +182,21 @@ function generateParallelogram(name: string) {
     // p2 represents point B
     let p2: CoordinateType = {
       x: getRandomValue(p1.x + 1, p1.x + 50),
-      y: getRandomValue(p1.x + 1, p1.x + 50)
+      y: p1.y
     };
     updateCoordinate(name[1], p2);
 
     // p3 represents point C
     let p3: CoordinateType = {
-      x: getRandomValue(p2.x + 1, p2.x + 50),
-      y: p2.y
+      x: getRandomValue(p1.x + 1, p1.x + 50),
+      y: getRandomValue(p1.x + 1, p1.x + 50)
     };
     updateCoordinate(name[2], p3);
 
     // p4 represents point D
     let p4: CoordinateType = {
-      x: getRandomValue(p1.x + 1, p1.x + 50),
-      y: p1.y
+      x: p3.x - p2.x - p1.x,
+      y: p3.y
     };
     updateCoordinate(name[3], p4);
   }
