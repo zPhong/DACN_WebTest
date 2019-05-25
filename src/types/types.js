@@ -34,8 +34,8 @@ export type RelationsResultType = {
 };
 
 export type DrawingDataType = {
-    points: Array<DrawingNodeType>,
-    segment: Array<string>
+  points: Array<DrawingNodeType>,
+  segment: Array<string>
 };
 
 export type LinearEquation = {
