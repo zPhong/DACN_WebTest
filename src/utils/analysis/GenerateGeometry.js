@@ -29,11 +29,11 @@ function generateTriangle(name: string, type: string) {
     updateCoordinate(name[0], p1);
     switch (type) {
       case '': {
-        p3.y = p1.y;
-        p3.x = getRandomValue(p1.x + 1, p1.x + 50);
+        p3.y = getRandomValue(p1.y + 5, p1.y + 10);
+        p3.x = getRandomValue(p1.x - 3, p1.x - 10);
         updateCoordinate(name[2], p3);
-        p2.y = getRandomValue(p1.y + 1, p1.y + 50);
-        p2.x = getRandomValue(p1.x + 1, p3.x);
+        p2.y = p3.y;
+        p2.x = getRandomValue(p1.x + 3, p3.x + 10);
         updateCoordinate(name[1], p2);
         break;
       }
@@ -50,55 +50,56 @@ function generateTriangle(name: string, type: string) {
 
       case 'cân': {
         /*
-         *             B
+         *            [A]
          *          *    *
          *        *        *
          *      *            *
          *    *                *
-         * [A] * * * * * * * *  C
+         *  C  * * * * * * * *  B
          */
-        p2.x = getRandomValue(p1.x + 1, p1.x + 50);
-        p2.y = getRandomValue(p1.y + 1, p1.y + 50);
-        updateCoordinate(name[1], p2);
-        const distance_From_A_To_B = calculateDistanceTwoPoints(p1, p2);
-        p3.y = p1.y;
-        p3.x = distance_From_A_To_B + p1.x;
+        const distance_From_A_To_B = getRandomValue(3, 6);
+
+        p3.y = getRandomValue(p1.y + 5, p1.y + 10);
+        p3.x = p1.x - distance_From_A_To_B;
         updateCoordinate(name[2], p3);
+        p2.y = p3.y;
+        p2.x = p1.x + distance_From_A_To_B;
+        updateCoordinate(name[1], p2);
         break;
       }
 
       case 'vuông cân': {
-        /*  B
-         *  * *
-         *  *   *
-         *  *     *
-         *  *       *
-         *  *         *
-         * [A]* * * * * C
+        /*
+         *            [A]
+         *          *    *
+         *        *        *
+         *      *            *
+         *    *                *
+         *  C  * * * * * * * *  B
          */
-        p2.y = getRandomValue(p1.y + 1, p1.y + 50);
-        p2.x = p1.x;
-        updateCoordinate(name[1], p2);
-        const distance_From_A_To_B = calculateDistanceTwoPoints(p1, p2);
-        p3.y = p1.y;
-        p3.x = p1.x + distance_From_A_To_B;
+        const distance_From_A_To_B = getRandomValue(5, 10);
+        p3.y = p1.y + distance_From_A_To_B;
+        p3.x = p1.x - distance_From_A_To_B;
         updateCoordinate(name[2], p3);
+        p2.y = p3.y;
+        p2.x = p1.x + distance_From_A_To_B;
+        updateCoordinate(name[1], p2);
         break;
       }
 
       case 'đều': {
         /*
-         *       [B]
+         *       [A]
          *      *   *
          *    *       *
-         * [A] * * * * [C]
+         * [C] * * * * [B]
          */
-        p2.x = getRandomValue(p1.x + 1, p1.x + 50);
+        p2.x = getRandomValue(p1.x + 5, p1.x + 10);
         p2.y = Math.sqrt(3) * p2.x;
         updateCoordinate(name[1], p2);
         const distance_From_A_To_B = calculateDistanceTwoPoints(p1, p2);
-        p3.y = p1.y;
-        p3.x = distance_From_A_To_B + p1.x;
+        p3.y = p2.y;
+        p3.x = -distance_From_A_To_B + p2.x;
         updateCoordinate(name[2], p3);
         break;
       }
