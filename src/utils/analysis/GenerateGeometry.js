@@ -52,20 +52,16 @@ function generateTriangle(name: string, type: string) {
 
       case "cân": {
         /*
-         *             B
+         *            [A]
          *          *    *
          *        *        *
          *      *            *
          *    *                *
-         * [A] * * * * * * * *  C
+         *  C  * * * * * * * *  B
          */
         p2.x = getRandomValue(p1.x + MIN_RANDOM_NUMBER, p1.x + MAX_RANDOM_NUMBER);
         p2.y = getRandomValue(p1.y + MIN_RANDOM_NUMBER, p1.y + MAX_RANDOM_NUMBER);
         updateCoordinate(name[1], p2);
-        const distance_From_A_To_B = calculateDistanceTwoPoints(p1, p2);
-        p3.y = p1.y;
-        p3.x = distance_From_A_To_B + p1.x;
-        updateCoordinate(name[2], p3);
         break;
       }
 
@@ -81,26 +77,22 @@ function generateTriangle(name: string, type: string) {
         p2.y = getRandomValue(p1.y + MIN_RANDOM_NUMBER, p1.y + MAX_RANDOM_NUMBER);
         p2.x = p1.x;
         updateCoordinate(name[1], p2);
-        const distance_From_A_To_B = calculateDistanceTwoPoints(p1, p2);
-        p3.y = p1.y;
-        p3.x = p1.x + distance_From_A_To_B;
-        updateCoordinate(name[2], p3);
         break;
       }
 
       case "đều": {
         /*
-         *       [B]
+         *       [A]
          *      *   *
          *    *       *
-         * [A] * * * * [C]
+         * [C] * * * * [B]
          */
         p2.x = getRandomValue(p1.x + MIN_RANDOM_NUMBER, p1.x + MAX_RANDOM_NUMBER);
         p2.y = Math.sqrt(3) * p2.x;
         updateCoordinate(name[1], p2);
         const distance_From_A_To_B = calculateDistanceTwoPoints(p1, p2);
-        p3.y = p1.y;
-        p3.x = distance_From_A_To_B + p1.x;
+        p3.y = p2.y;
+        p3.x = -distance_From_A_To_B + p2.x;
         updateCoordinate(name[2], p3);
         break;
       }

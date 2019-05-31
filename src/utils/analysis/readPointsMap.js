@@ -33,7 +33,7 @@ export function readPointsMap(): Array<DrawingNodeType> {
           generateGeometry(relation[shapeName], shapeName, relation.type);
         }
 
-        if (shapeRules[shapeName][shapeType]) {
+        if (shapeRules[shapeName] && shapeRules[shapeName][shapeType]) {
           makeCorrectShape(
             relation[shapeName],
             shapeName,
