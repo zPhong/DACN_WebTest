@@ -13,6 +13,7 @@ import {
   calculateParallelEquation,
   calculateTwoVariablesFirstDegreeEquations,
   calculateIntersectionLinearEquationWithCircleEquation,
+  calculateIntersectionTwoCircleEquations,
   calculateSetOfLinearEquationAndQuadraticEquation
 } from './utils/math/Math2D';
 
@@ -29,10 +30,15 @@ class TestMath extends Component {
       coefficientY: -1,
       constantTerm: -5.5
     };
-    const c: CircleEquation = {
-      a: 5,
-      b: -3,
-      r: 5
+    const c1: CircleEquation = {
+      a: 0,
+      b: 0,
+      r: Math.sqrt(5)
+    };
+    const c2: CircleEquation = {
+      a: 2,
+      b: 4,
+      r: Math.sqrt(5)
     };
     const q: TwoVariableQuadraticEquation = {
       a: 1,
@@ -50,7 +56,7 @@ class TestMath extends Component {
           {equation.coefficientY === 0 ? '' : `${equation.coefficientY}y`}
           {equation.constantTerm === 0 ? '' : equation.constantTerm > 0 ? '+' : ''}
           {equation.constantTerm === 0 ? '' : `${equation.constantTerm}`}= 0
-          {console.log(calculateSetOfLinearEquationAndQuadraticEquation(d, q))}
+          {console.log(calculateIntersectionTwoCircleEquations(c1, c2))}
         </div>
         <div>{calculateDistanceTwoPoints(firstPoint, secondPoint)}</div>
       </div>
