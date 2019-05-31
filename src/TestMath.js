@@ -1,12 +1,19 @@
 import React, { Component } from 'react';
 import './css/App.css';
-import type { CircleEquation, CoordinateType, FirstDegreeEquation, LinearEquation } from "./types/types";
+import type {
+  CircleEquation,
+  CoordinateType,
+  FirstDegreeEquation,
+  LinearEquation,
+  TwoVariableQuadraticEquation
+} from './types/types';
 import {
   calculateDistanceTwoPoints,
   calculateLinearEquationFromTwoPoints,
   calculateParallelEquation,
   calculateTwoVariablesFirstDegreeEquations,
-  calculateIntersectionLinearEquationWithCircleEquation
+  calculateIntersectionLinearEquationWithCircleEquation,
+  calculateSetOfLinearEquationAndQuadraticEquation
 } from './utils/math/Math2D';
 
 class TestMath extends Component {
@@ -15,17 +22,24 @@ class TestMath extends Component {
     const secondPoint: CoordinateType = { x: 7, y: 3, z: 0 };
     const linearEquation: LinearEquation = calculateLinearEquationFromTwoPoints(firstPoint, secondPoint);
 
-    const f1: FirstDegreeEquation = {a: 4, b: 3, c: -23};
-    const f2: FirstDegreeEquation = {a: 3, b: -4, c: -36};
-    const d1: LinearEquation = {
-      coefficientX: 1,
-      coefficientY: 1,
-      constantTerm: -2,
+    const f1: FirstDegreeEquation = { a: 4, b: 3, c: -23 };
+    const f2: FirstDegreeEquation = { a: 3, b: -4, c: -36 };
+    const d: LinearEquation = {
+      coefficientX: 0.5,
+      coefficientY: -1,
+      constantTerm: -5.5
     };
-    const c1: CircleEquation = {
+    const c: CircleEquation = {
+      a: 5,
+      b: -3,
+      r: 5
+    };
+    const q: TwoVariableQuadraticEquation = {
       a: 1,
       b: 1,
-      r: 5
+      c: -10,
+      d: 6,
+      e: 1
     };
 
     const equation = calculateParallelEquation(linearEquation);
@@ -36,8 +50,7 @@ class TestMath extends Component {
           {equation.coefficientY === 0 ? '' : `${equation.coefficientY}y`}
           {equation.constantTerm === 0 ? '' : equation.constantTerm > 0 ? '+' : ''}
           {equation.constantTerm === 0 ? '' : `${equation.constantTerm}`}= 0
-
-          {console.log(calculateIntersectionLinearEquationWithCircleEquation(d1,c1))}
+          {console.log(calculateSetOfLinearEquationAndQuadraticEquation(d, q))}
         </div>
         <div>{calculateDistanceTwoPoints(firstPoint, secondPoint)}</div>
       </div>
