@@ -256,7 +256,7 @@ function convertCircleEquationToQuadraticEquation(c: CircleEquation): TwoVariabl
     b: 1,
     c: -2 * c.a,
     d: -2 * c.b,
-    e: c.a * c.a + c.b * c.b - c.r * c.r
+    e: Math.round(c.a * c.a + c.b * c.b - c.r * c.r)
   };
 }
 
@@ -336,6 +336,78 @@ export function calculateSetOfLinearEquationAndQuadraticEquation(
       Object({ x: root.x1, y: (-l.constantTerm - l.coefficientX * root.x1) / l.coefficientY }),
       Object({ x: root.x2, y: (-l.constantTerm - l.coefficientX * root.x2) / l.coefficientY })
     );
+  }
+
+  return results;
+}
+
+export function calculateIntersectionTwoCircleEquations(c1: CircleEquation, c2: CircleEquation) {
+  const q1 = convertCircleEquationToQuadraticEquation(c1);
+  const q2 = convertCircleEquationToQuadraticEquation(c2);
+  console.log(q1);
+  console.log(q2);
+  let results: Array<Object> = [];
+
+  const C = q1.c - q2.c;
+  const D = q1.d - q2.d;
+  const E = q2.e - q1.e;
+
+  if (C === 0 && D === 0 && E === 0) {
+    return INFINITY;
+  }
+
+  if (D !== 0) {
+    const a = D * D + C * C;
+    const b = D * D * q1.c - 2 * E * C - q1.d * D * C;
+    const c = E * E + q1.e * D * D + q1.d * D * E;
+    const root = calculateQuadraticEquation(a, b, c);
+    if (typeof root === 'number') {
+      results.push(
+        Object({
+          x: root,
+          y: (E - C * root) / D
+        })
+      );
+    } else if (root === IMPOSSIBLE) {
+      return root;
+    } else {
+      results.push(
+        Object({
+          x: root.x1,
+          y: (E - C * root.x1) / D
+        }),
+        Object({
+          x: root.x2,
+          y: (E - C * root.x2) / D
+        })
+      );
+    }
+  } else {
+    const a = D * D + C * C;
+    const b = C * C * q1.d - 2 * E * D - q1.c * D * C;
+    const c = E * E + q1.e * C * C + q1.c * C * E;
+    const root = calculateQuadraticEquation(a, b, c);
+    if (typeof root === 'number') {
+      results.push(
+        Object({
+          x: E / C,
+          y: root
+        })
+      );
+    } else if (root === IMPOSSIBLE) {
+      return root;
+    } else {
+      results.push(
+        Object({
+          x: E / C,
+          y: root.x1
+        }),
+        Object({
+          x: E / C,
+          y: root.x2
+        })
+      );
+    }
   }
 
   return results;
