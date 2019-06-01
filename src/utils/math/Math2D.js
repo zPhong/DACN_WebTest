@@ -20,6 +20,37 @@ export function getRandomValue(min: number, max: number): number {
   return Math.floor(Math.random() * max) + min;
 }
 
+function getRandomPointInLine(d: LinearEquation): CoordinateType {
+  if (d.coefficientY !== 0) {
+    return {
+      x: getRandomValue(-50, 50),
+      y: (-d.constantTerm - d.coefficientX * x) / d.coefficientY
+    };
+  } else {
+    return {
+      x: -d.constantTerm / d.coefficientX,
+      y: getRandomValue(-50, 50)
+    };
+  }
+}
+
+export function generatePointAlignment(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
+  return {
+    x: (firstPoint.x + secondPoint.x) / getRandomValue(2, 5),
+    y: (firstPoint.y + secondPoint.y) / getRandomValue(2, 5)
+  };
+}
+
+export function generatePointNotAlignment(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
+  let resultPoint: CoordinateType = {};
+  resultPoint.x = getRandomValue(-50, 50);
+  const line = getLineFromTwoPoints(firstPoint, secondPoint);
+  do {
+    resultPoint.y = getRandomValue(-50,50);
+  } while (resultPoint.y !== line.coefficientX * resultPoint.x + line.constantTerm);
+  return resultPoint;
+}
+
 export function calculateMiddlePoint(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
   return {
     x: (firstPoint.x + secondPoint.x) / 2,
@@ -35,12 +66,30 @@ export function calculateSymmetricalPoint(
   return isRight
     ? {
         x: 2 * secondPoint.x - firstPoint.x,
-        y: 2 * secondPoint.y - firstPoint.x
+        y: 2 * secondPoint.y - firstPoint.y
       }
     : {
         x: 2 * firstPoint.x - secondPoint.x,
         y: 2 * firstPoint.y - secondPoint.y
       };
+}
+
+function getLineFromTwoPoints(p1: CoordinateType, p2: CoordinateType) : LinearEquation {
+  const result = calculateSetOfLinearEquationAndQuadraticEquation(
+    {
+      coefficientX: p1.x,
+      coefficientY: 1,
+      constantTerm: -p1.y,
+    },
+    {
+      a: 0,
+      b: 0,
+      c: p2.x,
+      d: 1,
+      e: -p2.y
+    }
+  );
+  return {coefficientX: result.x, coefficientY: -1, constantTerm: result.y }
 }
 
 export function calculateLinearEquationFromTwoPoints(
@@ -152,12 +201,18 @@ export function calculateCircleEquationByCenterPoint(centerPoint: CoordinateType
 }
 
 export function calculateInternalBisectLineEquation(lineOne: LinearEquation, lineTwo: LinearEquation): LinearEquation {
-  const firstLine = _calculateBisectLineEquation(lineOne, lineTwo)[0];
-  const secondLine = _calculateBisectLineEquation(lineOne, lineTwo)[1];
+  const results = _calculateBisectLineEquation(lineOne, lineTwo);
+  const firstLine: LinearEquation = results[0];
+  const secondLine: LinearEquation = results[1];
 
-  let pointInFirstLine;
-  let pointInSecondLine;
-  return _getInternalBisectLineEquation();
+  const pointInFirstLine: CoordinateType = getRandomPointInLine(lineOne);
+  let pointInSecondLine: CoordinateType = { x: pointInFirstLine.x, y: undefined };
+  if (lineTwo.coefficientY !== 0) {
+    pointInSecondLine.y = (-lineTwo.constantTerm - lineTwo.coefficientX * pointInSecondLine.x) / lineTwo.coefficientY;
+  } else {
+    pointInSecondLine.y = getRandomValue(-50, 50);
+  }
+  return _getInternalBisectLineEquation(firstLine, secondLine, pointInFirstLine, pointInSecondLine);
 }
 
 function _calculateBisectLineEquation(
@@ -207,14 +262,6 @@ function _getInternalBisectLineEquation(
   let firstEquation = pointOne.x * lineOne.coefficientX + pointOne.y * lineOne.coefficientY + lineOne.constantTerm;
   let secondEquation = pointTwo.x * lineOne.coefficientX + pointTwo.y * lineOne.coefficientY + lineOne.constantTerm;
   return firstEquation * secondEquation > 0 ? lineOne : lineTwo;
-}
-
-function _getPointInLine(line: LinearEquation): CoordinateType {
-  let point: CoordinateType = {};
-  point.x = Math.floor(Math.random() * 100) - 50;
-  point.y = line.coefficientX * point.x + line.constantTerm;
-
-  return point;
 }
 
 function _getPointInLineWithCondition(
