@@ -1,5 +1,6 @@
 import type { NodeType, NodeRelationType, DrawingNodeType, CoordinateType, LinearEquation } from '../../types/types';
 import appModel from '../../appModel';
+import { calculateMiddlePoint, calculateSymmetricalPoint } from '../math/Math2D';
 
 export function readRelation(relation: mixed, point: string): LinearEquation {
   if (relation.operation) {
@@ -13,7 +14,7 @@ export function readRelation(relation: mixed, point: string): LinearEquation {
       case 'vuông góc':
       case 'phân giác':
       case 'thẳng hàng':
-        analyzeRelationType(relation, point);
+        const result = analyzeRelationType(relation, point);
         break;
       case 'cắt':
         break;
@@ -36,7 +37,6 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
   }
 
   //points = [...new Set(points)].filter((point: string): boolean => !nonStaticPoints.includes(point));
-
   const relationType = relation.relation;
 
   if (
@@ -45,10 +45,35 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
     relationType === 'không thuộc' ||
     relationType === 'thẳng hàng'
   ) {
+    let calculatedPoint;
     if (segmentIncludePoint) {
       const otherStaticPoint = relation.point[0];
-      if (relationType === 'trung điểm') {
+      const otherStaticNodeInSegment = appModel.getNodeInPointsMapById(segmentIncludePoint.replace(point, ''));
+
+      if (!otherStaticNodeInSegment.coordinate.x && !otherStaticNodeInSegment.coordinate.y) {
+        return null;
       }
+
+      if (relationType === 'trung điểm') {
+        calculatedPoint = calculateSymmetricalPoint(
+          otherStaticNodeInSegment.coordinate,
+          appModel.getNodeInPointsMapById(otherStaticPoint).coordinate,
+          segmentIncludePoint.indexOf(point) === 1
+        );
+
+        console.log(calculatedPoint);
+
+        appModel.updateCoordinate(point, calculatedPoint);
+      }
+    } else {
+      calculatedPoint = calculateMiddlePoint(
+        appModel.getNodeInPointsMapById(segmentNotIncludePoint[0]).coordinate,
+        appModel.getNodeInPointsMapById(segmentNotIncludePoint[1]).coordinate
+      );
+
+      console.log(calculatedPoint);
+
+      appModel.updateCoordinate(point, calculatedPoint);
     }
   } else if (relationType === 'song song' || relationType === 'vuông góc' || relationType === 'phân giác') {
   }

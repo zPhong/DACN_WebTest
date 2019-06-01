@@ -32,6 +32,7 @@ export function analyzeResult(validatedResult: RelationsResultType): DrawingData
 
   let result = {};
 
+  readPointsMap();
   result.points = appModel.pointsMap.map(
     (node: NodeType): DrawingNodeType => ({
       id: node.id,
@@ -40,7 +41,6 @@ export function analyzeResult(validatedResult: RelationsResultType): DrawingData
   );
 
   result.segments = getArraySegments(validatedResult);
-  readPointsMap();
   return result;
 }
 

@@ -35,7 +35,7 @@ export function calculateSymmetricalPoint(
   return isRight
     ? {
         x: 2 * secondPoint.x - firstPoint.x,
-        y: 2 * secondPoint.y - firstPoint.x
+        y: 2 * secondPoint.y - firstPoint.y
       }
     : {
         x: 2 * firstPoint.x - secondPoint.x,

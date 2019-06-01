@@ -41,10 +41,10 @@ export function readPointsMap(): Array<DrawingNodeType> {
           );
         }
       }
-      if (!appModel.isExecutedRelation(relation)) {
-        // calculate
-        readRelation(relation);
 
+      readRelation(relation, executingNode.id);
+
+      if (!appModel.isExecutedRelation(relation)) {
         //
         appModel.executedRelations.push(relation);
       }

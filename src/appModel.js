@@ -17,7 +17,6 @@ class AppModel {
   updateCoordinate = (nodeId: string, coordinate: CoordinateType): void => {
     const index = this.getIndexOfNodeInPointsMapById(nodeId);
     if (index !== NOT_FOUND) {
-      console.log(nodeId, coordinate);
       this.pointsMap[index].coordinate = coordinate;
     }
   };
@@ -163,6 +162,13 @@ class AppModel {
       if (id === this.pointsMap[i].id) return i;
     }
     return NOT_FOUND;
+  };
+
+  getNodeInPointsMapById = (id: string): NodeType | null => {
+    for (let i = 0; i < this.pointsMap.length; i++) {
+      if (id === this.pointsMap[i].id) return this.pointsMap[i];
+    }
+    return null;
   };
 
   isStaticNodeById = (id: string): boolean => {

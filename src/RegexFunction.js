@@ -35,8 +35,6 @@ export function analyzeInput(input) {
 
   appModel.relationsResult = result;
 
-  analyzeResult(result);
-
   return analyzeResult(result);
 }
 
