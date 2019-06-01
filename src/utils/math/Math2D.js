@@ -42,9 +42,23 @@ export function generatePointAlignmentInside(firstPoint: CoordinateType, secondP
   };
 }
 
-export function generatePointAlignmentOutside(firstPoint: CoordinateType, secondPoint: CoordinateType, isRight: boolean = true): CoordinateType {
+export function generatePointAlignmentOutside(
+  firstPoint: CoordinateType,
+  secondPoint: CoordinateType,
+  isRight: boolean = true
+): CoordinateType {
+  const line = getLineFromTwoPoints(firstPoint, secondPoint);
+  const tempXRight = getRandomValue(secondPoint.x, 50);
+  const tempXLeft = getRandomValue(-50, firstPoint.x);
   return isRight
-
+    ? {
+        x: tempXRight,
+        y: line.coefficientX * tempXRight + line.constantTerm
+      }
+    : {
+        x: tempXLeft,
+        y: line.coefficientX * tempXLeft + line.constantTerm
+      };
 }
 
 export function generatePointNotAlignment(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
@@ -52,7 +66,7 @@ export function generatePointNotAlignment(firstPoint: CoordinateType, secondPoin
   resultPoint.x = getRandomValue(-50, 50);
   const line = getLineFromTwoPoints(firstPoint, secondPoint);
   do {
-    resultPoint.y = getRandomValue(-50,50);
+    resultPoint.y = getRandomValue(-50, 50);
   } while (resultPoint.y !== line.coefficientX * resultPoint.x + line.constantTerm);
   return resultPoint;
 }
@@ -80,12 +94,12 @@ export function calculateSymmetricalPoint(
       };
 }
 
-function getLineFromTwoPoints(p1: CoordinateType, p2: CoordinateType) : LinearEquation {
+function getLineFromTwoPoints(p1: CoordinateType, p2: CoordinateType): LinearEquation {
   const result = calculateSetOfLinearEquationAndQuadraticEquation(
     {
       coefficientX: p1.x,
       coefficientY: 1,
-      constantTerm: -p1.y,
+      constantTerm: -p1.y
     },
     {
       a: 0,
@@ -95,7 +109,7 @@ function getLineFromTwoPoints(p1: CoordinateType, p2: CoordinateType) : LinearEq
       e: -p2.y
     }
   );
-  return {coefficientX: result.x, coefficientY: -1, constantTerm: result.y }
+  return { coefficientX: result.x, coefficientY: -1, constantTerm: result.y };
 }
 
 export function calculateLinearEquationFromTwoPoints(
