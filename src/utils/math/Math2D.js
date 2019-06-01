@@ -20,6 +20,37 @@ export function getRandomValue(min: number, max: number): number {
   return Math.floor(Math.random() * max) + min;
 }
 
+function getRandomPointInLine(d: LinearEquation): CoordinateType {
+  if (d.coefficientY !== 0) {
+    return {
+      x: getRandomValue(-50, 50),
+      y: (-d.constantTerm - d.coefficientX * x) / d.coefficientY
+    };
+  } else {
+    return {
+      x: -d.constantTerm / d.coefficientX,
+      y: getRandomValue(-50, 50)
+    };
+  }
+}
+
+export function generatePointAlignment(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
+  return {
+    x: (firstPoint.x + secondPoint.x) / getRandomValue(2, 5),
+    y: (firstPoint.y + secondPoint.y) / getRandomValue(2, 5)
+  };
+}
+
+export function generatePointNotAlignment(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
+  let resultPoint: CoordinateType = {};
+  resultPoint.x = getRandomValue(-50, 50);
+  const line = getLineFromTwoPoints(firstPoint, secondPoint);
+  do {
+    resultPoint.y = getRandomValue(-50,50);
+  } while (resultPoint.y !== line.coefficientX * resultPoint.x + line.constantTerm);
+  return resultPoint;
+}
+
 export function calculateMiddlePoint(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
   return {
     x: (firstPoint.x + secondPoint.x) / 2,
@@ -41,6 +72,24 @@ export function calculateSymmetricalPoint(
         x: 2 * firstPoint.x - secondPoint.x,
         y: 2 * firstPoint.y - secondPoint.y
       };
+}
+
+function getLineFromTwoPoints(p1: CoordinateType, p2: CoordinateType) : LinearEquation {
+  const result = calculateSetOfLinearEquationAndQuadraticEquation(
+    {
+      coefficientX: p1.x,
+      coefficientY: 1,
+      constantTerm: -p1.y,
+    },
+    {
+      a: 0,
+      b: 0,
+      c: p2.x,
+      d: 1,
+      e: -p2.y
+    }
+  );
+  return {coefficientX: result.x, coefficientY: -1, constantTerm: result.y }
 }
 
 export function calculateLinearEquationFromTwoPoints(
@@ -152,12 +201,18 @@ export function calculateCircleEquationByCenterPoint(centerPoint: CoordinateType
 }
 
 export function calculateInternalBisectLineEquation(lineOne: LinearEquation, lineTwo: LinearEquation): LinearEquation {
-  const firstLine = _calculateBisectLineEquation(lineOne, lineTwo)[0];
-  const secondLine = _calculateBisectLineEquation(lineOne, lineTwo)[1];
+  const results = _calculateBisectLineEquation(lineOne, lineTwo);
+  const firstLine: LinearEquation = results[0];
+  const secondLine: LinearEquation = results[1];
 
-  let pointInFirstLine;
-  let pointInSecondLine;
-  return _getInternalBisectLineEquation();
+  const pointInFirstLine: CoordinateType = getRandomPointInLine(lineOne);
+  let pointInSecondLine: CoordinateType = { x: pointInFirstLine.x, y: undefined };
+  if (lineTwo.coefficientY !== 0) {
+    pointInSecondLine.y = (-lineTwo.constantTerm - lineTwo.coefficientX * pointInSecondLine.x) / lineTwo.coefficientY;
+  } else {
+    pointInSecondLine.y = getRandomValue(-50, 50);
+  }
+  return _getInternalBisectLineEquation(firstLine, secondLine, pointInFirstLine, pointInSecondLine);
 }
 
 function _calculateBisectLineEquation(
@@ -207,14 +262,6 @@ function _getInternalBisectLineEquation(
   let firstEquation = pointOne.x * lineOne.coefficientX + pointOne.y * lineOne.coefficientY + lineOne.constantTerm;
   let secondEquation = pointTwo.x * lineOne.coefficientX + pointTwo.y * lineOne.coefficientY + lineOne.constantTerm;
   return firstEquation * secondEquation > 0 ? lineOne : lineTwo;
-}
-
-function _getPointInLine(line: LinearEquation): CoordinateType {
-  let point: CoordinateType = {};
-  point.x = Math.floor(Math.random() * 100) - 50;
-  point.y = line.coefficientX * point.x + line.constantTerm;
-
-  return point;
 }
 
 function _getPointInLineWithCondition(
@@ -423,6 +470,46 @@ export function calculateIntersectionTwoCircleEquations(c1: CircleEquation, c2: 
         })
       );
     }
+  }
+
+  return results;
+}
+
+export function calculateLinesByAnotherLineAndAngle(d: LinearEquation, p: CoordinateType, angle: number) {
+  let results: Array<LinearEquation> = [];
+
+  const cosine = Math.cos((angle * Math.PI) / 180);
+  const A =
+    d.coefficientX * d.coefficientX -
+    cosine * cosine * d.coefficientX * d.coefficientX -
+    cosine * cosine * d.coefficientY * d.coefficientY;
+  const B = 2 * d.coefficientX * d.coefficientY;
+  const C =
+    d.coefficientY * d.coefficientY -
+    cosine * cosine * d.coefficientX * d.coefficientX -
+    cosine * cosine * d.coefficientY * d.coefficientY;
+  const root = calculateQuadraticEquation(A, B, C);
+
+  if (typeof root === 'number') {
+    results.push({
+      x: Math.round(root),
+      y: -Math.round(root) * p.x - p.y
+    });
+  } else if (root === IMPOSSIBLE) {
+    return root;
+  } else {
+    results.push(
+      {
+        coefficientX: root.x1,
+        coefficientY: 1,
+        constantTerm: -root.x1 * p.x - p.y
+      },
+      {
+        coefficientX: root.x2,
+        coefficientY: 1,
+        constantTerm: -root.x2 * p.x - p.y
+      }
+    );
   }
 
   return results;
