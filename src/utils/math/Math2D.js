@@ -11,6 +11,8 @@ import type {
 
 const INFINITY = 'vô cực';
 const IMPOSSIBLE = 'vô nghiệm';
+const MIN_RANDOM_NUMBER = 5;
+const MAX_RANDOM_NUMBER = 30;
 
 export function getStartPoint(): CoordinateType {
   return { x: 0, y: 0, z: 0 };
@@ -22,7 +24,7 @@ export function getRandomValue(min: number, max: number): number {
 
 function getRandomPointInLine(d: LinearEquation): CoordinateType {
   if (d.coefficientY !== 0) {
-    const tempX = getRandomValue(-50, 50);
+    const tempX = getRandomValue(MIN_RANDOM_NUMBER, MAX_RANDOM_NUMBER);
     return {
       x: tempX,
       y: (-d.constantTerm - d.coefficientX * tempX) / d.coefficientY
@@ -30,15 +32,16 @@ function getRandomPointInLine(d: LinearEquation): CoordinateType {
   } else {
     return {
       x: -d.constantTerm / d.coefficientX,
-      y: getRandomValue(-50, 50)
+      y: getRandomValue(MIN_RANDOM_NUMBER, MAX_RANDOM_NUMBER)
     };
   }
 }
 
 export function generatePointAlignmentInside(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
+  const constant = getRandomValue(2, 5);
   return {
-    x: (firstPoint.x + secondPoint.x) / getRandomValue(2, 5),
-    y: (firstPoint.y + secondPoint.y) / getRandomValue(2, 5)
+    x: (firstPoint.x + secondPoint.x) / constant,
+    y: (firstPoint.y + secondPoint.y) / constant
   };
 }
 
@@ -48,8 +51,8 @@ export function generatePointAlignmentOutside(
   isRight: boolean = true
 ): CoordinateType {
   const line = getLineFromTwoPoints(firstPoint, secondPoint);
-  const tempXRight = getRandomValue(secondPoint.x, 50);
-  const tempXLeft = getRandomValue(-50, firstPoint.x);
+  const tempXRight = getRandomValue(secondPoint.x, MAX_RANDOM_NUMBER);
+  const tempXLeft = getRandomValue(MIN_RANDOM_NUMBER, firstPoint.x);
   return isRight
     ? {
         x: tempXRight,
@@ -63,10 +66,10 @@ export function generatePointAlignmentOutside(
 
 export function generatePointNotAlignment(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
   let resultPoint: CoordinateType = {};
-  resultPoint.x = getRandomValue(-50, 50);
+  resultPoint.x = getRandomValue(MIN_RANDOM_NUMBER, MAX_RANDOM_NUMBER);
   const line = getLineFromTwoPoints(firstPoint, secondPoint);
   do {
-    resultPoint.y = getRandomValue(-50, 50);
+    resultPoint.y = getRandomValue(MIN_RANDOM_NUMBER, MAX_RANDOM_NUMBER);
   } while (resultPoint.y !== line.coefficientX * resultPoint.x + line.constantTerm);
   return resultPoint;
 }
@@ -135,8 +138,8 @@ export function calculateLinearEquationFromTwoPoints(
 }
 
 export function calculateParallelEquation(linearEquation: LinearEquation): LinearEquation {
-  // Random a constance term from -50 -> 50
-  const constantTerm = Math.floor(Math.random() * 100) - 50;
+  // Random a constance term from MIN_RANDOM_NUMBER -> MAX_RANDOM_NUMBER
+  const constantTerm = Math.floor(Math.random() * 100) - MAX_RANDOM_NUMBER;
 
   let parallelEquation: LinearEquation = { coefficientZ: 0 };
   parallelEquation.coefficientX = linearEquation.coefficientX;
@@ -147,8 +150,8 @@ export function calculateParallelEquation(linearEquation: LinearEquation): Linea
 }
 
 export function calculatePerpendicularEquation(linearEquation: LinearEquation): LinearEquation {
-  // Random a constance term from -50 -> 50
-  const constantTerm = Math.floor(Math.random() * 100) - 50;
+  // Random a constance term from MIN_RANDOM_NUMBER -> MAX_RANDOM_NUMBER
+  const constantTerm = Math.floor(Math.random() * 100) - MAX_RANDOM_NUMBER;
 
   let perpendicularEquation: LinearEquation = { coefficientZ: 0 };
   perpendicularEquation.coefficientX = -linearEquation.coefficientX;
@@ -230,7 +233,7 @@ export function calculateInternalBisectLineEquation(lineOne: LinearEquation, lin
   if (lineTwo.coefficientY !== 0) {
     pointInSecondLine.y = (-lineTwo.constantTerm - lineTwo.coefficientX * pointInSecondLine.x) / lineTwo.coefficientY;
   } else {
-    pointInSecondLine.y = getRandomValue(-50, 50);
+    pointInSecondLine.y = getRandomValue(MIN_RANDOM_NUMBER, MAX_RANDOM_NUMBER);
   }
   return _getInternalBisectLineEquation(firstLine, secondLine, pointInFirstLine, pointInSecondLine);
 }
