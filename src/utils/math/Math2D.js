@@ -21,11 +21,17 @@ export function getRandomValue(min: number, max: number): number {
 }
 
 export function calculateMiddlePoint(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
-  let middlePoint: CoordinateType = { z: 0 };
-  middlePoint.x = (firstPoint.x + secondPoint.x) / 2;
-  middlePoint.y = (firstPoint.y + secondPoint.y) / 2;
+  return {
+    x: (firstPoint.x + secondPoint.x) / 2,
+    y: (firstPoint.y + secondPoint.y) / 2
+  };
+}
 
-  return middlePoint;
+export function calculateSymmetricalPoint(firstPoint: CoordinateType, middlePoint: CoordinateType): CoordinateType {
+  return {
+    x: firstPoint.x + middlePoint.x,
+    y: firstPoint.y + middlePoint.y
+  };
 }
 
 export function calculateLinearEquationFromTwoPoints(
