@@ -27,11 +27,20 @@ export function calculateMiddlePoint(firstPoint: CoordinateType, secondPoint: Co
   };
 }
 
-export function calculateSymmetricalPoint(firstPoint: CoordinateType, middlePoint: CoordinateType): CoordinateType {
-  return {
-    x: firstPoint.x + middlePoint.x,
-    y: firstPoint.y + middlePoint.y
-  };
+export function calculateSymmetricalPoint(
+  firstPoint: CoordinateType,
+  secondPoint: CoordinateType,
+  isRight: boolean = true
+): CoordinateType {
+  return isRight
+    ? {
+        x: 2 * secondPoint.x - firstPoint.x,
+        y: 2 * secondPoint.y - firstPoint.x
+      }
+    : {
+        x: 2 * firstPoint.x - secondPoint.x,
+        y: 2 * firstPoint.y - secondPoint.y
+      };
 }
 
 export function calculateLinearEquationFromTwoPoints(
