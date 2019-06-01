@@ -35,8 +35,6 @@ export function analyzeInput(input) {
 
   appModel.relationsResult = result;
 
-  analyzeResult(result);
-
   return analyzeResult(result);
 }
 
@@ -62,6 +60,7 @@ function getInformation(string) {
   const result = defineInformation(preProgress);
 
   if (!result) return { Error: 'Sai định dạng' };
+  if (result.point && result.point.length > 3) return { Error: 'Tối đa 3 điểm thẳng háng' };
 
   // add operation for define type
   if (type === 'define') {

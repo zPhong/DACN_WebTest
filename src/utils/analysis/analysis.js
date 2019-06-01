@@ -32,6 +32,7 @@ export function analyzeResult(validatedResult: RelationsResultType): DrawingData
 
   let result = {};
 
+  readPointsMap();
   result.points = appModel.pointsMap.map(
     (node: NodeType): DrawingNodeType => ({
       id: node.id,
@@ -40,7 +41,6 @@ export function analyzeResult(validatedResult: RelationsResultType): DrawingData
   );
 
   result.segments = getArraySegments(validatedResult);
-  readPointsMap();
   return result;
 }
 
@@ -202,8 +202,8 @@ function getDependentObject(): Array<string> {
   result.push(lastNode.id);
 
   lastNode.dependentNodes.forEach((node) => {
-    if (!result.includes(node.id) && !appModel.pointsMap[findIndexByNodeId(node.id, appModel.pointsMap)].isStatic)
-      result.push(node.id);
+    const nodeIndex = findIndexByNodeId(node.id, appModel.pointsMap);
+    if (!result.includes(node.id) && nodeIndex !== -1 && !appModel.pointsMap[nodeIndex].isStatic) result.push(node.id);
   });
   return result;
 }
@@ -247,7 +247,7 @@ function createDependentNodeOfObject(
 }
 
 function createNode(id: string, dependentNodes?: Array<NodeRelationType>): any {
-  const node = { id, coordinate: { x: 0, y: 0, z: 0 }, isStatic: false };
+  const node = { id, coordinate: { x: undefined, y: undefined, z: 0 }, isStatic: false };
   const _dependentNodes = dependentNodes ? { dependentNodes } : { dependentNodes: [] };
 
   return { ...node, ..._dependentNodes };
@@ -264,6 +264,6 @@ function updateMap(node: NodeType, map: Array<NodeType>) {
     };
   } else {
     map.push(node);
-    if (map.length === 1) map[0].isStatic = true;
+    if (appModel.pointsMap.length === 1) map[0].isStatic = true;
   }
 }

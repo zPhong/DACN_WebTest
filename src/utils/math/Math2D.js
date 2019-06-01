@@ -11,8 +11,8 @@ import type {
 
 const INFINITY = 'vô cực';
 const IMPOSSIBLE = 'vô nghiệm';
-const MIN_RANDOM_NUMBER = 5;
-const MAX_RANDOM_NUMBER = 30;
+const MIN_RANDOM_NUMBER = -10;
+const MAX_RANDOM_NUMBER = 10;
 
 export function getStartPoint(): CoordinateType {
   return { x: 0, y: 0, z: 0 };
@@ -40,6 +40,7 @@ function getRandomPointInLine(d: LinearEquation): CoordinateType {
 export function generatePointAlignmentInside(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
   const line = getLineFromTwoPoints(firstPoint, secondPoint);
   const tempX = (firstPoint.x + secondPoint.x) / getRandomValue(2, 5);
+  console.log('line', line);
   return {
     x: tempX,
     y: line.coefficientX * tempX + line.constantTerm
@@ -112,7 +113,7 @@ function getLineFromTwoPoints(p1: CoordinateType, p2: CoordinateType): LinearEqu
       d: 1,
       e: -p2.y
     }
-  );
+  )[0];
   return { coefficientX: result.x, coefficientY: -1, constantTerm: result.y };
 }
 
