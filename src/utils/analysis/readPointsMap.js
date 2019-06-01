@@ -9,6 +9,7 @@ import {
 } from '../math/Math2D';
 import { shapeRules, mappingShapeType, TwoStaticPointRequireShape } from '../../configuration/define';
 import { generateGeometry } from './GenerateGeometry';
+import { readRelation } from './readRelation';
 
 export function readPointsMap(): Array<DrawingNodeType> {
   console.table(appModel.pointsMap);
@@ -42,6 +43,9 @@ export function readPointsMap(): Array<DrawingNodeType> {
       }
       if (!appModel.isExecutedRelation(relation)) {
         // calculate
+        readRelation(relation);
+
+        //
         appModel.executedRelations.push(relation);
       }
     });

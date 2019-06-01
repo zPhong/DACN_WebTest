@@ -14,61 +14,61 @@ class AppModel {
     this.executedNode = [];
   }
 
-  updateCoordinate(nodeId: string, coordinate: CoordinateType): void {
+  updateCoordinate = (nodeId: string, coordinate: CoordinateType): void => {
     const index = this.getIndexOfNodeInPointsMapById(nodeId);
     if (index !== NOT_FOUND) {
       console.log(nodeId, coordinate);
       this.pointsMap[index].coordinate = coordinate;
     }
-  }
+  };
 
-  isStaticNode(node: NodeType): boolean {
+  isStaticNode = (node: NodeType): boolean => {
     if (node.isStatic) return true;
     for (let i = 0; i < node.dependentNodes.length; i++) {
       if (!this.isExecutedRelation(node.dependentNodes[i].relation)) return false;
     }
 
     return this.executedNode.includes(node.id);
-  }
+  };
 
-  isExecutedRelation(relation: any): boolean {
+  isExecutedRelation = (relation: any): boolean => {
     for (let i = 0; i < this.executedRelations.length; i++) {
       if (relation === this.executedRelations[i]) return true;
     }
     return false;
-  }
+  };
 
-  updateStaticNode() {
+  updateStaticNode = () => {
     this.pointsMap = this.pointsMap.map(
       (node: NodeType): NodeType => {
         node.isStatic = this.isStaticNode(node);
         return node;
       }
     );
-  }
+  };
 
-  updatePointsMap(node: NodeType) {
+  updatePointsMap = (node: NodeType) => {
     let index = this.getIndexOfNodeInPointsMapById(node.id);
     this.pointsMap[index] = node;
-  }
+  };
 
-  isPointsMapStatic(): boolean {
+  isPointsMapStatic = (): boolean => {
     for (let i = 0; i < this.pointsMap.length; i++) {
       if (!this.pointsMap[i].isStatic) return false;
     }
     return true;
-  }
+  };
 
-  getNextExecuteNode(): NodeType {
+  getNextExecuteNode = (): NodeType => {
     const clonePointsMap = [...this.pointsMap]
       .filter((node) => !this.executedNode.includes(node.id))
       .sort(this.sortNodeByPriority);
 
     if (clonePointsMap.length > 0) return clonePointsMap[0];
     return null;
-  }
+  };
 
-  sortNodeByPriority(nodeOne: NodeType, nodeTwo: NodeType): number {
+  sortNodeByPriority = (nodeOne: NodeType, nodeTwo: NodeType): number => {
     const staticNodeOneCount = this.getDependentStaticNodeCount(nodeOne);
     const nodeOneData = {
       static: staticNodeOneCount,
@@ -123,56 +123,56 @@ class AppModel {
     });
 
     return parseInt(rankTwo) - parseInt(rankOne);
-  }
+  };
 
-  getMinIndexOfDependentNodeInRelationsList(node: NodeType) {
+  getMinIndexOfDependentNodeInRelationsList = (node: NodeType) => {
     const indexArray = [];
     for (let i = 0; i < node.dependentNodes.length; i++) {
       indexArray.push(this.getIndexOfRelationInRelationsList(node.dependentNodes[i]));
     }
 
     return Math.min(...indexArray);
-  }
+  };
 
-  getIndexOfRelationInRelationsList(relation: any): number {
+  getIndexOfRelationInRelationsList = (relation: any): number => {
     const list = [...this.relationsResult.shapes, ...this.relationsResult.relations];
     for (let i = 0; i < list.length; i++) {
       if (relation === list[i]) return i;
     }
     return NOT_FOUND;
-  }
+  };
 
-  getDependentStaticNodeCount(node: NodeType): number {
+  getDependentStaticNodeCount = (node: NodeType): number => {
     let count = 0;
     for (let i = 0; i < node.dependentNodes.length; i++) {
       if (this.isStaticNodeById(node.dependentNodes[i].id)) count++;
     }
 
     return count;
-  }
+  };
 
-  getIndexOfNodeInPointsMap(node): number {
+  getIndexOfNodeInPointsMap = (node): number => {
     for (let i = 0; i < this.pointsMap.length; i++) {
       if (node === this.pointsMap[i]) return i;
     }
     return NOT_FOUND;
-  }
+  };
 
-  getIndexOfNodeInPointsMapById(id: string): number {
+  getIndexOfNodeInPointsMapById = (id: string): number => {
     for (let i = 0; i < this.pointsMap.length; i++) {
       if (id === this.pointsMap[i].id) return i;
     }
     return NOT_FOUND;
-  }
+  };
 
-  isStaticNodeById(id: string): boolean {
+  isStaticNodeById = (id: string): boolean => {
     for (let i = 0; i < this.pointsMap.length; i++) {
       if (id === this.pointsMap[i].id) {
         return this.isStaticNode(this.pointsMap[i]);
       }
     }
     return false;
-  }
+  };
 }
 
 const appModel = new AppModel();
