@@ -427,3 +427,43 @@ export function calculateIntersectionTwoCircleEquations(c1: CircleEquation, c2: 
 
   return results;
 }
+
+export function calculateLinesByAnotherLineAndAngle(d: LinearEquation, p: CoordinateType, angle: number) {
+  let results: Array<LinearEquation> = [];
+
+  const cosine = Math.cos((angle * Math.PI) / 180);
+  const A =
+    d.coefficientX * d.coefficientX -
+    cosine * cosine * d.coefficientX * d.coefficientX -
+    cosine * cosine * d.coefficientY * d.coefficientY;
+  const B = 2 * d.coefficientX * d.coefficientY;
+  const C =
+    d.coefficientY * d.coefficientY -
+    cosine * cosine * d.coefficientX * d.coefficientX -
+    cosine * cosine * d.coefficientY * d.coefficientY;
+  const root = calculateQuadraticEquation(A, B, C);
+
+  if (typeof root === 'number') {
+    results.push({
+      x: Math.round(root),
+      y: -Math.round(root) * p.x - p.y
+    });
+  } else if (root === IMPOSSIBLE) {
+    return root;
+  } else {
+    results.push(
+      {
+        coefficientX: root.x1,
+        coefficientY: 1,
+        constantTerm: -root.x1 * p.x - p.y
+      },
+      {
+        coefficientX: root.x2,
+        coefficientY: 1,
+        constantTerm: -root.x2 * p.x - p.y
+      }
+    );
+  }
+
+  return results;
+}
