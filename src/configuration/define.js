@@ -14,8 +14,8 @@ const defineSentences = {
     '{object} phân giác {angle}',
     '{arrayPoints} thẳng hàng',
     '{point} trung điểm {segment}',
-    '{point} thuộc {object}',
-    '{point} không thuộc {object}'
+    '{point} không thuộc {object}',
+    '{point} thuộc {object}'
   ],
   shape: [
     'tam giác {type triangle}',

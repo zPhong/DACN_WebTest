@@ -1,6 +1,13 @@
 import type { NodeType, NodeRelationType, DrawingNodeType, CoordinateType, LinearEquation } from '../../types/types';
 import appModel from '../../appModel';
-import { calculateMiddlePoint, calculateSymmetricalPoint } from '../math/Math2D';
+import {
+  calculateMiddlePoint,
+  calculateSymmetricalPoint,
+  generatePointAlignmentInside,
+  generatePointAlignmentOutside,
+  generatePointNotAlignment,
+  getRandomValue
+} from '../math/Math2D';
 
 export function readRelation(relation: mixed, point: string): LinearEquation {
   if (relation.operation) {
@@ -46,6 +53,7 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
     relationType === 'thẳng hàng'
   ) {
     let calculatedPoint;
+    console.log(segmentIncludePoint, segmentNotIncludePoint);
     if (segmentIncludePoint) {
       const otherStaticPoint = relation.point[0];
       const otherStaticNodeInSegment = appModel.getNodeInPointsMapById(segmentIncludePoint.replace(point, ''));
@@ -65,15 +73,51 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
 
         appModel.updateCoordinate(point, calculatedPoint);
       }
+    } else if (segmentNotIncludePoint) {
+      switch (relationType) {
+        case 'trung điểm':
+          calculatedPoint = calculateMiddlePoint(
+            appModel.getNodeInPointsMapById(segmentNotIncludePoint[0]).coordinate,
+            appModel.getNodeInPointsMapById(segmentNotIncludePoint[1]).coordinate
+          );
+          appModel.updateCoordinate(point, calculatedPoint);
+          break;
+        case 'thuộc':
+          calculatedPoint = generatePointAlignmentInside(
+            appModel.getNodeInPointsMapById(segmentNotIncludePoint[0]).coordinate,
+            appModel.getNodeInPointsMapById(segmentNotIncludePoint[1]).coordinate
+          );
+          appModel.updateCoordinate(point, calculatedPoint);
+          break;
+        case 'không thuộc':
+          calculatedPoint = generatePointAlignmentOutside(
+            appModel.getNodeInPointsMapById(segmentNotIncludePoint[0]).coordinate,
+            appModel.getNodeInPointsMapById(segmentNotIncludePoint[1]).coordinate,
+            getRandomValue(0, 2) === 1
+          );
+          appModel.updateCoordinate(point, calculatedPoint);
+          break;
+        default:
+          break;
+      }
     } else {
-      calculatedPoint = calculateMiddlePoint(
-        appModel.getNodeInPointsMapById(segmentNotIncludePoint[0]).coordinate,
-        appModel.getNodeInPointsMapById(segmentNotIncludePoint[1]).coordinate
-      );
-
-      console.log(calculatedPoint);
-
-      appModel.updateCoordinate(point, calculatedPoint);
+      const points = relation.point;
+      const index = points.indexOf(point);
+      console.log(index, points);
+      if (index === 1) {
+        calculatedPoint = generatePointAlignmentInside(
+          appModel.getNodeInPointsMapById(points[0]).coordinate,
+          appModel.getNodeInPointsMapById(points[2]).coordinate
+        );
+        appModel.updateCoordinate(point, calculatedPoint);
+      } else {
+        calculatedPoint = generatePointAlignmentOutside(
+          appModel.getNodeInPointsMapById(points[index === 2 ? 0 : 1]).coordinate,
+          appModel.getNodeInPointsMapById(points[index === 2 ? 1 : 2]).coordinate,
+          index === 2
+        );
+        appModel.updateCoordinate(point, calculatedPoint);
+      }
     }
   } else if (relationType === 'song song' || relationType === 'vuông góc' || relationType === 'phân giác') {
   }
