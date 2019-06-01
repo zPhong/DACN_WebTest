@@ -22,9 +22,10 @@ export function getRandomValue(min: number, max: number): number {
 
 function getRandomPointInLine(d: LinearEquation): CoordinateType {
   if (d.coefficientY !== 0) {
+    const tempX = getRandomValue(-50, 50);
     return {
-      x: getRandomValue(-50, 50),
-      y: (-d.constantTerm - d.coefficientX * x) / d.coefficientY
+      x: tempX,
+      y: (-d.constantTerm - d.coefficientX * tempX) / d.coefficientY
     };
   } else {
     return {
@@ -34,11 +35,16 @@ function getRandomPointInLine(d: LinearEquation): CoordinateType {
   }
 }
 
-export function generatePointAlignment(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
+export function generatePointAlignmentInside(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
   return {
     x: (firstPoint.x + secondPoint.x) / getRandomValue(2, 5),
     y: (firstPoint.y + secondPoint.y) / getRandomValue(2, 5)
   };
+}
+
+export function generatePointAlignmentOutside(firstPoint: CoordinateType, secondPoint: CoordinateType, isRight: boolean = true): CoordinateType {
+  return isRight
+
 }
 
 export function generatePointNotAlignment(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
