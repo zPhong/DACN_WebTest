@@ -65,3 +65,12 @@ export type FirstDegreeEquation = {
   b: number,
   c: number
 }
+
+// Ax2 + By2 + Cx + Dy + E = 0
+export type TwoVariableQuadraticEquation = {
+  a: number,
+  b: number,
+  c: number,
+  d: number,
+  e: number
+}

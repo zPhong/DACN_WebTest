@@ -1,6 +1,13 @@
 // @flow
 
-import type { CircleEquation, CoordinateType, FirstDegreeEquation, LinearEquation, Vector } from '../../types/types';
+import type {
+  CircleEquation,
+  CoordinateType,
+  FirstDegreeEquation,
+  LinearEquation,
+  TwoVariableQuadraticEquation,
+  Vector
+} from '../../types/types';
 
 const INFINITY = 'vô cực';
 const IMPOSSIBLE = 'vô nghiệm';
@@ -14,11 +21,26 @@ export function getRandomValue(min: number, max: number): number {
 }
 
 export function calculateMiddlePoint(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
-  let middlePoint: CoordinateType = { z: 0 };
-  middlePoint.x = (firstPoint.x + secondPoint.x) / 2;
-  middlePoint.y = (firstPoint.y + secondPoint.y) / 2;
+  return {
+    x: (firstPoint.x + secondPoint.x) / 2,
+    y: (firstPoint.y + secondPoint.y) / 2
+  };
+}
 
-  return middlePoint;
+export function calculateSymmetricalPoint(
+  firstPoint: CoordinateType,
+  secondPoint: CoordinateType,
+  isRight: boolean = true
+): CoordinateType {
+  return isRight
+    ? {
+        x: 2 * secondPoint.x - firstPoint.x,
+        y: 2 * secondPoint.y - firstPoint.x
+      }
+    : {
+        x: 2 * firstPoint.x - secondPoint.x,
+        y: 2 * firstPoint.y - secondPoint.y
+      };
 }
 
 export function calculateLinearEquationFromTwoPoints(
@@ -233,43 +255,29 @@ export function calculateIntersectionLinearEquationWithCircleEquation(
   c: CircleEquation
 ): Array<Object> {
   const centerPoint: CoordinateType = { x: c.a, y: c.b };
-  let results: Array<Object> = [];
-
   const distanceFromCenterPointToLine = calculateDistanceFromPointToLine(centerPoint, d);
-
+  console.log(distanceFromCenterPointToLine);
   if (distanceFromCenterPointToLine > c.r) {
     return IMPOSSIBLE;
   } else {
-    const u = d.coefficientX * d.coefficientX + d.coefficientY * d.coefficientY;
-    const v =
-      2 * d.coefficientX * d.coefficientY * c.b -
-      2 * d.coefficientX * d.constantTerm -
-      2 * c.a * d.coefficientY * d.coefficientY;
-    const w =
-      d.coefficientY * d.coefficientY * c.r * c.r -
-      d.coefficientY * d.coefficientY * c.a * c.a -
-      d.coefficientY * d.coefficientY * c.b * c.b +
-      2 * d.coefficientY * d.constantTerm * c.b -
-      d.constantTerm * d.constantTerm;
-
-    // solves x. Unneeded check IMPOSSIBLE.
-    const root = calculateQuadraticEquation(u, v, -w);
-
-    if (typeof root === 'number') {
-      results.push(Object({ x: root, y: (d.constantTerm - d.coefficientX * root) / d.coefficientY }));
-    } else {
-      results.push(
-        Object({ x: root.x1, y: (d.constantTerm - d.coefficientX * root.x1) / d.coefficientY }),
-        Object({ x: root.x2, y: (d.constantTerm - d.coefficientX * root.x2) / d.coefficientY })
-      );
-    }
-
-    return results;
+    console.log(convertCircleEquationToQuadraticEquation(c));
+    return calculateSetOfLinearEquationAndQuadraticEquation(d, convertCircleEquationToQuadraticEquation(c));
   }
 }
 
+function convertCircleEquationToQuadraticEquation(c: CircleEquation): TwoVariableQuadraticEquation {
+  return {
+    a: 1,
+    b: 1,
+    c: -2 * c.a,
+    d: -2 * c.b,
+    e: Math.round(c.a * c.a + c.b * c.b - c.r * c.r)
+  };
+}
+
 /*
- * Solves a quadratic equation. This equation is defined: Ax2 + Bx + C = 0
+ * Solves a quadratic equation. This equation is defined: Ax2 + Bx + C = 0.
+ *
  *  @params:
  *        + a (number): represents x's coefficient.
  *        + b (number): represents y's coefficient.
@@ -295,4 +303,127 @@ export function calculateQuadraticEquation(a: number, b: number, c: number) {
     x2 = (-b - Math.sqrt(delta)) / (2 * a);
     return { x1, x2 };
   }
+}
+
+// Ax2 + By2 + Cx + Dy + E = 0
+export function isIn(p: CoordinateType, e: TwoVariableQuadraticEquation): boolean {
+  return e.a * p.x * p.x + e.b * p.y * p.y + e.c * p.x + e.d * p.y + e.e === 0;
+}
+
+/*
+ *  Solves a set of a linear equation and quadratic equation.
+ *  Linear equation is defined:     Ax + By + C = 0.
+ *  Quadratic equation is defined:  Ax2 + By2 + Cx + Dy + E = 0.
+ *
+ *  @params:
+ *        + l (LinearEquation): represents a linear equation.
+ *        + q (QuadraticEquation): represents a quadratic equation.
+ *  @return:
+ *        + IMPOSSIBLE (string): if the set is no root.
+ *        + (number): if the set has only ONE root.
+ *        + x1, x2 (Object): if the set has TWO root.
+ */
+export function calculateSetOfLinearEquationAndQuadraticEquation(
+  l: LinearEquation,
+  q: TwoVariableQuadraticEquation
+): Array<Object> {
+  let results: Array<Object> = [];
+
+  const u = q.a * l.coefficientY * l.coefficientY + q.b * l.coefficientX * l.coefficientX;
+  const v =
+    2 * l.coefficientX * l.constantTerm * q.b +
+    q.c * l.coefficientY * l.coefficientY -
+    q.d * l.coefficientY * l.coefficientX;
+  const w =
+    q.b * l.constantTerm * l.constantTerm -
+    q.d * l.coefficientY * l.constantTerm +
+    q.e * l.coefficientY * l.coefficientY;
+
+  // solves x. Unneeded check IMPOSSIBLE.
+  const root = calculateQuadraticEquation(u, v, w);
+
+  if (typeof root === 'number') {
+    results.push(Object({ x: root, y: (-l.constantTerm - l.coefficientX * root) / l.coefficientY }));
+  } else if (root === IMPOSSIBLE) {
+    return root;
+  } else {
+    results.push(
+      Object({ x: root.x1, y: (-l.constantTerm - l.coefficientX * root.x1) / l.coefficientY }),
+      Object({ x: root.x2, y: (-l.constantTerm - l.coefficientX * root.x2) / l.coefficientY })
+    );
+  }
+
+  return results;
+}
+
+export function calculateIntersectionTwoCircleEquations(c1: CircleEquation, c2: CircleEquation) {
+  const q1 = convertCircleEquationToQuadraticEquation(c1);
+  const q2 = convertCircleEquationToQuadraticEquation(c2);
+  console.log(q1);
+  console.log(q2);
+  let results: Array<Object> = [];
+
+  const C = q1.c - q2.c;
+  const D = q1.d - q2.d;
+  const E = q2.e - q1.e;
+
+  if (C === 0 && D === 0 && E === 0) {
+    return INFINITY;
+  }
+
+  if (D !== 0) {
+    const a = D * D + C * C;
+    const b = D * D * q1.c - 2 * E * C - q1.d * D * C;
+    const c = E * E + q1.e * D * D + q1.d * D * E;
+    const root = calculateQuadraticEquation(a, b, c);
+    if (typeof root === 'number') {
+      results.push(
+        Object({
+          x: root,
+          y: (E - C * root) / D
+        })
+      );
+    } else if (root === IMPOSSIBLE) {
+      return root;
+    } else {
+      results.push(
+        Object({
+          x: root.x1,
+          y: (E - C * root.x1) / D
+        }),
+        Object({
+          x: root.x2,
+          y: (E - C * root.x2) / D
+        })
+      );
+    }
+  } else {
+    const a = D * D + C * C;
+    const b = C * C * q1.d - 2 * E * D - q1.c * D * C;
+    const c = E * E + q1.e * C * C + q1.c * C * E;
+    const root = calculateQuadraticEquation(a, b, c);
+    if (typeof root === 'number') {
+      results.push(
+        Object({
+          x: E / C,
+          y: root
+        })
+      );
+    } else if (root === IMPOSSIBLE) {
+      return root;
+    } else {
+      results.push(
+        Object({
+          x: E / C,
+          y: root.x1
+        }),
+        Object({
+          x: E / C,
+          y: root.x2
+        })
+      );
+    }
+  }
+
+  return results;
 }
