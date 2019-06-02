@@ -72,7 +72,7 @@ export function generatePointNotAlignment(firstPoint: CoordinateType, secondPoin
   const line = getLineFromTwoPoints(firstPoint, secondPoint);
   do {
     resultPoint.y = getRandomValue(MIN_RANDOM_NUMBER, MAX_RANDOM_NUMBER);
-  } while (resultPoint.y !== line.coefficientX * resultPoint.x + line.constantTerm);
+  } while (resultPoint.y === line.coefficientX * resultPoint.x + line.constantTerm);
   return resultPoint;
 }
 
@@ -99,7 +99,7 @@ export function calculateSymmetricalPoint(
       };
 }
 
-function getLineFromTwoPoints(p1: CoordinateType, p2: CoordinateType): LinearEquation {
+export function getLineFromTwoPoints(p1: CoordinateType, p2: CoordinateType): LinearEquation {
   const result = calculateSetOfLinearEquationAndQuadraticEquation(
     {
       coefficientX: p1.x,
