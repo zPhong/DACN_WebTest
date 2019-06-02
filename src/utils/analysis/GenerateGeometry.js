@@ -1,6 +1,11 @@
 import appModel from '../../appModel';
 import type { CoordinateType, LinearEquation } from '../../types/types';
-import { calculateDistanceTwoPoints, calculateLinearEquationFromTwoPoints, getRandomValue } from '../math/Math2D';
+import {
+  calculateDistanceTwoPoints,
+  calculateLinearEquationFromTwoPoints,
+  getLineFromTwoPoints,
+  getRandomValue
+} from "../math/Math2D";
 
 const MIN_RANDOM_NUMBER = 5;
 const MAX_RANDOM_NUMBER = 15;
@@ -13,7 +18,7 @@ const geometricObj = {
   rectangle: generateRectangle,
   rhombus: generateRhombus,
   square: generateSquare,
-  circle: generateCircle,
+  circle: generateCircle
 };
 
 export function generateGeometry(name: string, shape: string, type?: string) {
@@ -116,7 +121,7 @@ function generateQuadrilateral(name: string) {
     // p2 represents point B
     const p2: CoordinateType = {
       x: getRandomValue(p1.x + MIN_RANDOM_NUMBER, p1.x + MAX_RANDOM_NUMBER),
-      y: getRandomValue(p1.y + MIN_RANDOM_NUMBER, p1.y + MAX_RANDOM_NUMBER)
+      y: getRandomValue(p1.y - MAX_RANDOM_NUMBER, p1.y + MAX_RANDOM_NUMBER)
     };
     appModel.updateCoordinate(name[1], p2);
 
@@ -125,16 +130,23 @@ function generateQuadrilateral(name: string) {
     // prevent point C is on AB line
     const linearEquation: LinearEquation = calculateLinearEquationFromTwoPoints(p1, p2);
     do {
-      p3.x = getRandomValue(p2.x + MIN_RANDOM_NUMBER, p2.x + MAX_RANDOM_NUMBER);
-      p3.y = getRandomValue(p1.y + MIN_RANDOM_NUMBER, p2.y);
+      p3.x = getRandomValue(p1.x + MIN_RANDOM_NUMBER, p1.x + MAX_RANDOM_NUMBER);
+      p3.y = getRandomValue(p1.y + MIN_RANDOM_NUMBER, p1.y + MAX_RANDOM_NUMBER);
     } while (p3.y === linearEquation.coefficientX * p3.x + linearEquation.constantTerm);
     appModel.updateCoordinate(name[2], p3);
 
     // p4 represents point D
     const p4: CoordinateType = {
-      x: getRandomValue(p1.x + MIN_RANDOM_NUMBER, p1.x + MAX_RANDOM_NUMBER),
-      y: p1.y
+      x: getRandomValue(p1.x - MAX_RANDOM_NUMBER, p3.x),
+      y: undefined,
     };
+
+    // prevents p1, p2, p4 are straight
+    const line = getLineFromTwoPoints(p1, p2);
+    do {
+      p4.y = getRandomValue(p1.x, p1.x + MAX_RANDOM_NUMBER);
+    } while (p4.y === line.coefficientX * p4.x + line.constantTerm);
+
     appModel.updateCoordinate(name[3], p4);
   }
 }
@@ -187,7 +199,7 @@ function generateTrapezoid(name: string, type: string) {
         appModel.updateCoordinate(name[2], p3);
 
         const distanceX = Math.abs(p3.x - p2.x);
-        const p4X = getRandomValue(0,2) === 1 ? p1.x + distanceX : p1.x - distanceX;
+        const p4X = getRandomValue(0, 2) === 1 ? p1.x + distanceX : p1.x - distanceX;
         // p4 represents point D
         const p4: CoordinateType = {
           x: p4X,
@@ -327,6 +339,4 @@ function generateSquare(name: string) {
   }
 }
 
-function generateCircle(name: string) {
-
-}
+function generateCircle(name: string) {}
