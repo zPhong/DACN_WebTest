@@ -112,10 +112,13 @@ class App extends Component {
                 style={{
                   width: '100%',
                   height: '50%',
-                  marginBottom: '1rem'
+                  marginBottom: '1rem',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center'
                 }}>
                 <textarea
-                  style={{ flex: 1, height: 100 }}
+                  style={{ width: '70%', height: '80%' }}
                   name="title"
                   value={input}
                   onChange={(event) => {
