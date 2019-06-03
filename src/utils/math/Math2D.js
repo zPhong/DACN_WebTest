@@ -117,28 +117,6 @@ export function getLineFromTwoPoints(p1: CoordinateType, p2: CoordinateType): Li
   return { coefficientX: result.x, coefficientY: -1, constantTerm: result.y };
 }
 
-export function calculateLinearEquationFromTwoPoints(
-  firstPoint: CoordinateType,
-  secondPoint: CoordinateType
-): LinearEquation {
-  let directionVector: Vector = { z: 0 };
-  directionVector.a = secondPoint.x - firstPoint.x;
-  directionVector.b = secondPoint.y - firstPoint.y;
-
-  let normalVector: Vector = { z: 0 };
-  normalVector.a = directionVector.b;
-  normalVector.b = -directionVector.a;
-
-  const constantTerm = firstPoint.y - normalVector.a * firstPoint.x;
-
-  let linearEquation: LinearEquation = {};
-  linearEquation.coefficientX = normalVector.a;
-  linearEquation.coefficientY = normalVector.b;
-  linearEquation.constantTerm = constantTerm;
-
-  return linearEquation;
-}
-
 export function calculateParallelEquation(linearEquation: LinearEquation): LinearEquation {
   // Random a constance term from MIN_RANDOM_NUMBER -> MAX_RANDOM_NUMBER
   const constantTerm = Math.floor(Math.random() * 100) - MAX_RANDOM_NUMBER;

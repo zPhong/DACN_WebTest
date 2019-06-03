@@ -2,7 +2,6 @@ import appModel from '../../appModel';
 import type { CoordinateType, LinearEquation } from '../../types/types';
 import {
   calculateDistanceTwoPoints,
-  calculateLinearEquationFromTwoPoints,
   getLineFromTwoPoints,
   getRandomValue
 } from "../math/Math2D";
@@ -128,7 +127,7 @@ function generateQuadrilateral(name: string) {
     // p3 represents point C
     let p3: CoordinateType = {};
     // prevent point C is on AB line
-    const linearEquation: LinearEquation = calculateLinearEquationFromTwoPoints(p1, p2);
+    const linearEquation: LinearEquation = getLineFromTwoPoints(p1, p2);
     do {
       p3.x = getRandomValue(p1.x + MIN_RANDOM_NUMBER, p1.x + MAX_RANDOM_NUMBER);
       p3.y = getRandomValue(p1.y + MIN_RANDOM_NUMBER, p1.y + MAX_RANDOM_NUMBER);
