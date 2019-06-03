@@ -57,13 +57,13 @@ export function generatePointAlignmentOutside(
   const tempXLeft = getRandomValue(MIN_RANDOM_NUMBER, firstPoint.x);
   return isRight
     ? {
-        x: tempXRight,
-        y: line.coefficientX * tempXRight + line.constantTerm
-      }
+      x: tempXRight,
+      y: line.coefficientX * tempXRight + line.constantTerm
+    }
     : {
-        x: tempXLeft,
-        y: line.coefficientX * tempXLeft + line.constantTerm
-      };
+      x: tempXLeft,
+      y: line.coefficientX * tempXLeft + line.constantTerm
+    };
 }
 
 export function generatePointNotAlignment(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
@@ -90,13 +90,13 @@ export function calculateSymmetricalPoint(
 ): CoordinateType {
   return isRight
     ? {
-        x: 2 * secondPoint.x - firstPoint.x,
-        y: 2 * secondPoint.y - firstPoint.y
-      }
+      x: 2 * secondPoint.x - firstPoint.x,
+      y: 2 * secondPoint.y - firstPoint.y
+    }
     : {
-        x: 2 * firstPoint.x - secondPoint.x,
-        y: 2 * firstPoint.y - secondPoint.y
-      };
+      x: 2 * firstPoint.x - secondPoint.x,
+      y: 2 * firstPoint.y - secondPoint.y
+    };
 }
 
 export function getLineFromTwoPoints(p1: CoordinateType, p2: CoordinateType): LinearEquation {
@@ -174,8 +174,8 @@ export function calculatePerpendicularLineByPointAndLine(point: CoordinateType, 
   // perpendicular line has the direction vector is opposite pairs with the other line.
   // perpendicular line's constantTerm = -ax - y with (x,y) is coordinate of the point
   perpendicularLine.coefficientX = -line.coefficientX;
-  perpendicularLine.coefficientY = -line.coefficientY;
-  perpendicularLine.constantTerm = -perpendicularLine.coefficientX * point.x - point.y;
+  perpendicularLine.coefficientY = line.coefficientY;
+  perpendicularLine.constantTerm = point.y - line.coefficientX * point.x;
 
   return perpendicularLine;
 }
