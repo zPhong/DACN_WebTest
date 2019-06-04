@@ -181,7 +181,7 @@ export function calculatePerpendicularLineByPointAndLine(point: CoordinateType, 
 }
 
 export function calculateIntersectionByLineAndLine(lineOne: LinearEquation, lineTwo: LinearEquation): CoordinateType {
-  return  calculateSetOfLinearEquationAndQuadraticEquation(
+  return calculateSetOfLinearEquationAndQuadraticEquation(
     {
       coefficientX: lineOne.coefficientX,
       coefficientY: lineOne.coefficientY,
@@ -383,28 +383,30 @@ export function calculateSetOfLinearEquationAndQuadraticEquation(
   let results: Array<Object> = [];
   let u, v, w;
 
-  if (l.coefficientX !== 0) {
-    u = l.coefficientY * l.coefficientY + l.coefficientX * l.coefficientX * q.b;
-    v =
-      2 * l.coefficientY * l.constantTerm * q.a -
-      l.coefficientX * q.c * l.coefficientY +
-      l.coefficientX * l.coefficientX * q.d;
-    w =
-      q.a * l.constantTerm * l.constantTerm -
-      l.coefficientX * q.c * l.constantTerm +
-      q.e * l.coefficientX * l.coefficientX;
+  const A = l.coefficientX;
+  const B = l.coefficientY;
+  const C = l.constantTerm;
+  const D = q.a;
+  const E = q.b;
+  const F = q.c;
+  const G = q.d;
+  const H = q.e;
+  if (A !== 0) {
+    u = A * A * E + D * B * B;
+    v = 2 * B * C * D - A * B * F + A * A * G;
+    w = D * C * C - A * C * F + A * A * H;
 
     // solves x. Unneeded check IMPOSSIBLE.
     const root = calculateQuadraticEquation(u, v, w);
 
     if (typeof root === 'number') {
-      results.push(Object({ x: (-l.constantTerm - l.coefficientY * root) / l.coefficientX, y: root }));
+      results.push(Object({ x: (-C - B * root) / A, y: root }));
     } else if (root === IMPOSSIBLE) {
       return root;
     } else {
       results.push(
-        Object({ x: (-l.constantTerm - l.coefficientY * root.x1) / l.coefficientX, y: root.x1 }),
-        Object({ x: (-l.constantTerm - l.coefficientY * root.x2) / l.coefficientX, y: root.x2 })
+        Object({ x: (-C - B * root.x1) / A, y: root.x1 }),
+        Object({ x: (-C - B * root.x2) / A, y: root.x2 })
       );
     }
   } else {
