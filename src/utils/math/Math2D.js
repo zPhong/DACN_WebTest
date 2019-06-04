@@ -173,7 +173,11 @@ export function calculatePerpendicularLineByPointAndLine(point: CoordinateType, 
 
   // perpendicular line has the direction vector is opposite pairs with the other line.
   // perpendicular line's constantTerm = -ax - y with (x,y) is coordinate of the point
-  perpendicularLine.coefficientX = -1 / line.coefficientX;
+  if (line.coefficientX !== 0) {
+    perpendicularLine.coefficientX = -1 / line.coefficientX;
+  } else {
+    perpendicularLine.coefficientX = 0;
+  }
   perpendicularLine.coefficientY = line.coefficientY;
   perpendicularLine.constantTerm = point.y - perpendicularLine.coefficientX * point.x;
 
