@@ -72,7 +72,7 @@ export function generatePointNotAlignment(firstPoint: CoordinateType, secondPoin
   const line = getLineFromTwoPoints(firstPoint, secondPoint);
   do {
     resultPoint.y = getRandomValue(MIN_RANDOM_NUMBER, MAX_RANDOM_NUMBER);
-  } while (resultPoint.y !== line.coefficientX * resultPoint.x + line.constantTerm);
+  } while (resultPoint.y === line.coefficientX * resultPoint.x + line.constantTerm);
   return resultPoint;
 }
 
@@ -99,7 +99,7 @@ export function calculateSymmetricalPoint(
       };
 }
 
-function getLineFromTwoPoints(p1: CoordinateType, p2: CoordinateType): LinearEquation {
+export function getLineFromTwoPoints(p1: CoordinateType, p2: CoordinateType): LinearEquation {
   const result = calculateSetOfLinearEquationAndQuadraticEquation(
     {
       coefficientX: p1.x,
@@ -115,28 +115,6 @@ function getLineFromTwoPoints(p1: CoordinateType, p2: CoordinateType): LinearEqu
     }
   )[0];
   return { coefficientX: result.x, coefficientY: -1, constantTerm: result.y };
-}
-
-export function calculateLinearEquationFromTwoPoints(
-  firstPoint: CoordinateType,
-  secondPoint: CoordinateType
-): LinearEquation {
-  let directionVector: Vector = { z: 0 };
-  directionVector.a = secondPoint.x - firstPoint.x;
-  directionVector.b = secondPoint.y - firstPoint.y;
-
-  let normalVector: Vector = { z: 0 };
-  normalVector.a = directionVector.b;
-  normalVector.b = -directionVector.a;
-
-  const constantTerm = firstPoint.y - normalVector.a * firstPoint.x;
-
-  let linearEquation: LinearEquation = {};
-  linearEquation.coefficientX = normalVector.a;
-  linearEquation.coefficientY = normalVector.b;
-  linearEquation.constantTerm = constantTerm;
-
-  return linearEquation;
 }
 
 export function calculateParallelEquation(linearEquation: LinearEquation): LinearEquation {
@@ -195,25 +173,28 @@ export function calculatePerpendicularLineByPointAndLine(point: CoordinateType, 
 
   // perpendicular line has the direction vector is opposite pairs with the other line.
   // perpendicular line's constantTerm = -ax - y with (x,y) is coordinate of the point
-  perpendicularLine.coefficientX = -line.coefficientX;
-  perpendicularLine.coefficientY = -line.coefficientY;
-  perpendicularLine.constantTerm = -perpendicularLine.coefficientX * point.x - point.y;
+  perpendicularLine.coefficientX = -1 / line.coefficientX;
+  perpendicularLine.coefficientY = line.coefficientY;
+  perpendicularLine.constantTerm = point.y - perpendicularLine.coefficientX * point.x;
 
   return perpendicularLine;
 }
 
 export function calculateIntersectionByLineAndLine(lineOne: LinearEquation, lineTwo: LinearEquation): CoordinateType {
-  let crossPoint: CoordinateType = {};
-
-  // ax + y + b = a'x + y + b'
-  // => x = (b' - b) / (a - a')
-  crossPoint.x = (lineTwo.constantTerm - lineOne.constantTerm) / (lineOne.coefficientX - lineTwo.coefficientX);
-
-  // ax + y + b = 0
-  // => y = -b - ax
-  crossPoint.y = -lineOne.constantTerm - lineOne.coefficientX * crossPoint.x;
-
-  return crossPoint;
+  return  calculateSetOfLinearEquationAndQuadraticEquation(
+    {
+      coefficientX: lineOne.coefficientX,
+      coefficientY: lineOne.coefficientY,
+      constantTerm: lineOne.constantTerm
+    },
+    {
+      a: 0,
+      b: 0,
+      c: lineTwo.coefficientX,
+      d: lineTwo.coefficientY,
+      e: lineTwo.constantTerm
+    }
+  )[0];
 }
 
 export function calculateCircleEquationByCenterPoint(centerPoint: CoordinateType, radius: number): CircleEquation {
@@ -400,29 +381,53 @@ export function calculateSetOfLinearEquationAndQuadraticEquation(
   q: TwoVariableQuadraticEquation
 ): Array<Object> {
   let results: Array<Object> = [];
+  let u, v, w;
 
-  const u = q.a * l.coefficientY * l.coefficientY + q.b * l.coefficientX * l.coefficientX;
-  const v =
-    2 * l.coefficientX * l.constantTerm * q.b +
-    q.c * l.coefficientY * l.coefficientY -
-    q.d * l.coefficientY * l.coefficientX;
-  const w =
-    q.b * l.constantTerm * l.constantTerm -
-    q.d * l.coefficientY * l.constantTerm +
-    q.e * l.coefficientY * l.coefficientY;
+  if (l.coefficientX !== 0) {
+    u = l.coefficientY * l.coefficientY + l.coefficientX * l.coefficientX * q.b;
+    v =
+      2 * l.coefficientY * l.constantTerm * q.a -
+      l.coefficientX * q.c * l.coefficientY +
+      l.coefficientX * l.coefficientX * q.d;
+    w =
+      q.a * l.constantTerm * l.constantTerm -
+      l.coefficientX * q.c * l.constantTerm +
+      q.e * l.coefficientX * l.coefficientX;
 
-  // solves x. Unneeded check IMPOSSIBLE.
-  const root = calculateQuadraticEquation(u, v, w);
+    // solves x. Unneeded check IMPOSSIBLE.
+    const root = calculateQuadraticEquation(u, v, w);
 
-  if (typeof root === 'number') {
-    results.push(Object({ x: root, y: (-l.constantTerm - l.coefficientX * root) / l.coefficientY }));
-  } else if (root === IMPOSSIBLE) {
-    return root;
+    if (typeof root === 'number') {
+      results.push(Object({ x: (-l.constantTerm - l.coefficientY * root) / l.coefficientX, y: root }));
+    } else if (root === IMPOSSIBLE) {
+      return root;
+    } else {
+      results.push(
+        Object({ x: (-l.constantTerm - l.coefficientY * root.x1) / l.coefficientX, y: root.x1 }),
+        Object({ x: (-l.constantTerm - l.coefficientY * root.x2) / l.coefficientX, y: root.x2 })
+      );
+    }
   } else {
-    results.push(
-      Object({ x: root.x1, y: (-l.constantTerm - l.coefficientX * root.x1) / l.coefficientY }),
-      Object({ x: root.x2, y: (-l.constantTerm - l.coefficientX * root.x2) / l.coefficientY })
-    );
+    u = q.a * l.coefficientY * l.coefficientY;
+    v = q.c * l.coefficientY * l.coefficientY;
+    w =
+      q.b * l.constantTerm * l.constantTerm -
+      q.d * l.coefficientY * l.constantTerm +
+      q.e * l.coefficientY * l.coefficientY;
+
+    // solves x. Unneeded check IMPOSSIBLE.
+    const root = calculateQuadraticEquation(u, v, w);
+
+    if (typeof root === 'number') {
+      results.push(Object({ x: root, y: -l.constantTerm / l.coefficientY }));
+    } else if (root === IMPOSSIBLE) {
+      return root;
+    } else {
+      results.push(
+        Object({ x: root.x1, y: -l.constantTerm / l.coefficientY }),
+        Object({ x: root.x2, y: -l.constantTerm / l.coefficientY })
+      );
+    }
   }
 
   return results;
