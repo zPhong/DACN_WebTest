@@ -22,7 +22,7 @@ export function getRandomValue(min: number, max: number): number {
   return Math.floor(Math.random() * max) + min;
 }
 
-function getRandomPointInLine(d: LinearEquation): CoordinateType {
+export function getRandomPointInLine(d: LinearEquation): CoordinateType {
   if (d.coefficientY !== 0) {
     const tempX = getRandomValue(MIN_RANDOM_NUMBER, MAX_RANDOM_NUMBER);
     return {

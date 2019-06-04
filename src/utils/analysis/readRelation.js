@@ -124,8 +124,6 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
       }
     }
   } else if (relationType === 'song song' || relationType === 'vuông góc' || relationType === 'phân giác') {
-    console.log(segmentIncludePoint);
-
     //undefined point
     for (let i = 0; i < 2; i++) {
       if (!appModel.isValidCoordinate(segmentNotIncludePoint[i])) {
@@ -146,6 +144,8 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
         appModel.getNodeInPointsMapById(otherStaticPoint).coordinate,
         staticLineEquation
       );
+
+      console.log(calculatedLineEquation, staticLineEquation);
 
       const calculatedPoint = calculateIntersectionByLineAndLine(calculatedLineEquation, staticLineEquation);
       appModel.updateCoordinate(point, calculatedPoint);

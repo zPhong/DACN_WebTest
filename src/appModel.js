@@ -61,7 +61,9 @@ class AppModel {
   isValidCoordinate = (nodeId: string) => {
     if (nodeId) {
       const node = this.getNodeInPointsMapById(nodeId);
-      return node.coordinate.x && node.coordinate.y;
+      if (node) {
+        return node.coordinate.x !== undefined && node.coordinate.y !== undefined;
+      }
     }
     return false;
   };
