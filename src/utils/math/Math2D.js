@@ -9,10 +9,7 @@ import type {
   Vector
 } from '../../types/types';
 
-const INFINITY = 'vô cực';
-const IMPOSSIBLE = 'vô nghiệm';
-const MIN_RANDOM_NUMBER = -10;
-const MAX_RANDOM_NUMBER = 10;
+import { MIN_RANDOM_NUMBER, MAX_RANDOM_NUMBER, INFINITY, IMPOSSIBLE } from '../values';
 
 export function getStartPoint(): CoordinateType {
   return { x: 0, y: 0, z: 0 };
@@ -556,4 +553,14 @@ export function calculateLinesByAnotherLineAndAngle(d: LinearEquation, p: Coordi
   }
 
   return results;
+}
+
+export function convertLinearToQuadric(l: LinearEquation): TwoVariableQuadraticEquation {
+  return {
+    a: 0,
+    b: 0,
+    c: l.coefficientX,
+    d: l.coefficientY,
+    e: l.constantTerm
+  };
 }
