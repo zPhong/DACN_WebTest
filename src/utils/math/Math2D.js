@@ -446,8 +446,7 @@ export function calculateSetOfLinearEquationAndQuadraticEquation(
 export function calculateIntersectionTwoCircleEquations(c1: CircleEquation, c2: CircleEquation) {
   const q1 = convertCircleEquationToQuadraticEquation(c1);
   const q2 = convertCircleEquationToQuadraticEquation(c2);
-  console.log(q1);
-  console.log(q2);
+
   let results: Array<Object> = [];
 
   const C = q1.c - q2.c;
