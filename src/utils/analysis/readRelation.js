@@ -6,6 +6,12 @@ import {
   generatePointAlignmentInside,
   generatePointAlignmentOutside,
   generatePointNotAlignment,
+  calculateInternalBisectLineEquation,
+  calculatePerpendicularLineByPointAndLine,
+  calculateParallelLineByPointAndLine,
+  calculateIntersectionByLineAndLine,
+  getLineFromTwoPoints,
+  getRandomPointInLine,
   getRandomValue
 } from '../math/Math2D';
 
@@ -13,6 +19,7 @@ export function readRelation(relation: mixed, point: string): LinearEquation {
   if (relation.operation) {
   } else if (relation.relation) {
     const relationType = relation.relation;
+    let result;
     switch (relationType) {
       case 'trung điểm':
       case 'thuộc':
@@ -21,9 +28,10 @@ export function readRelation(relation: mixed, point: string): LinearEquation {
       case 'vuông góc':
       case 'phân giác':
       case 'thẳng hàng':
-        const result = analyzeRelationType(relation, point);
+        result = analyzeRelationType(relation, point);
         break;
       case 'cắt':
+        result = analyzeIntersectRelation(relation, point);
         break;
       default:
         break;
@@ -53,7 +61,6 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
     relationType === 'thẳng hàng'
   ) {
     let calculatedPoint;
-    console.log(segmentIncludePoint, segmentNotIncludePoint);
     if (segmentIncludePoint) {
       const otherStaticPoint = relation.point[0];
       const otherStaticNodeInSegment = appModel.getNodeInPointsMapById(segmentIncludePoint.replace(point, ''));
@@ -119,8 +126,89 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
         appModel.updateCoordinate(point, calculatedPoint);
       }
     }
-  } else if (relationType === 'song song' || relationType === 'vuông góc' || relationType === 'phân giác') {
+  } else if (relationType === 'song song' || relationType === 'vuông góc') {
+    //undefined point
+    for (let i = 0; i < 2; i++) {
+      if (!appModel.isValidCoordinate(segmentNotIncludePoint[i])) {
+        return;
+      }
+    }
+
+    const staticLineEquation = getLineFromTwoPoints(
+      appModel.getNodeInPointsMapById(segmentNotIncludePoint[0]).coordinate,
+      appModel.getNodeInPointsMapById(segmentNotIncludePoint[1]).coordinate
+    );
+
+    const otherStaticPoint = segmentIncludePoint.replace(point, '');
+
+    let calculatedLineEquation;
+    if (relationType === 'vuông góc') {
+      calculatedLineEquation = calculatePerpendicularLineByPointAndLine(
+        appModel.getNodeInPointsMapById(otherStaticPoint).coordinate,
+        staticLineEquation
+      );
+
+      const calculatedPoint = calculateIntersectionByLineAndLine(calculatedLineEquation, staticLineEquation);
+      appModel.updateCoordinate(point, calculatedPoint);
+    }
+    if (relationType === 'song song') {
+      calculatedLineEquation = calculateParallelLineByPointAndLine(
+        appModel.getNodeInPointsMapById(otherStaticPoint).coordinate,
+        staticLineEquation
+      );
+
+      const calculatedPoint = getRandomPointInLine(calculatedLineEquation);
+
+      appModel.updateCoordinate(point, calculatedPoint);
+    }
+  } else if (relationType === 'phân giác') {
+    if (relation.angle) {
+      const angle = relation.angle[0];
+
+      const staticLineEquation = getLineFromTwoPoints(
+        appModel.getNodeInPointsMapById(angle[0]).coordinate,
+        appModel.getNodeInPointsMapById(angle[2]).coordinate
+      );
+
+      const calculatedLineEquation = calculateInternalBisectLineEquation(
+        getLineFromTwoPoints(
+          appModel.getNodeInPointsMapById(angle[0]).coordinate,
+          appModel.getNodeInPointsMapById(angle[1]).coordinate
+        ),
+        getLineFromTwoPoints(
+          appModel.getNodeInPointsMapById(angle[1]).coordinate,
+          appModel.getNodeInPointsMapById(angle[2]).coordinate
+        )
+      );
+
+      console.log(calculatedLineEquation);
+
+      const calculatedPoint = calculateIntersectionByLineAndLine(calculatedLineEquation, staticLineEquation);
+      appModel.updateCoordinate(point, calculatedPoint);
+    }
   }
+}
+
+function analyzeIntersectRelation(relation: mixed, point: string): CoordinateType {
+  for (let index in relation.segment) {
+    for (let i = 0; i < 2; i++) {
+      if (!appModel.isValidCoordinate(relation.segment[index][i])) {
+        return;
+      }
+    }
+  }
+
+  const calculatedLineEquationOne = getLineFromTwoPoints(
+    appModel.getNodeInPointsMapById(relation.segment[0][0]).coordinate,
+    appModel.getNodeInPointsMapById(relation.segment[0][1]).coordinate
+  );
+  const calculatedLineEquationTwo = getLineFromTwoPoints(
+    appModel.getNodeInPointsMapById(relation.segment[1][0]).coordinate,
+    appModel.getNodeInPointsMapById(relation.segment[1][1]).coordinate
+  );
+
+  const calculatedPoint = calculateIntersectionByLineAndLine(calculatedLineEquationOne, calculatedLineEquationTwo);
+  appModel.updateCoordinate(point, calculatedPoint);
 }
 
 function analyzeOperationType(relation: mixed): CoordinateType {}

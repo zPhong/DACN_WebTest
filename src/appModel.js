@@ -58,6 +58,16 @@ class AppModel {
     return true;
   };
 
+  isValidCoordinate = (nodeId: string) => {
+    if (nodeId) {
+      const node = this.getNodeInPointsMapById(nodeId);
+      if (node) {
+        return node.coordinate.x !== undefined && node.coordinate.y !== undefined;
+      }
+    }
+    return false;
+  };
+
   getNextExecuteNode = (): NodeType => {
     const clonePointsMap = [...this.pointsMap]
       .filter((node) => !this.executedNode.includes(node.id))
