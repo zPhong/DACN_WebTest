@@ -6,6 +6,11 @@ import {
   generatePointAlignmentInside,
   generatePointAlignmentOutside,
   generatePointNotAlignment,
+  calculatePerpendicularLineByPointAndLine,
+  calculateParallelLineByPointAndLine,
+  calculateIntersectionByLineAndLine,
+  getLineFromTwoPoints,
+  getRandomPointInLine,
   getRandomValue
 } from '../math/Math2D';
 
@@ -53,7 +58,6 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
     relationType === 'thẳng hàng'
   ) {
     let calculatedPoint;
-    console.log(segmentIncludePoint, segmentNotIncludePoint);
     if (segmentIncludePoint) {
       const otherStaticPoint = relation.point[0];
       const otherStaticNodeInSegment = appModel.getNodeInPointsMapById(segmentIncludePoint.replace(point, ''));
@@ -120,7 +124,65 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
       }
     }
   } else if (relationType === 'song song' || relationType === 'vuông góc' || relationType === 'phân giác') {
+    console.log(segmentIncludePoint);
+
+    //undefined point
+    for (let i = 0; i < 2; i++) {
+      if (!appModel.isValidCoordinate(segmentNotIncludePoint[i])) {
+        return;
+      }
+    }
+
+    const staticLineEquation = getLineFromTwoPoints(
+      appModel.getNodeInPointsMapById(segmentNotIncludePoint[0]).coordinate,
+      appModel.getNodeInPointsMapById(segmentNotIncludePoint[1]).coordinate
+    );
+
+    const otherStaticPoint = segmentIncludePoint.replace(point, '');
+
+    let calculatedLineEquation;
+    if (relationType === 'vuông góc') {
+      calculatedLineEquation = calculatePerpendicularLineByPointAndLine(
+        appModel.getNodeInPointsMapById(otherStaticPoint).coordinate,
+        staticLineEquation
+      );
+
+      const calculatedPoint = calculateIntersectionByLineAndLine(calculatedLineEquation, staticLineEquation);
+      appModel.updateCoordinate(point, calculatedPoint);
+    }
+    if (relationType === 'song song') {
+      calculatedLineEquation = calculateParallelLineByPointAndLine(
+        appModel.getNodeInPointsMapById(otherStaticPoint).coordinate,
+        staticLineEquation
+      );
+
+      const calculatedPoint = getRandomPointInLine(calculatedLineEquation);
+
+      appModel.updateCoordinate(point, calculatedPoint);
+    }
   }
+}
+
+function analyzeIntersectRelation(relation: mixed, point: string): CoordinateType {
+  for (let index in relation.segment) {
+    for (let i = 0; i < 2; i++) {
+      if (!appModel.isValidCoordinate(relation.segment[index][i])) {
+        return;
+      }
+    }
+  }
+
+  const calculatedLineEquationOne = getLineFromTwoPoints(
+    appModel.getNodeInPointsMapById(relation.segment[0][0]).coordinate,
+    appModel.getNodeInPointsMapById(relation.segment[0][1]).coordinate
+  );
+  const calculatedLineEquationTwo = getLineFromTwoPoints(
+    appModel.getNodeInPointsMapById(relation.segment[1][0]).coordinate,
+    appModel.getNodeInPointsMapById(relation.segment[1][1]).coordinate
+  );
+
+  const calculatedPoint = calculateIntersectionByLineAndLine(calculatedLineEquationOne, calculatedLineEquationTwo);
+  appModel.updateCoordinate(point, calculatedPoint);
 }
 
 function analyzeOperationType(relation: mixed): CoordinateType {}
