@@ -1,4 +1,11 @@
-import type { NodeType, NodeRelationType, DrawingNodeType, CoordinateType, LinearEquation } from '../../types/types';
+import type {
+  NodeType,
+  NodeRelationType,
+  DrawingNodeType,
+  CoordinateType,
+  LinearEquation,
+  CircleEquation, TwoVariableQuadraticEquation
+} from "../../types/types";
 import appModel from '../../appModel';
 import {
   calculateMiddlePoint,
@@ -12,14 +19,16 @@ import {
   calculateIntersectionByLineAndLine,
   getLineFromTwoPoints,
   getRandomPointInLine,
-  getRandomValue
+  getRandomValue,
+  calculateIntersectionTwoCircleEquations
 } from '../math/Math2D';
+import { NOT_ENOUGH_SET } from '../values';
 
-export function readRelation(relation: mixed, point: string): LinearEquation {
+export function readRelation(relation: mixed, point: string): TwoVariableQuadraticEquation {
+  let equationResults;
   if (relation.operation) {
   } else if (relation.relation) {
     const relationType = relation.relation;
-    let result;
     switch (relationType) {
       case 'trung điểm':
       case 'thuộc':
@@ -28,14 +37,29 @@ export function readRelation(relation: mixed, point: string): LinearEquation {
       case 'vuông góc':
       case 'phân giác':
       case 'thẳng hàng':
-        result = analyzeRelationType(relation, point);
+        equationResults = analyzeRelationType(relation, point);
         break;
       case 'cắt':
-        result = analyzeIntersectRelation(relation, point);
+        equationResults = analyzeIntersectRelation(relation, point);
         break;
       default:
         break;
     }
+  }
+
+  //TODO
+  if (equationResults.coefficientX !== undefined) {
+    // equationResults is linear
+    return {
+      a: 0,
+      b: 0,
+      c: equationResults.coefficientX,
+      d: equationResults.coefficientY,
+      e: equationResults.constantTerm,
+    }
+  } else {
+    // equationResults is circle
+    return equationResults;
   }
 }
 

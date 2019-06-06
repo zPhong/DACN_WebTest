@@ -5,14 +5,10 @@ import type {
   CoordinateType,
   FirstDegreeEquation,
   LinearEquation,
-  TwoVariableQuadraticEquation,
-  Vector
-} from '../../types/types';
+  TwoVariableQuadraticEquation, Vector
+} from "../../types/types";
 
-const INFINITY = 'vô cực';
-const IMPOSSIBLE = 'vô nghiệm';
-const MIN_RANDOM_NUMBER = -10;
-const MAX_RANDOM_NUMBER = 10;
+import { IMPOSSIBLE, INFINITY, MAX_RANDOM_NUMBER, MIN_RANDOM_NUMBER, NOT_BE_IN_LINE } from '../values';
 
 export function getStartPoint(): CoordinateType {
   return { x: 0, y: 0, z: 0 };
@@ -100,21 +96,14 @@ export function calculateSymmetricalPoint(
 }
 
 export function getLineFromTwoPoints(p1: CoordinateType, p2: CoordinateType): LinearEquation {
-  const result = calculateSetOfLinearEquationAndQuadraticEquation(
-    {
-      coefficientX: p1.x,
-      coefficientY: 1,
-      constantTerm: -p1.y
-    },
-    {
-      a: 0,
-      b: 0,
-      c: p2.x,
-      d: 1,
-      e: -p2.y
-    }
-  )[0];
-  return { coefficientX: result.x, coefficientY: -1, constantTerm: result.y };
+  const directionVector: Vector = {a: p2.x - p1.x, b: p2.y - p1.y};
+  const normalVector: Vector = {a: -directionVector.b, b: directionVector.a};
+
+  return {
+    coefficientX: normalVector.a,
+    coefficientY: normalVector.b,
+    constantTerm: -normalVector.a * p1.x - normalVector.b * p1.y
+  }
 }
 
 export function calculateParallelEquation(linearEquation: LinearEquation): LinearEquation {
@@ -371,6 +360,7 @@ export function calculateQuadraticEquation(a: number, b: number, c: number) {
 
 // Ax2 + By2 + Cx + Dy + E = 0
 export function isIn(p: CoordinateType, e: TwoVariableQuadraticEquation): boolean {
+  if (p.x === undefined || p.y === undefined) return false;
   return e.a * p.x * p.x + e.b * p.y * p.y + e.c * p.x + e.d * p.y + e.e === 0;
 }
 
@@ -449,8 +439,7 @@ export function calculateSetOfLinearEquationAndQuadraticEquation(
 export function calculateIntersectionTwoCircleEquations(c1: CircleEquation, c2: CircleEquation) {
   const q1 = convertCircleEquationToQuadraticEquation(c1);
   const q2 = convertCircleEquationToQuadraticEquation(c2);
-  console.log(q1);
-  console.log(q2);
+
   let results: Array<Object> = [];
 
   const C = q1.c - q2.c;
@@ -556,4 +545,47 @@ export function calculateLinesByAnotherLineAndAngle(d: LinearEquation, p: Coordi
   }
 
   return results;
+}
+
+export function convertLinearToQuadric(l: LinearEquation): TwoVariableQuadraticEquation {
+  return {
+    a: 0,
+    b: 0,
+    c: l.coefficientX,
+    d: l.coefficientY,
+    e: l.constantTerm
+  };
+}
+
+export function getAngleFromTwoLines(d1: LinearEquation, d2: LinearEquation): number {
+  const a1 = d1.coefficientX;
+  const a2 = d2.coefficientX;
+  const b1 = d1.coefficientY;
+  const b2 = d2.coefficientY;
+
+  const result =
+    (Math.acos(Math.abs(a1 * a2 + b1 * b2) / Math.sqrt((a1 * a1 + b1 * b1) * (a2 * a2 + b2 * b2))) * 180) / Math.PI;
+
+  // round result
+  return Math.round(result * 1000) / 1000;
+}
+
+export function getMiddlePointFromThreePointsInALine(
+  p1: CoordinateType,
+  p2: CoordinateType,
+  p3: CoordinateType
+): CoordinateType {
+  const line = getLineFromTwoPoints(p1, p2);
+  if (!isIn(p3, { a: 0, b: 0, c: line.coefficientX, d: line.coefficientY, e: line.constantTerm }))
+    return NOT_BE_IN_LINE;
+
+  // another way: check vector =)))~
+  const dis_p1_p2 = calculateDistanceTwoPoints(p1, p2);
+  const dis_p2_p3 = calculateDistanceTwoPoints(p2, p3);
+  const dis_p1_p3 = calculateDistanceTwoPoints(p1, p3);
+
+  const max = Math.max(dis_p1_p2, dis_p2_p3, dis_p1_p3);
+  if (dis_p1_p2 === max) return p3;
+  else if (dis_p1_p3 === max) return p2;
+  else return p1;
 }
