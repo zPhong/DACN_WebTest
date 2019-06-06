@@ -4,8 +4,9 @@ import type {
   DrawingNodeType,
   CoordinateType,
   LinearEquation,
-  CircleEquation, TwoVariableQuadraticEquation
-} from "../../types/types";
+  CircleEquation,
+  TwoVariableQuadraticEquation
+} from '../../types/types';
 import appModel from '../../appModel';
 import {
   calculateMiddlePoint,
@@ -13,13 +14,19 @@ import {
   generatePointAlignmentInside,
   generatePointAlignmentOutside,
   generatePointNotAlignment,
+  calculateIntersectionLinearEquationWithCircleEquation,
+  calculateLinesByAnotherLineAndAngle,
+  calculateCircleEquationByCenterPoint,
   calculateInternalBisectLineEquation,
   calculatePerpendicularLineByPointAndLine,
   calculateParallelLineByPointAndLine,
   calculateIntersectionByLineAndLine,
   getLineFromTwoPoints,
   getRandomPointInLine,
+  calculateDistanceTwoPoints,
   getRandomValue,
+  isIn,
+  getMiddlePointFromThreePointsInALine,
   calculateIntersectionTwoCircleEquations
 } from '../math/Math2D';
 import { NOT_ENOUGH_SET } from '../values';
@@ -27,6 +34,7 @@ import { NOT_ENOUGH_SET } from '../values';
 export function readRelation(relation: mixed, point: string): TwoVariableQuadraticEquation {
   let equationResults;
   if (relation.operation) {
+    equationResults = analyzeOperationType(relation, point);
   } else if (relation.relation) {
     const relationType = relation.relation;
     switch (relationType) {
@@ -48,18 +56,20 @@ export function readRelation(relation: mixed, point: string): TwoVariableQuadrat
   }
 
   //TODO
-  if (equationResults.coefficientX !== undefined) {
-    // equationResults is linear
-    return {
-      a: 0,
-      b: 0,
-      c: equationResults.coefficientX,
-      d: equationResults.coefficientY,
-      e: equationResults.constantTerm,
+  if (equationResults) {
+    if (equationResults.coefficientX !== undefined) {
+      // equationResults is linear
+      return {
+        a: 0,
+        b: 0,
+        c: equationResults.coefficientX,
+        d: equationResults.coefficientY,
+        e: equationResults.constantTerm
+      };
+    } else {
+      // equationResults is circle
+      return equationResults;
     }
-  } else {
-    // equationResults is circle
-    return equationResults;
   }
 }
 
@@ -100,8 +110,6 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
           segmentIncludePoint.indexOf(point) === 1
         );
 
-        console.log(calculatedPoint);
-
         appModel.updateCoordinate(point, calculatedPoint);
       }
     } else if (segmentNotIncludePoint) {
@@ -118,6 +126,7 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
             appModel.getNodeInPointsMapById(segmentNotIncludePoint[0]).coordinate,
             appModel.getNodeInPointsMapById(segmentNotIncludePoint[1]).coordinate
           );
+          console.log(calculatedPoint);
           appModel.updateCoordinate(point, calculatedPoint);
           break;
         case 'không thuộc':
@@ -205,8 +214,6 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
         )
       );
 
-      console.log(calculatedLineEquation);
-
       const calculatedPoint = calculateIntersectionByLineAndLine(calculatedLineEquation, staticLineEquation);
       appModel.updateCoordinate(point, calculatedPoint);
     }
@@ -235,4 +242,129 @@ function analyzeIntersectRelation(relation: mixed, point: string): CoordinateTyp
   appModel.updateCoordinate(point, calculatedPoint);
 }
 
-function analyzeOperationType(relation: mixed): CoordinateType {}
+//chỉ xử lý : = , *
+function analyzeOperationType(relation: mixed, point: string): any {
+  const objectType = relation.segment ? 'segment' : 'angle';
+  const valueData = {};
+
+  const objectsIncludePoint = [];
+
+  for (let index in relation[objectType]) {
+    const object = relation[objectType][index];
+    if (object.includes(point)) {
+      objectsIncludePoint.push(object);
+    }
+
+    let isStatic = false;
+    object.split('').forEach((point) => {
+      if (!appModel.isStaticNodeById(point)) {
+        isStatic = false;
+      }
+    });
+    if (!isStatic) {
+      return;
+    }
+
+    valueData[object] =
+      objectType === 'segment'
+        ? calculateDistanceTwoPoints(
+            appModel.getNodeInPointsMapById(object[0]).coordinate,
+            appModel.getNodeInPointsMapById(object[1]).coordinate
+          )
+        : 0; //cần pt tính góc tạo bỡi 2 đường
+  }
+
+  //điểm cần tính phụ thuộc 1 điểm duy nhất
+  if (objectsIncludePoint.length === 1) {
+    const index = relation[objectType].indexOf(objectsIncludePoint[0]);
+    const staticObject = relation[objectType][index === 0 ? 1 : 0];
+    const staticValue =
+      index === 0 ? relation.value * valueData[staticObject] : valueData[staticObject] / relation.value;
+
+    if (objectType === 'segment') {
+      return calculateCircleEquationByCenterPoint(
+        appModel.getNodeInPointsMapById(objectsIncludePoint[0].replace(point, '')).coordinate,
+        staticValue
+      );
+    }
+    const staticLineInAngle = getLineFromTwoPoints(
+      appModel.getNodeInPointsMapById(objectsIncludePoint[0].replace(point, '')[0]).coordinate,
+      appModel.getNodeInPointsMapById(objectsIncludePoint[0].replace(point, '')[1]).coordinate
+    );
+
+    return calculateLinesByAnotherLineAndAngle(
+      staticLineInAngle,
+      appModel.getNodeInPointsMapById(objectsIncludePoint[0].replace(point, '')[1]).coordinate,
+      staticValue
+    );
+  }
+  if (objectsIncludePoint.length === 2) {
+    const staticPointOne = objectsIncludePoint[0].replace(point, '');
+    const staticPointTwo = objectsIncludePoint[1].replace(point, '');
+
+    //cần check thêm loại shape
+    if (!appModel.isStaticNodeById(staticPointOne) || !appModel.isStaticNodeById(staticPointTwo)) {
+      return;
+    }
+
+    const staticLineEquation = getLineFromTwoPoints(
+      appModel.getNodeInPointsMapById(staticPointOne).coordinate,
+      appModel.getNodeInPointsMapById(staticPointTwo).coordinate
+    );
+
+    const staticDistance = calculateDistanceTwoPoints(
+      appModel.getNodeInPointsMapById(staticPointOne).coordinate,
+      appModel.getNodeInPointsMapById(staticPointTwo).coordinate
+    );
+
+    const isAlign = isIn(appModel.getNodeInPointsMapById(point).coordinate, {
+      a: 0,
+      b: 0,
+      c: staticLineEquation.coefficientX,
+      d: staticLineEquation.coefficientY,
+      e: staticLineEquation.constantTerm
+    });
+
+    const ratio = relation.value;
+
+    if (isAlign) {
+      let calculatedPoint;
+      const betweenPoint = getMiddlePointFromThreePointsInALine(
+        appModel.getNodeInPointsMapById(point).coordinate,
+        appModel.getNodeInPointsMapById(staticPointOne).coordinate,
+        appModel.getNodeInPointsMapById(staticPointTwo).coordinate
+      );
+      if (betweenPoint === appModel.getNodeInPointsMapById(point).coordinate) {
+        calculatedPoint = calculateIntersectionLinearEquationWithCircleEquation(
+          staticLineEquation,
+          calculateCircleEquationByCenterPoint(
+            appModel.getNodeInPointsMapById(staticPointOne).coordinate,
+            (ratio * staticDistance) / (ratio + 1)
+          )
+        );
+      }
+      if (betweenPoint === appModel.getNodeInPointsMapById(staticPointOne).coordinate && ratio < 1) {
+        calculatedPoint = calculateIntersectionLinearEquationWithCircleEquation(
+          staticLineEquation,
+          calculateCircleEquationByCenterPoint(
+            appModel.getNodeInPointsMapById(staticPointOne).coordinate,
+            (ratio * staticDistance) / (1 - ratio)
+          )
+        );
+      }
+      if (betweenPoint === appModel.getNodeInPointsMapById(staticPointTwo).coordinate && ratio > 1) {
+        calculatedPoint = calculateIntersectionLinearEquationWithCircleEquation(
+          staticLineEquation,
+          calculateCircleEquationByCenterPoint(
+            appModel.getNodeInPointsMapById(staticPointOne).coordinate,
+            (ratio * staticDistance) / (ratio - 1)
+          )
+        );
+      }
+
+      appModel.updateCoordinate(point, calculatedPoint);
+    } else {
+    }
+    return null;
+  }
+}

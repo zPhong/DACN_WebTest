@@ -36,7 +36,6 @@ export function getRandomPointInLine(d: LinearEquation): CoordinateType {
 export function generatePointAlignmentInside(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
   const line = getLineFromTwoPoints(firstPoint, secondPoint);
   const tempX = (firstPoint.x + secondPoint.x) / getRandomValue(2, 5);
-  console.log('line', line);
   return {
     x: tempX,
     y: line.coefficientX * tempX + line.constantTerm
