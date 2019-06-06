@@ -38,7 +38,7 @@ export function generatePointAlignmentInside(firstPoint: CoordinateType, secondP
   const tempX = (firstPoint.x + secondPoint.x) / getRandomValue(2, 5);
   return {
     x: tempX,
-    y: (line.coefficientX * tempX + line.constantTerm) / line.coefficientY,
+    y: (line.coefficientX * tempX + line.constantTerm) / -line.coefficientY,
   };
 }
 
