@@ -27,7 +27,8 @@ import {
   getRandomValue,
   isIn,
   getMiddlePointFromThreePointsInALine,
-  calculateIntersectionTwoCircleEquations
+  calculateIntersectionTwoCircleEquations,
+  getAngleFromTwoLines
 } from '../math/Math2D';
 import { NOT_ENOUGH_SET } from '../values';
 
@@ -126,7 +127,6 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
             appModel.getNodeInPointsMapById(segmentNotIncludePoint[0]).coordinate,
             appModel.getNodeInPointsMapById(segmentNotIncludePoint[1]).coordinate
           );
-          console.log(calculatedPoint);
           appModel.updateCoordinate(point, calculatedPoint);
           break;
         case 'không thuộc':
@@ -143,7 +143,6 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
     } else {
       const points = relation.point;
       const index = points.indexOf(point);
-      console.log(index, points);
       if (index === 1) {
         calculatedPoint = generatePointAlignmentInside(
           appModel.getNodeInPointsMapById(points[0]).coordinate,
@@ -254,13 +253,13 @@ function analyzeOperationType(relation: mixed, point: string): any {
     if (object.includes(point)) {
       objectsIncludePoint.push(object);
     }
-
-    let isStatic = false;
-    object.split('').forEach((point) => {
-      if (!appModel.isStaticNodeById(point)) {
+    let isStatic = true;
+    object.split('').forEach((objPoint) => {
+      if (objPoint !== point && !appModel.isStaticNodeById(objPoint)) {
         isStatic = false;
       }
     });
+
     if (!isStatic) {
       return;
     }
@@ -271,15 +270,28 @@ function analyzeOperationType(relation: mixed, point: string): any {
             appModel.getNodeInPointsMapById(object[0]).coordinate,
             appModel.getNodeInPointsMapById(object[1]).coordinate
           )
-        : 0; //cần pt tính góc tạo bỡi 2 đường
+        : getAngleFromTwoLines(
+            getLineFromTwoPoints(
+              appModel.getNodeInPointsMapById(object[0]).coordinate,
+              appModel.getNodeInPointsMapById(object[1]).coordinate
+            ),
+            getLineFromTwoPoints(
+              appModel.getNodeInPointsMapById(object[1]).coordinate,
+              appModel.getNodeInPointsMapById(object[2]).coordinate
+            )
+          );
   }
 
   //điểm cần tính phụ thuộc 1 điểm duy nhất
   if (objectsIncludePoint.length === 1) {
     const index = relation[objectType].indexOf(objectsIncludePoint[0]);
     const staticObject = relation[objectType][index === 0 ? 1 : 0];
-    const staticValue =
-      index === 0 ? relation.value * valueData[staticObject] : valueData[staticObject] / relation.value;
+    let staticValue;
+    if (relation[objectType].length > 1) {
+      staticValue = index === 0 ? relation.value * valueData[staticObject] : valueData[staticObject] / relation.value;
+    } else {
+      staticValue = relation.value[0];
+    }
 
     if (objectType === 'segment') {
       return calculateCircleEquationByCenterPoint(
@@ -299,72 +311,107 @@ function analyzeOperationType(relation: mixed, point: string): any {
     );
   }
   if (objectsIncludePoint.length === 2) {
-    const staticPointOne = objectsIncludePoint[0].replace(point, '');
-    const staticPointTwo = objectsIncludePoint[1].replace(point, '');
+    if (objectType === 'segment') {
+      const staticPointOne = objectsIncludePoint[0].replace(point, '');
+      const staticPointTwo = objectsIncludePoint[1].replace(point, '');
+      console.log(staticPointOne, staticPointTwo);
+      //cần check thêm loại shape
+      if (!appModel.isStaticNodeById(staticPointOne) || !appModel.isStaticNodeById(staticPointTwo)) {
+        return;
+      }
 
-    //cần check thêm loại shape
-    if (!appModel.isStaticNodeById(staticPointOne) || !appModel.isStaticNodeById(staticPointTwo)) {
-      return;
-    }
-
-    const staticLineEquation = getLineFromTwoPoints(
-      appModel.getNodeInPointsMapById(staticPointOne).coordinate,
-      appModel.getNodeInPointsMapById(staticPointTwo).coordinate
-    );
-
-    const staticDistance = calculateDistanceTwoPoints(
-      appModel.getNodeInPointsMapById(staticPointOne).coordinate,
-      appModel.getNodeInPointsMapById(staticPointTwo).coordinate
-    );
-
-    const isAlign = isIn(appModel.getNodeInPointsMapById(point).coordinate, {
-      a: 0,
-      b: 0,
-      c: staticLineEquation.coefficientX,
-      d: staticLineEquation.coefficientY,
-      e: staticLineEquation.constantTerm
-    });
-
-    const ratio = relation.value;
-
-    if (isAlign) {
-      let calculatedPoint;
-      const betweenPoint = getMiddlePointFromThreePointsInALine(
-        appModel.getNodeInPointsMapById(point).coordinate,
+      const staticLineEquation = getLineFromTwoPoints(
         appModel.getNodeInPointsMapById(staticPointOne).coordinate,
         appModel.getNodeInPointsMapById(staticPointTwo).coordinate
       );
-      if (betweenPoint === appModel.getNodeInPointsMapById(point).coordinate) {
-        calculatedPoint = calculateIntersectionLinearEquationWithCircleEquation(
-          staticLineEquation,
-          calculateCircleEquationByCenterPoint(
-            appModel.getNodeInPointsMapById(staticPointOne).coordinate,
-            (ratio * staticDistance) / (ratio + 1)
-          )
-        );
-      }
-      if (betweenPoint === appModel.getNodeInPointsMapById(staticPointOne).coordinate && ratio < 1) {
-        calculatedPoint = calculateIntersectionLinearEquationWithCircleEquation(
-          staticLineEquation,
-          calculateCircleEquationByCenterPoint(
-            appModel.getNodeInPointsMapById(staticPointOne).coordinate,
-            (ratio * staticDistance) / (1 - ratio)
-          )
-        );
-      }
-      if (betweenPoint === appModel.getNodeInPointsMapById(staticPointTwo).coordinate && ratio > 1) {
-        calculatedPoint = calculateIntersectionLinearEquationWithCircleEquation(
-          staticLineEquation,
-          calculateCircleEquationByCenterPoint(
-            appModel.getNodeInPointsMapById(staticPointOne).coordinate,
-            (ratio * staticDistance) / (ratio - 1)
-          )
-        );
-      }
 
-      appModel.updateCoordinate(point, calculatedPoint);
-    } else {
+      const staticDistance = calculateDistanceTwoPoints(
+        appModel.getNodeInPointsMapById(staticPointOne).coordinate,
+        appModel.getNodeInPointsMapById(staticPointTwo).coordinate
+      );
+
+      const isAlign = isIn(appModel.getNodeInPointsMapById(point).coordinate, {
+        a: 0,
+        b: 0,
+        c: staticLineEquation.coefficientX,
+        d: staticLineEquation.coefficientY,
+        e: staticLineEquation.constantTerm
+      });
+
+      const ratio = +relation.value[0];
+      if (isAlign) {
+        let calculatedPoint;
+        const betweenPoint = getMiddlePointFromThreePointsInALine(
+          appModel.getNodeInPointsMapById(point).coordinate,
+          appModel.getNodeInPointsMapById(staticPointOne).coordinate,
+          appModel.getNodeInPointsMapById(staticPointTwo).coordinate
+        );
+
+        if (betweenPoint === appModel.getNodeInPointsMapById(point).coordinate) {
+          calculatedPoint = calculateIntersectionLinearEquationWithCircleEquation(
+            staticLineEquation,
+            calculateCircleEquationByCenterPoint(
+              appModel.getNodeInPointsMapById(staticPointOne).coordinate,
+              (ratio * staticDistance) / (ratio + 1)
+            )
+          );
+
+          [...calculatedPoint].forEach((p) => {
+            const result = getMiddlePointFromThreePointsInALine(
+              p,
+              appModel.getNodeInPointsMapById(staticPointOne).coordinate,
+              appModel.getNodeInPointsMapById(staticPointTwo).coordinate
+            );
+            if (result === p) {
+              calculatedPoint = p;
+            }
+          });
+        }
+        if (betweenPoint === appModel.getNodeInPointsMapById(staticPointOne).coordinate && ratio < 1) {
+          calculatedPoint = calculateIntersectionLinearEquationWithCircleEquation(
+            staticLineEquation,
+            calculateCircleEquationByCenterPoint(
+              appModel.getNodeInPointsMapById(staticPointOne).coordinate,
+              (ratio * staticDistance) / (1 - ratio)
+            )
+          );
+
+          [...calculatedPoint].forEach((p) => {
+            const result = getMiddlePointFromThreePointsInALine(
+              p,
+              appModel.getNodeInPointsMapById(staticPointOne).coordinate,
+              appModel.getNodeInPointsMapById(staticPointTwo).coordinate
+            );
+            if (result === appModel.getNodeInPointsMapById(staticPointOne).coordinate) {
+              calculatedPoint = p;
+            }
+          });
+        }
+        if (betweenPoint === appModel.getNodeInPointsMapById(staticPointTwo).coordinate && ratio > 1) {
+          calculatedPoint = calculateIntersectionLinearEquationWithCircleEquation(
+            staticLineEquation,
+            calculateCircleEquationByCenterPoint(
+              appModel.getNodeInPointsMapById(staticPointOne).coordinate,
+              (ratio * staticDistance) / (ratio - 1)
+            )
+          );
+
+          [...calculatedPoint].forEach((p) => {
+            const result = getMiddlePointFromThreePointsInALine(
+              p,
+              appModel.getNodeInPointsMapById(staticPointOne).coordinate,
+              appModel.getNodeInPointsMapById(staticPointTwo).coordinate
+            );
+            if (result === appModel.getNodeInPointsMapById(staticPointTwo).coordinate) {
+              calculatedPoint = p;
+            }
+          });
+        }
+
+        appModel.updateCoordinate(point, calculatedPoint);
+      } else {
+      }
+      return null;
     }
-    return null;
   }
 }

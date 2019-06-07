@@ -5,8 +5,9 @@ import type {
   CoordinateType,
   FirstDegreeEquation,
   LinearEquation,
-  TwoVariableQuadraticEquation, Vector
-} from "../../types/types";
+  TwoVariableQuadraticEquation,
+  Vector
+} from '../../types/types';
 
 import { IMPOSSIBLE, INFINITY, MAX_RANDOM_NUMBER, MIN_RANDOM_NUMBER, NOT_BE_IN_LINE } from '../values';
 
@@ -38,7 +39,7 @@ export function generatePointAlignmentInside(firstPoint: CoordinateType, secondP
   const tempX = (firstPoint.x + secondPoint.x) / getRandomValue(2, 5);
   return {
     x: tempX,
-    y: (line.coefficientX * tempX + line.constantTerm) / line.coefficientY,
+    y: (line.coefficientX * tempX + line.constantTerm) / -line.coefficientY
   };
 }
 
@@ -95,14 +96,14 @@ export function calculateSymmetricalPoint(
 }
 
 export function getLineFromTwoPoints(p1: CoordinateType, p2: CoordinateType): LinearEquation {
-  const directionVector: Vector = {a: p2.x - p1.x, b: p2.y - p1.y};
-  const normalVector: Vector = {a: -directionVector.b, b: directionVector.a};
+  const directionVector: Vector = { a: p2.x - p1.x, b: p2.y - p1.y };
+  const normalVector: Vector = { a: -directionVector.b, b: directionVector.a };
 
   return {
     coefficientX: normalVector.a,
     coefficientY: normalVector.b,
     constantTerm: -normalVector.a * p1.x - normalVector.b * p1.y
-  }
+  };
 }
 
 export function calculateParallelEquation(linearEquation: LinearEquation): LinearEquation {

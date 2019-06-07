@@ -97,7 +97,7 @@ class AppModel {
     };
 
     //get Max
-    const rankingOrderDesc = ['dependence', 'static'];
+    const rankingOrderDesc = ['static', 'dependence'];
 
     //get Min
     const rankingOrderAsc = ['nonStatic', 'minRelationIndex', 'index'];
