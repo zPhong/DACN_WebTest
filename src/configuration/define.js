@@ -2,7 +2,7 @@ const defineSentences = {
   define: [
     '{object} + {object} = {object}',
     '{object} - {object} = {object}',
-    '{object} * {value} = {object}',
+    '{object} = {value} * {object}',
     '{object} = {object}',
     '{object} > {object}',
     '{object} < {object}'

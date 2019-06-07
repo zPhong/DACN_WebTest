@@ -68,6 +68,10 @@ function getInformation(string) {
       if (result.operation) return;
       if (string.includes(operation)) {
         result.operation = operation;
+        if (operation === '=' && !result.value) {
+          result.value = '1';
+          result.operation = '*';
+        }
       }
     });
   }
