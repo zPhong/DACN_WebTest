@@ -50,7 +50,7 @@ export type LinearEquation = {
 export type LineEquation = {
   a: number,
   b: number
-}
+};
 
 export type Vector = {
   a: number,
@@ -70,7 +70,7 @@ export type FirstDegreeEquation = {
   a: number,
   b: number,
   c: number
-}
+};
 
 // Ax2 + By2 + Cx + Dy + E = 0
 export type TwoVariableQuadraticEquation = {
@@ -79,4 +79,10 @@ export type TwoVariableQuadraticEquation = {
   c: number,
   d: number,
   e: number
-}
+};
+
+export type PointDetailsType = {
+  setOfEquation: Array<CircleEquation>,
+  roots: Array<Object>,
+  exceptedCoordinates: Array<CoordinateType>
+};
