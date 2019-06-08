@@ -1,4 +1,6 @@
-import type { NodeType, RelationsResultType } from './types/types';
+import type { CircleEquation, CoordinateType, NodeType, PointDetailsType, RelationsResultType } from './types/types';
+import { calculateIntersectionTwoCircleEquations } from "./utils/math/Math2D";
+import { NOT_ENOUGH_SET } from "./utils/values";
 const NOT_FOUND = 99;
 
 class AppModel {
@@ -6,12 +8,14 @@ class AppModel {
   pointsMap: Array<NodeType> = [];
   executedRelations = [];
   executedNode = [];
+  __pointDetails__ = new Map();
 
   clear() {
     this.relationsResult = [];
     this.pointsMap = [];
     this.executedRelations = [];
     this.executedNode = [];
+    this.__pointDetails__.clear();
   }
 
   updateCoordinate = (nodeId: string, coordinate: CoordinateType): void => {
@@ -189,6 +193,24 @@ class AppModel {
     }
     return false;
   };
+
+  _calculateSet(equations: Array<CircleEquation>) {
+    if (equations.length === 2) {
+      return calculateIntersectionTwoCircleEquations(equations[0], equations[1]);
+    } else return NOT_ENOUGH_SET;
+  }
+
+  _updatePointDetails(pointId: string, pointDetails: PointDetailsType) {
+    this.__pointDetails__.set(pointId, {
+      setOfEquation: pointDetails.setOfEquation,
+      roots: pointDetails.roots,
+      exceptedCoordinates: pointDetails.exceptedCoordinates
+    });
+  }
+
+  executePointDetails(pointId: string, equation: CircleEquation) {
+    // if (this.__pointDetails__.get(pointId))
+  }
 }
 
 const appModel = new AppModel();

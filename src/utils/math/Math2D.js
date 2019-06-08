@@ -235,6 +235,11 @@ export function calculateInternalBisectLineEquation(lineOne: LinearEquation, lin
   } else {
     pointInSecondLine.y = getRandomValue(MIN_RANDOM_NUMBER, MAX_RANDOM_NUMBER);
   }
+
+  if(getAngleFromTwoLines(lineOne, lineTwo) === 0) {
+    throw new Map().set('error', 'không hỗ trợ trường hợp này');
+  }
+
   return _getInternalBisectLineEquation(firstLine, secondLine, pointInFirstLine, pointInSecondLine);
 }
 
