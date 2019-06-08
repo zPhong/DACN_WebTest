@@ -340,7 +340,7 @@ export function calculateIntersectionLinearEquationWithCircleEquation(
   }
 }
 
-function convertCircleEquationToQuadraticEquation(c: CircleEquation): TwoVariableQuadraticEquation {
+export function convertCircleEquationToQuadraticEquation(c: CircleEquation): TwoVariableQuadraticEquation {
   return {
     a: 1,
     b: 1,
