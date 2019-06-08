@@ -148,15 +148,14 @@ export function calculateDistanceFromPointToLine(point: CoordinateType, line: Li
 }
 
 export function calculateParallelLineByPointAndLine(point: CoordinateType, line: LinearEquation): LinearEquation {
-  let parallelLine: LinearEquation = {};
-
   // parallel line has `a` coefficient equals the other line.
   // parallel line's constantTerm = -ax - y with (x,y) is coordinate of the point
-  parallelLine.coefficientX = line.coefficientX;
-  parallelLine.coefficientY = line.coefficientY;
-  parallelLine.constantTerm = -parallelLine.coefficientX * point.x - point.y;
+  const lineEquation = _convertLinearEquationToLineType(line);
+  const parLine: LineEquation = {};
+  parLine.a = lineEquation.a;
+  parLine.b = point.y - lineEquation.a*point.x;
 
-  return parallelLine;
+  return _convertLineEquationToLinearEquation(parLine);
 }
 
 export function calculatePerpendicularLineByPointAndLine(point: CoordinateType, line: LinearEquation): LinearEquation {

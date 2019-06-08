@@ -46,6 +46,12 @@ export type LinearEquation = {
   constantTerm: number
 };
 
+// ax - y + b = 0
+export type LineEquation = {
+  a: number,
+  b: number
+}
+
 export type Vector = {
   a: number,
   b: number,
