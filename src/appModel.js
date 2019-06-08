@@ -1,6 +1,10 @@
 import type { CircleEquation, CoordinateType, NodeType, PointDetailsType, RelationsResultType } from './types/types';
-import { calculateIntersectionTwoCircleEquations } from "./utils/math/Math2D";
-import { NOT_ENOUGH_SET } from "./utils/values";
+import {
+  calculateIntersectionTwoCircleEquations,
+  convertCircleEquationToQuadraticEquation,
+  isIn
+} from './utils/math/Math2D';
+import { NOT_ENOUGH_SET } from './utils/values';
 const NOT_FOUND = 99;
 
 class AppModel {
@@ -209,7 +213,43 @@ class AppModel {
   }
 
   executePointDetails(pointId: string, equation: CircleEquation) {
-    // if (this.__pointDetails__.get(pointId))
+    if (!this.__pointDetails__.has(pointId)) {
+      this._updatePointDetails(pointId, { setOfEquation: [], roots: [], exceptedCoordinates: [] });
+    }
+
+    if (this.__pointDetails__.get(pointId).setOfEquation.length < 1) {
+      this._updatePointDetails(pointId, {
+        setOfEquation: [...this.__pointDetails__.get(pointId).setOfEquation, equation],
+        roots: this.__pointDetails__.get(pointId).roots,
+        exceptedCoordinates: this.__pointDetails__.get(pointId).exceptedCoordinates
+      });
+    }
+
+    if (this.__pointDetails__.get(pointId).setOfEquation.length === 2) {
+      const roots = this._calculateSet(this.__pointDetails__.get(pointId).setOfEquation);
+      this._updatePointDetails(pointId, {
+        setOfEquation: this.__pointDetails__.get(pointId).setOfEquation,
+        roots: roots,
+        exceptedCoordinates: this.__pointDetails__.get(pointId).exceptedCoordinates
+      });
+    }
+
+    let temp = this.__pointDetails__.get(pointId).roots;
+    const tempLength = temp.length;
+
+    temp = temp.filter((root) => {
+      return isIn(root, convertCircleEquationToQuadraticEquation(equation));
+    });
+
+    if (temp.length < tempLength) {
+      // TODO: Add exception
+      this._updatePointDetails(pointId, {
+        setOfEquation: this.__pointDetails__.get(pointId).setOfEquation,
+        roots: temp,
+        exceptedCoordinates: this.__pointDetails__.get(pointId).exceptedCoordinates
+      });
+    }
+
   }
 }
 
