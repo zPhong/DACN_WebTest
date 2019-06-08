@@ -284,7 +284,7 @@ function _getInternalBisectLineEquation(
 ): LinearEquation {
   let firstEquation = pointOne.x * lineOne.coefficientX + pointOne.y * lineOne.coefficientY + lineOne.constantTerm;
   let secondEquation = pointTwo.x * lineOne.coefficientX + pointTwo.y * lineOne.coefficientY + lineOne.constantTerm;
-  return firstEquation * secondEquation > 0 ? lineOne : lineTwo;
+  return firstEquation * secondEquation < 0 ? lineOne : lineTwo;
 }
 
 function _getPointInLineWithCondition(
