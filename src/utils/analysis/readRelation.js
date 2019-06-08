@@ -72,6 +72,7 @@ export function readRelation(relation: mixed, point: string): TwoVariableQuadrat
       return equationResults;
     }
   }
+  return null;
 }
 
 function analyzeRelationType(relation: mixed, point: string): LinearEquation {
@@ -157,7 +158,17 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
         );
         appModel.updateCoordinate(point, calculatedPoint);
       }
+
+      return getLineFromTwoPoints(
+        appModel.getNodeInPointsMapById(points[0]).coordinate,
+        appModel.getNodeInPointsMapById(points[1]).coordinate
+      );
     }
+
+    return getLineFromTwoPoints(
+      appModel.getNodeInPointsMapById(relation.segment[0][0]).coordinate,
+      appModel.getNodeInPointsMapById(relation.segment[0][1]).coordinate
+    );
   } else if (relationType === 'song song' || relationType === 'vuông góc') {
     //undefined point
     for (let i = 0; i < 2; i++) {
@@ -192,6 +203,8 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
       const calculatedPoint = getRandomPointInLine(calculatedLineEquation);
 
       appModel.updateCoordinate(point, calculatedPoint);
+
+      return calculatedLineEquation;
     }
   } else if (relationType === 'phân giác') {
     if (relation.angle) {
@@ -215,6 +228,8 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
 
       const calculatedPoint = calculateIntersectionByLineAndLine(calculatedLineEquation, staticLineEquation);
       appModel.updateCoordinate(point, calculatedPoint);
+
+      return calculatedLineEquation;
     }
   }
 }
@@ -409,6 +424,8 @@ function analyzeOperationType(relation: mixed, point: string): any {
         }
 
         appModel.updateCoordinate(point, calculatedPoint);
+
+        return staticLineEquation;
       } else {
       }
       return null;

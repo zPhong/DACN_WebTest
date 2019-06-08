@@ -41,6 +41,8 @@ function defineInformation(data) {
 
   if (validate) {
     return result;
+  } else {
+    return { Error: result };
   }
 }
 

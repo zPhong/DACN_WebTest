@@ -59,7 +59,7 @@ function getInformation(string) {
 
   const result = defineInformation(preProgress);
 
-  if (!result) return { Error: 'Sai định dạng' };
+  if (result.Error) return { Error: `Sai định dạng "${string}"` };
   if (result.point && result.point.length > 3) return { Error: 'Tối đa 3 điểm thẳng háng' };
 
   // add operation for define type
