@@ -28,7 +28,7 @@ import {
   isIn,
   getMiddlePointFromThreePointsInALine,
   calculateIntersectionTwoCircleEquations,
-  convertLinearToQuadric,
+  convertLinearToQuadratic,
   getAngleFromTwoLines
 } from '../math/Math2D';
 import { NOT_ENOUGH_SET } from '../values';
@@ -137,6 +137,7 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
             appModel.getNodeInPointsMapById(segmentNotIncludePoint[1]).coordinate,
             getRandomValue(0, 2) === 1
           );
+          console.log(calculatedPoint);
           appModel.updateCoordinate(point, calculatedPoint);
           break;
         default:
@@ -198,7 +199,7 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
 
       const isInStaticLine = isIn(
         appModel.getNodeInPointsMapById(otherStaticPoint).coordinate,
-        convertLinearToQuadric(staticLineEquation)
+        convertLinearToQuadratic(staticLineEquation)
       );
       const calculatedPoint = isInStaticLine
         ? getRandomPointInLine(calculatedLineEquation)
@@ -219,6 +220,9 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
   } else if (relationType === 'phân giác') {
     if (relation.angle) {
       const angle = relation.angle[0];
+      if (angle.includes(point)) {
+        return;
+      }
 
       const staticLineEquation = getLineFromTwoPoints(
         appModel.getNodeInPointsMapById(angle[0]).coordinate,
@@ -237,6 +241,7 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
       );
 
       const calculatedPoint = calculateIntersectionByLineAndLine(calculatedLineEquation, staticLineEquation);
+      console.log(point);
       appModel.updateCoordinate(point, calculatedPoint);
 
       return calculatedLineEquation;

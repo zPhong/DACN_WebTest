@@ -56,11 +56,11 @@ export function generatePointAlignmentOutside(
   return isRight
     ? {
         x: tempXRight,
-        y: line.coefficientX * tempXRight + line.constantTerm
+        y: (line.coefficientX * tempXRight + line.constantTerm) / -line.coefficientY
       }
     : {
         x: tempXLeft,
-        y: line.coefficientX * tempXLeft + line.constantTerm
+        y: (line.coefficientX * tempXLeft + line.constantTerm) / -line.coefficientY
       };
 }
 
@@ -153,7 +153,7 @@ export function calculateParallelLineByPointAndLine(point: CoordinateType, line:
   const lineEquation = _convertLinearEquationToLineType(line);
   const parLine: LineEquation = {};
   parLine.a = lineEquation.a;
-  parLine.b = point.y - lineEquation.a*point.x;
+  parLine.b = point.y - lineEquation.a * point.x;
 
   return _convertLineEquationToLinearEquation(parLine);
 }
@@ -174,7 +174,7 @@ export function calculatePerpendicularLineByPointAndLine(point: CoordinateType, 
   } else {
     const lineEquation = _convertLinearEquationToLineType(line);
     const perLine: LineEquation = {};
-    perLine.a = -1/ lineEquation.a;
+    perLine.a = -1 / lineEquation.a;
     perLine.b = point.y + point.x / lineEquation.a;
 
     perpendicularLine = _convertLineEquationToLinearEquation(perLine);
