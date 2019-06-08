@@ -331,22 +331,22 @@ export function calculateIntersectionLinearEquationWithCircleEquation(
 ): Array<Object> {
   const centerPoint: CoordinateType = { x: c.a, y: c.b };
   const distanceFromCenterPointToLine = calculateDistanceFromPointToLine(centerPoint, d);
-  console.log(distanceFromCenterPointToLine);
+
   if (distanceFromCenterPointToLine > c.r) {
     return IMPOSSIBLE;
   } else {
-    console.log(convertCircleEquationToQuadraticEquation(c));
     return calculateSetOfLinearEquationAndQuadraticEquation(d, convertCircleEquationToQuadraticEquation(c));
   }
 }
 
 export function convertCircleEquationToQuadraticEquation(c: CircleEquation): TwoVariableQuadraticEquation {
+  const temp = c.a * c.a + c.b * c.b - c.r * c.r;
   return {
     a: 1,
     b: 1,
     c: -2 * c.a,
     d: -2 * c.b,
-    e: Math.round(c.a * c.a + c.b * c.b - c.r * c.r)
+    e: Math.round(temp * 1000) / 1000
   };
 }
 
@@ -379,6 +379,8 @@ function convertQuadraticEquationToCircleEquation(q: TwoVariableQuadraticEquatio
  */
 export function calculateQuadraticEquation(a: number, b: number, c: number) {
   const delta = b * b - 4 * a * c;
+
+  console.table({ a, b, c, delta });
   let x1,
     x2: number = undefined;
 
@@ -398,7 +400,8 @@ export function calculateQuadraticEquation(a: number, b: number, c: number) {
 // Ax2 + By2 + Cx + Dy + E = 0
 export function isIn(p: CoordinateType, e: TwoVariableQuadraticEquation): boolean {
   if (p.x === undefined || p.y === undefined) return false;
-  return e.a * p.x * p.x + e.b * p.y * p.y + e.c * p.x + e.d * p.y + e.e === 0;
+  const temp = e.a * p.x * p.x + e.b * p.y * p.y + e.c * p.x + e.d * p.y + e.e;
+  return Math.round(temp * 1000) / 1000 === 0;
 }
 
 /*
@@ -481,50 +484,65 @@ export function calculateIntersectionTwoCircleEquations(c1: CircleEquation, c2: 
     q1 = convertCircleEquationToQuadraticEquation(c1);
   }
   if (c2.r === undefined) {
-    q1 = c2;
+    q2 = c2;
   } else {
     q2 = convertCircleEquationToQuadraticEquation(c2);
   }
 
   let results: Array<Object> = [];
 
-  // x2 + y2 + Ax + By + C = 0
-  // x2 + y2 + Dx + Ey + G = 0
-  const D = q2.c;
-  const E = q2.d;
-  const G = q2.e;
-
-  const a = q1.c - D;
-  const b = q1.d - E;
-  const c = q1.e - G;
-
-  if (a === 0 || b === 0) {
-    return IMPOSSIBLE;
-  } else {
-    const u = b * b + a * a;
-    const v = 2 * b * c - D * a * b + E * a * a;
-    const w = c * c - D * a * c + G * a * a;
-
-    const roots = calculateQuadraticEquation(u, v, w);
-
-    if (roots === IMPOSSIBLE) {
-      return roots;
-    } else if (roots === 'number') {
-      results.push({
-        x: (-c - b * roots) / a,
-        y: roots
-      });
+  if (q1.a !== q2.a) {
+    if (q1.a === 0) {
+      return calculateIntersectionLinearEquationWithCircleEquation(q1, convertQuadraticEquationToCircleEquation(q2));
     } else {
-      results.push(
-        {
-          x: (-c - b * roots.x1) / a,
-          y: roots.x1
-        },
-        {
-          x: (-c - b * roots.x2) / a,
-          y: roots.x2
-        }
-      );
+      return calculateIntersectionLinearEquationWithCircleEquation(q2, convertQuadraticEquationToCircleEquation(q1));
+    }
+  } else {
+    // a x2 + b y2 + Ax + By + C = 0
+    // a'x2 + b'y2 + Dx + Ey + G = 0
+    const D = q2.c;
+    const E = q2.d;
+    const G = q2.e;
+
+    // Z = a - a'
+    const Z = q1.a - q2.a > 0 ? q1.a : q2.a;
+    const _D = Z === q1.a ? q1.c : D;
+    const _E = Z === q1.a ? q1.d : E;
+    const _G = Z === q1.a ? q1.e : G;
+
+    const a = Z === q1.a ? q1.c - D : D - q1.c;
+    const b = Z === q1.a ? q1.d - E : E - q1.d;
+    const c = Z === q1.a ? q1.e - G : G - q1.e;
+
+    console.log(q1, q2, Z, _D, _E, _G, a, b, c);
+
+    if (a === 0 || b === 0) {
+      return IMPOSSIBLE;
+    } else {
+      const u = Z * (b * b + a * a);
+      const v = 2 * b * c * Z - _D * a * b + _E * a * a;
+      const w = Z * c * c - _D * a * c + _G * a * a;
+
+      const roots = calculateQuadraticEquation(u, v, w);
+      if (roots === IMPOSSIBLE) {
+        return roots;
+      } else if (typeof roots === 'number') {
+        results.push({
+          x: (-c - b * roots) / a,
+          y: roots
+        });
+      } else {
+        results.push(
+          {
+            x: (-c - b * roots.x1) / a,
+            y: roots.x1
+          },
+          {
+            x: (-c - b * roots.x2) / a,
+            y: roots.x2
+          }
+        );
+      }
     }
   }
 

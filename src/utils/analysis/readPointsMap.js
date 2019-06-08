@@ -4,7 +4,9 @@ import {
   calculateParallelLineByPointAndLine,
   calculatePerpendicularLineByPointAndLine,
   calculateDistanceTwoPoints,
-  calculateCircleEquationByCenterPoint, getLineFromTwoPoints
+  calculateCircleEquationByCenterPoint,
+  getLineFromTwoPoints,
+  getRandomValue
 } from '../math/Math2D';
 import { shapeRules, mappingShapeType, TwoStaticPointRequireShape } from '../../configuration/define';
 import { generateGeometry } from './GenerateGeometry';
@@ -41,7 +43,11 @@ export function readPointsMap(): Array<DrawingNodeType> {
         }
       }
 
-      readRelation(relation, executingNode.id);
+      const relationEquation = readRelation(relation, executingNode.id);
+
+      if (relationEquation) {
+        appModel.executePointDetails(executingNode.id, relationEquation);
+      }
 
       if (!appModel.isExecutedRelation(relation)) {
         //
@@ -50,6 +56,18 @@ export function readPointsMap(): Array<DrawingNodeType> {
     });
 
     //Update calculated value to pointsMap
+    if (appModel.__pointDetails__.has(executingNode.id)) {
+      const roots = appModel.__pointDetails__.get(executingNode.id).roots;
+      if (typeof roots === 'string') {
+        return { Error: `không tính toán được` };
+      }
+      if (roots.length > 0) {
+        const randomCoordinate = roots[getRandomValue(0, roots.length)];
+        console.log(randomCoordinate);
+        appModel.updateCoordinate(executingNode.id, randomCoordinate);
+      } else {
+      }
+    }
     //appModel.updatePointsMap(executingNode);
     appModel.executedNode.push(executingNode.id);
 

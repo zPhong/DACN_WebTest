@@ -218,7 +218,7 @@ class AppModel {
       this._updatePointDetails(pointId, { setOfEquation: [], roots: [], exceptedCoordinates: [] });
     }
 
-    if (this.__pointDetails__.get(pointId).setOfEquation.length < 1) {
+    if (this.__pointDetails__.get(pointId).setOfEquation.length <= 1) {
       this._updatePointDetails(pointId, {
         setOfEquation: [...this.__pointDetails__.get(pointId).setOfEquation, equation],
         roots: this.__pointDetails__.get(pointId).roots,
@@ -228,6 +228,9 @@ class AppModel {
 
     if (this.__pointDetails__.get(pointId).setOfEquation.length === 2) {
       const roots = this._calculateSet(this.__pointDetails__.get(pointId).setOfEquation);
+      console.log(roots);
+      console.log(this.__pointDetails__.get(pointId).setOfEquation);
+
       this._updatePointDetails(pointId, {
         setOfEquation: this.__pointDetails__.get(pointId).setOfEquation,
         roots: roots,
@@ -238,9 +241,15 @@ class AppModel {
     let temp = this.__pointDetails__.get(pointId).roots;
     const tempLength = temp.length;
 
+    if (typeof temp === 'string') {
+      return { Error: temp };
+    }
+
     temp = temp.filter((root) => {
-      return isIn(root, convertCircleEquationToQuadraticEquation(equation));
+      return isIn(root, equation);
     });
+
+    console.log(pointId, temp);
 
     if (temp.length < tempLength) {
       // TODO: Add exception
@@ -250,7 +259,6 @@ class AppModel {
         exceptedCoordinates: this.__pointDetails__.get(pointId).exceptedCoordinates
       });
     }
-
   }
 }
 
