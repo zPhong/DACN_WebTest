@@ -236,7 +236,7 @@ export function calculateInternalBisectLineEquation(lineOne: LinearEquation, lin
     pointInSecondLine.y = getRandomValue(MIN_RANDOM_NUMBER, MAX_RANDOM_NUMBER);
   }
 
-  if(getAngleFromTwoLines(lineOne, lineTwo) === 0) {
+  if (getAngleFromTwoLines(lineOne, lineTwo) === 0) {
     throw new Map().set('error', 'không hỗ trợ trường hợp này');
   }
 
@@ -474,69 +474,56 @@ export function calculateSetOfLinearEquationAndQuadraticEquation(
 }
 
 export function calculateIntersectionTwoCircleEquations(c1: CircleEquation, c2: CircleEquation) {
-  const q1 = convertCircleEquationToQuadraticEquation(c1);
-  const q2 = convertCircleEquationToQuadraticEquation(c2);
+  let q1, q2;
+  if (c1.r === undefined) {
+    q1 = c1;
+  } else {
+    q1 = convertCircleEquationToQuadraticEquation(c1);
+  }
+  if (c2.r === undefined) {
+    q1 = c2;
+  } else {
+    q2 = convertCircleEquationToQuadraticEquation(c2);
+  }
 
   let results: Array<Object> = [];
 
-  const C = q1.c - q2.c;
-  const D = q1.d - q2.d;
-  const E = q2.e - q1.e;
+  // x2 + y2 + Ax + By + C = 0
+  // x2 + y2 + Dx + Ey + G = 0
+  const D = q2.c;
+  const E = q2.d;
+  const G = q2.e;
 
-  if (C === 0 && D === 0 && E === 0) {
-    return INFINITY;
-  }
+  const a = q1.c - D;
+  const b = q1.d - E;
+  const c = q1.e - G;
 
-  if (D !== 0) {
-    const a = D * D + C * C;
-    const b = D * D * q1.c - 2 * E * C - q1.d * D * C;
-    const c = E * E + q1.e * D * D + q1.d * D * E;
-    const root = calculateQuadraticEquation(a, b, c);
-    if (typeof root === 'number') {
-      results.push(
-        Object({
-          x: root,
-          y: (E - C * root) / D
-        })
-      );
-    } else if (root === IMPOSSIBLE) {
-      return root;
-    } else {
-      results.push(
-        Object({
-          x: root.x1,
-          y: (E - C * root.x1) / D
-        }),
-        Object({
-          x: root.x2,
-          y: (E - C * root.x2) / D
-        })
-      );
-    }
+  if (a === 0 || b === 0) {
+    return IMPOSSIBLE;
   } else {
-    const a = D * D + C * C;
-    const b = C * C * q1.d - 2 * E * D - q1.c * D * C;
-    const c = E * E + q1.e * C * C + q1.c * C * E;
-    const root = calculateQuadraticEquation(a, b, c);
-    if (typeof root === 'number') {
-      results.push(
-        Object({
-          x: E / C,
-          y: root
-        })
-      );
-    } else if (root === IMPOSSIBLE) {
-      return root;
+    const u = b * b + a * a;
+    const v = 2 * b * c - D * a * b + E * a * a;
+    const w = c * c - D * a * c + G * a * a;
+
+    const roots = calculateQuadraticEquation(u, v, w);
+
+    if (roots === IMPOSSIBLE) {
+      return roots;
+    } else if (roots === 'number') {
+      results.push({
+        x: (-c - b * roots) / a,
+        y: roots
+      });
     } else {
       results.push(
-        Object({
-          x: E / C,
-          y: root.x1
-        }),
-        Object({
-          x: E / C,
-          y: root.x2
-        })
+        {
+          x: (-c - b * roots.x1) / a,
+          y: roots.x1
+        },
+        {
+          x: (-c - b * roots.x2) / a,
+          y: roots.x2
+        }
       );
     }
   }
