@@ -5,11 +5,13 @@ import type {
   CoordinateType,
   FirstDegreeEquation,
   LinearEquation,
+  LineEquation,
   TwoVariableQuadraticEquation,
   Vector
 } from '../../types/types';
 
 import { IMPOSSIBLE, INFINITY, MAX_RANDOM_NUMBER, MIN_RANDOM_NUMBER, NOT_BE_IN_LINE } from '../values';
+import { Line } from '../../euclid/model';
 
 export function getStartPoint(): CoordinateType {
   return { x: 0, y: 0, z: 0 };
@@ -171,15 +173,31 @@ export function calculatePerpendicularLineByPointAndLine(point: CoordinateType, 
     perpendicularLine.coefficientY = -1 / line.coefficientX;
     perpendicularLine.constantTerm = -perpendicularLine.coefficientY * point.y;
   } else {
-    perpendicularLine.coefficientX = -1 / line.coefficientX;
-    perpendicularLine.coefficientY = line.coefficientY;
-    perpendicularLine.constantTerm =
-      -perpendicularLine.coefficientX * point.x - perpendicularLine.coefficientY * point.y;
+    const lineEquation = _convertLinearEquationToLineType(line);
+    const perLine: LineEquation = {};
+    perLine.a = -1/ lineEquation.a;
+    perLine.b = point.y + point.x / lineEquation.a;
+
+    perpendicularLine = _convertLineEquationToLinearEquation(perLine);
   }
 
   return perpendicularLine;
 }
 
+function _convertLinearEquationToLineType(line: LinearEquation): LineEquation {
+  return {
+    a: -line.coefficientX / line.coefficientY,
+    b: -line.constantTerm / line.coefficientY
+  };
+}
+
+function _convertLineEquationToLinearEquation(line: LineEquation): LinearEquation {
+  return {
+    coefficientX: -line.a,
+    coefficientY: 1,
+    constantTerm: -line.b
+  };
+}
 export function calculateIntersectionByLineAndLine(lineOne: LinearEquation, lineTwo: LinearEquation): CoordinateType {
   return calculateSetOfLinearEquationAndQuadraticEquation(
     {
@@ -325,6 +343,21 @@ function convertCircleEquationToQuadraticEquation(c: CircleEquation): TwoVariabl
     c: -2 * c.a,
     d: -2 * c.b,
     e: Math.round(c.a * c.a + c.b * c.b - c.r * c.r)
+  };
+}
+
+function convertQuadraticEquationToCircleEquation(q: TwoVariableQuadraticEquation): CircleEquation {
+  if (q.a !== 1 || q.b !== 1) return;
+
+  const A = -q.d / 2;
+  const B = -q.e / 2;
+
+  if (A * A + B * B - q.e <= 0) return;
+
+  return {
+    a: A,
+    b: B,
+    r: Math.sqrt(A * A + B * B - q.e)
   };
 }
 
@@ -547,7 +580,7 @@ export function calculateLinesByAnotherLineAndAngle(d: LinearEquation, p: Coordi
   return results;
 }
 
-export function convertLinearToQuadric(l: LinearEquation): TwoVariableQuadraticEquation {
+export function convertLinearToQuadratic(l: LinearEquation): TwoVariableQuadraticEquation {
   return {
     a: 0,
     b: 0,
