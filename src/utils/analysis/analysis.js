@@ -40,7 +40,7 @@ export function analyzeResult(validatedResult: RelationsResultType): DrawingData
     })
   );
 
-  result.segments = getArraySegments(validatedResult);
+  result.segments = [...getArraySegments(validatedResult), ...appModel.additionSegment];
   return result;
 }
 

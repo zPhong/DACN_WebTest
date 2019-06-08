@@ -137,7 +137,8 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
             appModel.getNodeInPointsMapById(segmentNotIncludePoint[1]).coordinate,
             getRandomValue(0, 2) === 1
           );
-          console.log(calculatedPoint);
+
+          appModel.additionSegment.push(`${point}${segmentNotIncludePoint[0]}`);
           appModel.updateCoordinate(point, calculatedPoint);
           break;
         default:

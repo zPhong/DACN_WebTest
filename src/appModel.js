@@ -4,6 +4,7 @@ import { NOT_ENOUGH_SET } from "./utils/values";
 const NOT_FOUND = 99;
 
 class AppModel {
+  additionSegment: string[] = [];
   relationsResult: RelationsResultType = {};
   pointsMap: Array<NodeType> = [];
   executedRelations = [];
