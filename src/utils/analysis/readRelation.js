@@ -28,6 +28,7 @@ import {
   isIn,
   getMiddlePointFromThreePointsInALine,
   calculateIntersectionTwoCircleEquations,
+  convertLinearToQuadric,
   getAngleFromTwoLines
 } from '../math/Math2D';
 import { NOT_ENOUGH_SET } from '../values';
@@ -184,6 +185,10 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
 
     const otherStaticPoint = segmentIncludePoint.replace(point, '');
 
+    if (!appModel.isValidCoordinate(otherStaticPoint)) {
+      return;
+    }
+
     let calculatedLineEquation;
     if (relationType === 'vuông góc') {
       calculatedLineEquation = calculatePerpendicularLineByPointAndLine(
@@ -191,7 +196,13 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
         staticLineEquation
       );
 
-      const calculatedPoint = calculateIntersectionByLineAndLine(calculatedLineEquation, staticLineEquation);
+      const isInStaticLine = isIn(
+        appModel.getNodeInPointsMapById(otherStaticPoint).coordinate,
+        convertLinearToQuadric(staticLineEquation)
+      );
+      const calculatedPoint = isInStaticLine
+        ? getRandomPointInLine(calculatedLineEquation)
+        : calculateIntersectionByLineAndLine(calculatedLineEquation, staticLineEquation);
       appModel.updateCoordinate(point, calculatedPoint);
     }
     if (relationType === 'song song') {
@@ -203,9 +214,8 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
       const calculatedPoint = getRandomPointInLine(calculatedLineEquation);
 
       appModel.updateCoordinate(point, calculatedPoint);
-
-      return calculatedLineEquation;
     }
+    return calculatedLineEquation;
   } else if (relationType === 'phân giác') {
     if (relation.angle) {
       const angle = relation.angle[0];
