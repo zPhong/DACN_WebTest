@@ -491,11 +491,13 @@ export function calculateIntersectionTwoCircleEquations(c1: CircleEquation, c2: 
 
   let results: Array<Object> = [];
 
-  if (q1.a !== q2.a) {
-    if (q1.a === 0) {
-      return calculateIntersectionLinearEquationWithCircleEquation(q1, convertQuadraticEquationToCircleEquation(q2));
+  if (q1.a !== q2.a && q1.b !== q2.b) {
+    if (q1.a === 0 && q1.b === 0) {
+      // q2 is a quadratic equation
+      return calculateIntersectionLinearEquationWithCircleEquation({coefficientX: q1.c, coefficientY: q1.d, constantTerm: q1.e}, convertQuadraticEquationToCircleEquation(q2));
     } else {
-      return calculateIntersectionLinearEquationWithCircleEquation(q2, convertQuadraticEquationToCircleEquation(q1));
+      // q1 is a quadratic equation
+      return calculateIntersectionLinearEquationWithCircleEquation({coefficientX: q2.c, coefficientY: q2.d, constantTerm: q2.e}, convertQuadraticEquationToCircleEquation(q1));
     }
   } else {
     // a x2 + b y2 + Ax + By + C = 0
