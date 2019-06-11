@@ -15,6 +15,7 @@ import { readRelation } from './readRelation';
 
 export function readPointsMap(): Array<DrawingNodeType> | {} {
   appModel.createPointDetails();
+  console.table(appModel.pointsMap);
   while (!appModel.isPointsMapStatic()) {
     //get node to calculate
     const executingNode = appModel.getNextExecuteNode();
@@ -162,11 +163,12 @@ function makeCorrectShape(
       }
     });
     let pointDetails = appModel.__pointDetails__.get(nonStaticPoint);
-    console.log(nonStaticPoint, pointDetails);
     pointDetails = {
       ...pointDetails,
       setOfEquation: [...nodeSetEquations, ...pointDetails.setOfEquation]
     };
+    console.log(nonStaticPoint, pointDetails);
+
     appModel._updatePointDetails(nonStaticPoint, pointDetails);
   }
 }
