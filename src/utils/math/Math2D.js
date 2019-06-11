@@ -1,9 +1,7 @@
 // @flow
 
 import type {
-  CircleEquation,
   CoordinateType,
-  FirstDegreeEquation,
   LinearEquation,
   LineEquation,
   TwoVariableQuadraticEquation,
@@ -11,7 +9,12 @@ import type {
 } from '../../types/types';
 
 import { IMPOSSIBLE, INFINITY, MAX_RANDOM_NUMBER, MIN_RANDOM_NUMBER, NOT_BE_IN_LINE } from '../values';
-import { Line } from '../../euclid/model';
+import {
+  convertLinearEquationToLineType,
+  convertLinearToQuadratic,
+  convertLineEquationToLinearEquation,
+  convertQuadraticEquationToLinearEquation
+} from './Converter';
 
 export function getStartPoint(): CoordinateType {
   return { x: 0, y: 0, z: 0 };
@@ -34,6 +37,10 @@ export function getRandomPointInLine(d: LinearEquation): CoordinateType {
       y: getRandomValue(MIN_RANDOM_NUMBER, MAX_RANDOM_NUMBER)
     };
   }
+}
+
+function _makeRound(num: number): number {
+  return Math.round(num * 1000) / 1000;
 }
 
 export function generatePointAlignmentInside(firstPoint: CoordinateType, secondPoint: CoordinateType): CoordinateType {
@@ -150,12 +157,12 @@ export function calculateDistanceFromPointToLine(point: CoordinateType, line: Li
 export function calculateParallelLineByPointAndLine(point: CoordinateType, line: LinearEquation): LinearEquation {
   // parallel line has `a` coefficient equals the other line.
   // parallel line's constantTerm = -ax - y with (x,y) is coordinate of the point
-  const lineEquation = _convertLinearEquationToLineType(line);
+  const lineEquation = convertLinearEquationToLineType(line);
   const parLine: LineEquation = {};
   parLine.a = lineEquation.a;
   parLine.b = point.y - lineEquation.a * point.x;
 
-  return _convertLineEquationToLinearEquation(parLine);
+  return convertLineEquationToLinearEquation(parLine);
 }
 
 export function calculatePerpendicularLineByPointAndLine(point: CoordinateType, line: LinearEquation): LinearEquation {
@@ -172,31 +179,17 @@ export function calculatePerpendicularLineByPointAndLine(point: CoordinateType, 
     perpendicularLine.coefficientY = -1 / line.coefficientX;
     perpendicularLine.constantTerm = -perpendicularLine.coefficientY * point.y;
   } else {
-    const lineEquation = _convertLinearEquationToLineType(line);
+    const lineEquation = convertLinearEquationToLineType(line);
     const perLine: LineEquation = {};
     perLine.a = -1 / lineEquation.a;
     perLine.b = point.y + point.x / lineEquation.a;
 
-    perpendicularLine = _convertLineEquationToLinearEquation(perLine);
+    perpendicularLine = convertLineEquationToLinearEquation(perLine);
   }
 
   return perpendicularLine;
 }
 
-function _convertLinearEquationToLineType(line: LinearEquation): LineEquation {
-  return {
-    a: -line.coefficientX / line.coefficientY,
-    b: -line.constantTerm / line.coefficientY
-  };
-}
-
-function _convertLineEquationToLinearEquation(line: LineEquation): LinearEquation {
-  return {
-    coefficientX: -line.a,
-    coefficientY: 1,
-    constantTerm: -line.b
-  };
-}
 export function calculateIntersectionByLineAndLine(lineOne: LinearEquation, lineTwo: LinearEquation): CoordinateType {
   return calculateSetOfLinearEquationAndQuadraticEquation(
     {
@@ -214,13 +207,17 @@ export function calculateIntersectionByLineAndLine(lineOne: LinearEquation, line
   )[0];
 }
 
-export function calculateCircleEquationByCenterPoint(centerPoint: CoordinateType, radius: number): CircleEquation {
-  let circleEquation: CircleEquation = {};
-  circleEquation.a = centerPoint.x;
-  circleEquation.b = centerPoint.y;
-  circleEquation.r = Math.abs(radius);
-
-  return circleEquation;
+export function calculateCircleEquationByCenterPoint(
+  centerPoint: CoordinateType,
+  radius: number
+): TwoVariableQuadraticEquation {
+  return {
+    a: 1,
+    b: 1,
+    c: -2 * centerPoint.x,
+    d: -2 * centerPoint.y,
+    e: centerPoint.x * centerPoint.x + centerPoint.y * centerPoint.y - radius * radius
+  };
 }
 
 export function calculateInternalBisectLineEquation(lineOne: LinearEquation, lineTwo: LinearEquation): LinearEquation {
@@ -292,26 +289,22 @@ function _getInternalBisectLineEquation(
   return firstEquation * secondEquation < 0 ? lineOne : lineTwo;
 }
 
-function _getPointInLineWithCondition(
-  line: LinearEquation,
-  axis: string,
-  comparison: string,
-  point: CoordinateType
-): CoordinateType {
-  if (axis !== 'vertical' || axis !== 'horizontal' || comparison !== 'bigger' || comparison !== 'smaller') {
-    return {};
-  }
-
-  if (axis === 'horizontal') {
+// TODO: Uncheck
+export function calculateSetOfLinearEquations(d1: LinearEquation, d2: LinearEquation) {
+  if ((d1.coefficientX === 0 && d2.coefficientX === 0) || (d1.coefficientY === 0 && d2.coefficientY === 0)) {
+    return IMPOSSIBLE;
+  } else if (d1.coefficientX === 0 && d2.coefficientY === 0) {
+    return { x: -d2.constantTerm / d2.coefficientX, y: -d1.constantTerm / d1.coefficientY };
+  } else if (d2.coefficientX === 0 && d1.coefficientY === 0) {
+    return { x: -d1.constantTerm / d1.coefficientX, y: -d2.constantTerm / d2.coefficientY };
+  } else if (d1.constantTerm === 0 && d2.constantTerm === 0) {
+    return { x: 0, y: 0 };
   } else {
+    const tempY =
+      (d1.constantTerm * d2.coefficientX - d1.coefficientX * d2.constantTerm) /
+      (d1.coefficientY * d2.coefficientX + d1.coefficientX * d2.coefficientY);
+    return { x: (-d1.constantTerm - d1.coefficientY * tempY) / d1.coefficientX, y: tempY };
   }
-}
-
-export function calculateTwoVariablesFirstDegreeEquations(e1: FirstDegreeEquation, e2: FirstDegreeEquation) {
-  let y = (e1.a * e2.c - e2.a * e1.c) / (e1.a * e2.b - e2.a * e1.b);
-  let x = (e1.c - e1.b * y) / e1.a;
-
-  return { x, y };
 }
 
 /*
@@ -327,42 +320,18 @@ export function calculateTwoVariablesFirstDegreeEquations(e1: FirstDegreeEquatio
  */
 export function calculateIntersectionLinearEquationWithCircleEquation(
   d: LinearEquation,
-  c: CircleEquation
+  q: TwoVariableQuadraticEquation
 ): Array<Object> {
-  const centerPoint: CoordinateType = { x: c.a, y: c.b };
+  const A = -q.c / 2;
+  const B = -q.d / 2;
+  const centerPoint: CoordinateType = { x: A, y: B };
   const distanceFromCenterPointToLine = calculateDistanceFromPointToLine(centerPoint, d);
-  console.log(distanceFromCenterPointToLine);
-  if (distanceFromCenterPointToLine > c.r) {
+
+  if (distanceFromCenterPointToLine > Math.sqrt(A * A + B * B - q.e)) {
     return IMPOSSIBLE;
   } else {
-    console.log(convertCircleEquationToQuadraticEquation(c));
-    return calculateSetOfLinearEquationAndQuadraticEquation(d, convertCircleEquationToQuadraticEquation(c));
+    return calculateSetOfLinearEquationAndQuadraticEquation(d, q);
   }
-}
-
-export function convertCircleEquationToQuadraticEquation(c: CircleEquation): TwoVariableQuadraticEquation {
-  return {
-    a: 1,
-    b: 1,
-    c: -2 * c.a,
-    d: -2 * c.b,
-    e: Math.round(c.a * c.a + c.b * c.b - c.r * c.r)
-  };
-}
-
-function convertQuadraticEquationToCircleEquation(q: TwoVariableQuadraticEquation): CircleEquation {
-  if (q.a !== 1 || q.b !== 1) return;
-
-  const A = -q.d / 2;
-  const B = -q.e / 2;
-
-  if (A * A + B * B - q.e <= 0) return;
-
-  return {
-    a: A,
-    b: B,
-    r: Math.sqrt(A * A + B * B - q.e)
-  };
 }
 
 /*
@@ -379,6 +348,8 @@ function convertQuadraticEquationToCircleEquation(q: TwoVariableQuadraticEquatio
  */
 export function calculateQuadraticEquation(a: number, b: number, c: number) {
   const delta = b * b - 4 * a * c;
+
+  console.table({ a, b, c, delta });
   let x1,
     x2: number = undefined;
 
@@ -398,7 +369,11 @@ export function calculateQuadraticEquation(a: number, b: number, c: number) {
 // Ax2 + By2 + Cx + Dy + E = 0
 export function isIn(p: CoordinateType, e: TwoVariableQuadraticEquation): boolean {
   if (p.x === undefined || p.y === undefined) return false;
-  return e.a * p.x * p.x + e.b * p.y * p.y + e.c * p.x + e.d * p.y + e.e === 0;
+  if (e.a === undefined) {
+    e = convertLinearToQuadratic(e);
+  }
+  const temp = e.a * p.x * p.x + e.b * p.y * p.y + e.c * p.x + e.d * p.y + e.e;
+  return _makeRound(temp) === 0;
 }
 
 /*
@@ -436,16 +411,14 @@ export function calculateSetOfLinearEquationAndQuadraticEquation(
 
     // solves x. Unneeded check IMPOSSIBLE.
     const root = calculateQuadraticEquation(u, v, w);
-
     if (typeof root === 'number') {
-      results.push(Object({ x: (-C - B * root) / A, y: root }));
+      results.push({ x: (-C - B * root) / A, y: root });
     } else if (root === IMPOSSIBLE) {
       return root;
     } else {
-      results.push(
-        Object({ x: (-C - B * root.x1) / A, y: root.x1 }),
-        Object({ x: (-C - B * root.x2) / A, y: root.x2 })
-      );
+      const r1 = root.x1;
+      const r2 = root.x2;
+      results.push({ x: (-C - B * root.x1) / A, y: r1 }, { x: (-C - B * root.x2) / A, y: r2 });
     }
   } else {
     u = q.a * l.coefficientY * l.coefficientY;
@@ -459,13 +432,13 @@ export function calculateSetOfLinearEquationAndQuadraticEquation(
     const root = calculateQuadraticEquation(u, v, w);
 
     if (typeof root === 'number') {
-      results.push(Object({ x: root, y: -l.constantTerm / l.coefficientY }));
+      results.push({ x: root, y: -l.constantTerm / l.coefficientY });
     } else if (root === IMPOSSIBLE) {
       return root;
     } else {
       results.push(
-        Object({ x: root.x1, y: -l.constantTerm / l.coefficientY }),
-        Object({ x: root.x2, y: -l.constantTerm / l.coefficientY })
+        { x: root.x1, y: -l.constantTerm / l.coefficientY },
+        { x: root.x2, y: -l.constantTerm / l.coefficientY }
       );
     }
   }
@@ -473,58 +446,77 @@ export function calculateSetOfLinearEquationAndQuadraticEquation(
   return results;
 }
 
-export function calculateIntersectionTwoCircleEquations(c1: CircleEquation, c2: CircleEquation) {
-  let q1, q2;
-  if (c1.r === undefined) {
-    q1 = c1;
-  } else {
-    q1 = convertCircleEquationToQuadraticEquation(c1);
-  }
-  if (c2.r === undefined) {
-    q1 = c2;
-  } else {
-    q2 = convertCircleEquationToQuadraticEquation(c2);
-  }
-
+export function calculateIntersectionTwoCircleEquations(
+  firstEquation: TwoVariableQuadraticEquation,
+  secondEquation: TwoVariableQuadraticEquation
+) {
   let results: Array<Object> = [];
+  let q1, q2;
+  firstEquation.a === undefined ? (q1 = convertLinearToQuadratic(firstEquation)) : (q1 = firstEquation);
+  secondEquation.a === undefined ? (q2 = convertLinearToQuadratic(secondEquation)) : (q2 = secondEquation);
 
-  // x2 + y2 + Ax + By + C = 0
-  // x2 + y2 + Dx + Ey + G = 0
-  const D = q2.c;
-  const E = q2.d;
-  const G = q2.e;
-
-  const a = q1.c - D;
-  const b = q1.d - E;
-  const c = q1.e - G;
-
-  if (a === 0 || b === 0) {
-    return IMPOSSIBLE;
-  } else {
-    const u = b * b + a * a;
-    const v = 2 * b * c - D * a * b + E * a * a;
-    const w = c * c - D * a * c + G * a * a;
-
-    const roots = calculateQuadraticEquation(u, v, w);
-
-    if (roots === IMPOSSIBLE) {
-      return roots;
-    } else if (roots === 'number') {
-      results.push({
-        x: (-c - b * roots) / a,
-        y: roots
-      });
+  if (q1.a !== q2.a && q1.b !== q2.b) {
+    if (q1.a === 0 && q1.b === 0) {
+      // q2 is a quadratic equation
+      return calculateIntersectionLinearEquationWithCircleEquation(convertQuadraticEquationToLinearEquation(q1), q2);
     } else {
-      results.push(
-        {
-          x: (-c - b * roots.x1) / a,
-          y: roots.x1
-        },
-        {
-          x: (-c - b * roots.x2) / a,
-          y: roots.x2
-        }
-      );
+      // q1 is a quadratic equation
+      return calculateIntersectionLinearEquationWithCircleEquation(convertQuadraticEquationToLinearEquation(q2), q1);
+    }
+  } else if (q1.a === 0 && q1.b === 0 && q2.a === 0 && q2.b === 0) {
+    console.log(q1, q2);
+    results.push(
+      calculateSetOfLinearEquations(
+        convertQuadraticEquationToLinearEquation(q1),
+        convertQuadraticEquationToLinearEquation(q2)
+      )
+    );
+  } else {
+    // a x2 + b y2 + Ax + By + C = 0
+    // a'x2 + b'y2 + Dx + Ey + G = 0
+    const D = q2.c;
+    const E = q2.d;
+    const G = q2.e;
+
+    // Z = a - a'
+    const Z = q1.a - q2.a > 0 ? q1.a : q2.a;
+    const _D = Z === q1.a ? q1.c : D;
+    const _E = Z === q1.a ? q1.d : E;
+    const _G = Z === q1.a ? q1.e : G;
+
+    const a = Z === q1.a ? q1.c - D : D - q1.c;
+    const b = Z === q1.a ? q1.d - E : E - q1.d;
+    const c = Z === q1.a ? q1.e - G : G - q1.e;
+
+    if (a === 0 || b === 0) {
+      return IMPOSSIBLE;
+    } else {
+      const u = Z * (b * b + a * a);
+      const v = 2 * b * c * Z - _D * a * b + _E * a * a;
+      const w = Z * c * c - _D * a * c + _G * a * a;
+
+      const roots = calculateQuadraticEquation(u, v, w);
+      if (roots === IMPOSSIBLE) {
+        return roots;
+      } else if (typeof roots === 'number') {
+        results.push({
+          x: (-c - b * roots) / a,
+          y: roots
+        });
+      } else {
+        const r1 = roots.x1;
+        const r2 = roots.x2;
+        results.push(
+          {
+            x: (-c - b * roots.x1) / a,
+            y: r1
+          },
+          {
+            x: (-c - b * roots.x2) / a,
+            y: r2
+          }
+        );
+      }
     }
   }
 
@@ -533,6 +525,8 @@ export function calculateIntersectionTwoCircleEquations(c1: CircleEquation, c2: 
 
 export function calculateLinesByAnotherLineAndAngle(d: LinearEquation, p: CoordinateType, angle: number) {
   let results: Array<LinearEquation> = [];
+
+  console.log(d, p, angle);
 
   const cosine = Math.cos((angle * Math.PI) / 180);
   const A =
@@ -548,8 +542,9 @@ export function calculateLinesByAnotherLineAndAngle(d: LinearEquation, p: Coordi
 
   if (typeof root === 'number') {
     results.push({
-      x: Math.round(root),
-      y: -Math.round(root) * p.x - p.y
+      coefficientX: root,
+      coefficientY: 1,
+      constantTerm: -root * p.x - p.y
     });
   } else if (root === IMPOSSIBLE) {
     return root;
@@ -571,13 +566,10 @@ export function calculateLinesByAnotherLineAndAngle(d: LinearEquation, p: Coordi
   return results;
 }
 
-export function convertLinearToQuadratic(l: LinearEquation): TwoVariableQuadraticEquation {
+export function makeRoundCoordinate(point: CoordinateType) {
   return {
-    a: 0,
-    b: 0,
-    c: l.coefficientX,
-    d: l.coefficientY,
-    e: l.constantTerm
+    x: _makeRound(point.x),
+    y: _makeRound(point.y)
   };
 }
 
@@ -591,7 +583,7 @@ export function getAngleFromTwoLines(d1: LinearEquation, d2: LinearEquation): nu
     (Math.acos(Math.abs(a1 * a2 + b1 * b2) / Math.sqrt((a1 * a1 + b1 * b1) * (a2 * a2 + b2 * b2))) * 180) / Math.PI;
 
   // round result
-  return Math.round(result * 1000) / 1000;
+  return _makeRound(result);
 }
 
 export function getMiddlePointFromThreePointsInALine(
