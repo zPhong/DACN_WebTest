@@ -15,6 +15,12 @@ class AppModel {
   executedNode = [];
   __pointDetails__ = new Map();
 
+  createPointDetails = () => {
+    this.pointsMap.forEach((node) => {
+      this._updatePointDetails(node.id, { setOfEquation: [], roots: [], exceptedCoordinates: [] });
+    });
+  };
+
   clear() {
     this.relationsResult = [];
     this.pointsMap = [];

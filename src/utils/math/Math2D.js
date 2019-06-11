@@ -331,7 +331,7 @@ export function calculateIntersectionLinearEquationWithCircleEquation(
 ): Array<Object> {
   const centerPoint: CoordinateType = { x: c.a, y: c.b };
   const distanceFromCenterPointToLine = calculateDistanceFromPointToLine(centerPoint, d);
-
+  console.log(c, distanceFromCenterPointToLine);
   if (distanceFromCenterPointToLine > c.r) {
     return IMPOSSIBLE;
   } else {
@@ -400,7 +400,12 @@ export function calculateQuadraticEquation(a: number, b: number, c: number) {
 // Ax2 + By2 + Cx + Dy + E = 0
 export function isIn(p: CoordinateType, e: TwoVariableQuadraticEquation): boolean {
   if (p.x === undefined || p.y === undefined) return false;
+  console.log(e);
+  if (e.r) {
+    e = convertCircleEquationToQuadraticEquation(e);
+  }
   const temp = e.a * p.x * p.x + e.b * p.y * p.y + e.c * p.x + e.d * p.y + e.e;
+  console.log(e, temp);
   return Math.round(temp * 1000) / 1000 === 0;
 }
 
@@ -494,10 +499,16 @@ export function calculateIntersectionTwoCircleEquations(c1: CircleEquation, c2: 
   if (q1.a !== q2.a && q1.b !== q2.b) {
     if (q1.a === 0 && q1.b === 0) {
       // q2 is a quadratic equation
-      return calculateIntersectionLinearEquationWithCircleEquation({coefficientX: q1.c, coefficientY: q1.d, constantTerm: q1.e}, convertQuadraticEquationToCircleEquation(q2));
+      return calculateIntersectionLinearEquationWithCircleEquation(
+        { coefficientX: q1.c, coefficientY: q1.d, constantTerm: q1.e },
+        convertQuadraticEquationToCircleEquation(q2)
+      );
     } else {
       // q1 is a quadratic equation
-      return calculateIntersectionLinearEquationWithCircleEquation({coefficientX: q2.c, coefficientY: q2.d, constantTerm: q2.e}, convertQuadraticEquationToCircleEquation(q1));
+      return calculateIntersectionLinearEquationWithCircleEquation(
+        { coefficientX: q2.c, coefficientY: q2.d, constantTerm: q2.e },
+        convertQuadraticEquationToCircleEquation(q1)
+      );
     }
   } else {
     // a x2 + b y2 + Ax + By + C = 0

@@ -5,6 +5,7 @@ import {
   calculatePerpendicularLineByPointAndLine,
   calculateDistanceTwoPoints,
   calculateCircleEquationByCenterPoint,
+  calculateIntersectionTwoCircleEquations,
   getLineFromTwoPoints,
   getRandomValue
 } from '../math/Math2D';
@@ -12,8 +13,8 @@ import { shapeRules, mappingShapeType, TwoStaticPointRequireShape } from '../../
 import { generateGeometry } from './GenerateGeometry';
 import { readRelation } from './readRelation';
 
-export function readPointsMap(): Array<DrawingNodeType> {
-  console.table(appModel.pointsMap);
+export function readPointsMap(): Array<DrawingNodeType> | {} {
+  appModel.createPointDetails();
   while (!appModel.isPointsMapStatic()) {
     //get node to calculate
     const executingNode = appModel.getNextExecuteNode();
@@ -63,11 +64,11 @@ export function readPointsMap(): Array<DrawingNodeType> {
       }
       if (roots.length > 0) {
         const randomCoordinate = roots[getRandomValue(0, roots.length)];
-        console.log(randomCoordinate);
         appModel.updateCoordinate(executingNode.id, randomCoordinate);
       } else {
       }
     }
+
     //appModel.updatePointsMap(executingNode);
     appModel.executedNode.push(executingNode.id);
 
@@ -108,7 +109,7 @@ function makeCorrectShape(
 ) {
   const staticPointCountRequire = TwoStaticPointRequireShape.includes(shapeName) ? 2 : 1;
   let staticPoints = shape.replace(nonStaticPoint, '').split('');
-
+  console.log(nonStaticPoint);
   // check other points are static
   let count = 0;
   for (let i = 0; i < staticPoints.length; i++) {
@@ -121,9 +122,6 @@ function makeCorrectShape(
   }
 
   // get node infomation
-  const points = shape
-    .split('')
-    .map((point: string): NodeType => appModel.pointsMap[appModel.getIndexOfNodeInPointsMapById(point)]);
   let arrayRules = rules.split(new RegExp('&', 'g'));
 
   const nonStaticIndex = shape.indexOf(nonStaticPoint);
@@ -138,30 +136,47 @@ function makeCorrectShape(
     return true;
   });
 
-  console.log('---------------------------');
+  let nodeSetEquations = [];
   if (arrayRules.length > 0) {
     arrayRules.forEach((rule) => {
       const relationType = rule[2];
       console.log(rule, nonStaticIndex);
-      if (rule.includes(nonStaticIndex))
+      if (rule.includes(nonStaticIndex)) {
+        let equation;
         // eslint-disable-next-line default-case
         switch (relationType) {
           case '|':
-            console.log(getLinearEquationByParallelRule(rule, points, nonStaticIndex));
+            equation = getLinearEquationByParallelRule(rule, shape, nonStaticIndex);
             break;
           case '^':
-            console.log(getLinearPerpendicularByParallelRule(rule, points, nonStaticIndex));
+            equation = getLinearPerpendicularByParallelRule(rule, shape, nonStaticIndex);
             break;
           case '=':
-            console.log('equal');
+            equation = getLinearEquationsByEqualRule(rule, shape, nonStaticIndex);
             break;
         }
+        if (equation) {
+          nodeSetEquations = nodeSetEquations.concat(equation);
+          console.log(equation);
+        }
+      }
     });
+    let pointDetails = appModel.__pointDetails__.get(nonStaticPoint);
+    console.log(nonStaticPoint, pointDetails);
+    pointDetails = {
+      ...pointDetails,
+      setOfEquation: [...nodeSetEquations, ...pointDetails.setOfEquation]
+    };
+    appModel._updatePointDetails(nonStaticPoint, pointDetails);
   }
 }
 
-function getLinearEquationsByEqualRule(rule: string, arrayPoints: Array<NodeType>, nonStaticIndex: number) {
-  const lines = rule.split('|');
+function getLinearEquationsByEqualRule(
+  rule: string,
+  shape: string,
+  nonStaticIndex: number
+): Array<TwoVariableQuadraticEquation> {
+  const lines = rule.split('=');
   let staticLine;
   let nonStaticLines = [];
   // points with non-static point;
@@ -177,24 +192,42 @@ function getLinearEquationsByEqualRule(rule: string, arrayPoints: Array<NodeType
 
   //1 circle equation
   if (staticLine) {
-    const radius = calculateDistanceTwoPoints(staticLine[0].coordinate, staticLine[1].coordinate);
+    const radius = calculateDistanceTwoPoints(
+      appModel.getNodeInPointsMapById(shape[staticLine[0]]).coordinate,
+      appModel.getNodeInPointsMapById(shape[staticLine[1]]).coordinate
+    );
 
-    return calculateCircleEquationByCenterPoint(staticPoints[0], radius);
+    return [
+      calculateCircleEquationByCenterPoint(
+        appModel.getNodeInPointsMapById(shape[nonStaticLines[0].replace(nonStaticIndex, '')]).coordinate,
+        radius
+      )
+    ];
   }
 
   // tam giác đều
-  const radius = calculateDistanceTwoPoints(staticPoints[0].coordinate, staticPoints[1].coordinate);
+  const radius = calculateDistanceTwoPoints(
+    appModel.getNodeInPointsMapById(shape[staticLine[0]]).coordinate,
+    appModel.getNodeInPointsMapById(shape[staticLine[1]]).coordinate
+  );
 
-  const circleOne = calculateCircleEquationByCenterPoint(staticPoints[0], radius);
+  const circleOne = calculateCircleEquationByCenterPoint(
+    appModel.getNodeInPointsMapById(shape[staticLine[0]]).coordinate,
+    radius
+  );
 
-  const circleTwo = calculateCircleEquationByCenterPoint(staticPoints[1], radius);
+  const circleTwo = calculateCircleEquationByCenterPoint(
+    appModel.getNodeInPointsMapById(shape[staticLine[0]]).coordinate,
+    radius
+  );
+
+  const nonStaticNodeId = shape[nonStaticIndex].id;
+
+  appModel.updateCoordinate(nonStaticNodeId, calculateIntersectionTwoCircleEquations(circleOne, circleTwo));
+  return [circleOne, circleTwo];
 }
 
-function getLinearEquationByParallelRule(
-  rule: string,
-  arrayPoints: Array<NodeType>,
-  nonStaticIndex: number
-): LinearEquation {
+function getLinearEquationByParallelRule(rule: string, shape: string, nonStaticIndex: number): LinearEquation {
   const lines = rule.split('|');
   let staticLine, nonStaticLine;
   lines.forEach((line) => {
@@ -205,19 +238,20 @@ function getLinearEquationByParallelRule(
     }
   });
 
-  return calculateParallelLineByPointAndLine(
-    //point
-    arrayPoints[nonStaticLine.replace(nonStaticIndex, '')].coordinate,
-    //line
-    getLineFromTwoPoints(arrayPoints[staticLine[0]].coordinate, arrayPoints[staticLine[1]].coordinate)
-  );
+  return [
+    calculateParallelLineByPointAndLine(
+      //point
+      appModel.getNodeInPointsMapById(shape[nonStaticLine.replace(nonStaticIndex, '')]).coordinate,
+      //line
+      getLineFromTwoPoints(
+        appModel.getNodeInPointsMapById(shape[staticLine[0]]).coordinate,
+        appModel.getNodeInPointsMapById(shape[staticLine[1]]).coordinate
+      )
+    )
+  ];
 }
 
-function getLinearPerpendicularByParallelRule(
-  rule: string,
-  arrayPoints: Array<NodeType>,
-  nonStaticIndex: number
-): LinearEquation {
+function getLinearPerpendicularByParallelRule(rule: string, shape: string, nonStaticIndex: number): LinearEquation {
   const lines = rule.split('^');
   let staticLine;
   let nonStaticLines = [];
@@ -233,12 +267,17 @@ function getLinearPerpendicularByParallelRule(
   });
 
   if (staticLine) {
-    return calculatePerpendicularLineByPointAndLine(
-      //point
-      arrayPoints[nonStaticLines[0].replace(nonStaticIndex, '')].coordinate,
-      //line
-      getLineFromTwoPoints(arrayPoints[staticLine[0]].coordinate, arrayPoints[staticLine[1]].coordinate)
-    );
+    return [
+      calculatePerpendicularLineByPointAndLine(
+        //point
+        appModel.getNodeInPointsMapById(shape[nonStaticLines[0].replace(nonStaticIndex, '')]).coordinate,
+        //line
+        getLineFromTwoPoints(
+          appModel.getNodeInPointsMapById(shape[staticLine[0]]).coordinate,
+          appModel.getNodeInPointsMapById(shape[staticLine[1]]).coordinate
+        )
+      )
+    ];
   }
 }
 
