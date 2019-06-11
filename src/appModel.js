@@ -2,7 +2,8 @@ import type { CircleEquation, CoordinateType, NodeType, PointDetailsType, Relati
 import {
   calculateIntersectionTwoCircleEquations,
   convertCircleEquationToQuadraticEquation,
-  isIn
+  isIn,
+  makeRoundCoordinate
 } from './utils/math/Math2D';
 import { NOT_ENOUGH_SET } from './utils/values';
 const NOT_FOUND = 99;
@@ -21,6 +22,11 @@ class AppModel {
     });
   };
 
+  isQuadraticEquation = (equation): boolean => {
+    if (equation.coefficientX) return false;
+    return equation.a === 1 && equation.b === 1;
+  };
+
   clear() {
     this.relationsResult = [];
     this.pointsMap = [];
@@ -28,6 +34,23 @@ class AppModel {
     this.executedNode = [];
     this.__pointDetails__.clear();
   }
+
+  isNeedRandomCoordinate = (pointId: string): boolean => {
+    const roots = this.__pointDetails__.get(pointId).roots;
+    if (roots) {
+      for (let i = 0; i < roots.length; i++) {
+        if (
+          JSON.stringify(makeRoundCoordinate(roots[i])) ===
+          JSON.stringify(makeRoundCoordinate(this.getNodeInPointsMapById(pointId).coordinate))
+        ) {
+          console.log('A');
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
+  };
 
   updateCoordinate = (nodeId: string, coordinate: CoordinateType): void => {
     const index = this.getIndexOfNodeInPointsMapById(nodeId);
@@ -221,6 +244,7 @@ class AppModel {
 
   executePointDetails(pointId: string, equation: CircleEquation) {
     console.log(pointId, equation);
+    let isFirst = false;
     if (!this.__pointDetails__.has(pointId)) {
       this._updatePointDetails(pointId, { setOfEquation: [], roots: [], exceptedCoordinates: [] });
     }
@@ -231,9 +255,19 @@ class AppModel {
         roots: this.__pointDetails__.get(pointId).roots,
         exceptedCoordinates: this.__pointDetails__.get(pointId).exceptedCoordinates
       });
+      isFirst = true;
     }
 
     if (this.__pointDetails__.get(pointId).setOfEquation.length === 2) {
+      if (this.isQuadraticEquation(equation) && !isFirst) {
+        for (let i = 0; i < 2; i++) {
+          if (!this.isQuadraticEquation(this.__pointDetails__.get(pointId).setOfEquation[i])) {
+            this.__pointDetails__.get(pointId).setOfEquation[i] = equation;
+            break;
+          }
+        }
+      }
+
       const roots = this._calculateSet(this.__pointDetails__.get(pointId).setOfEquation);
       console.log(roots);
       console.log(this.__pointDetails__.get(pointId).setOfEquation);

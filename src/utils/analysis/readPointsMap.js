@@ -66,8 +66,10 @@ export function readPointsMap(): Array<DrawingNodeType> | {} {
         return { Error: `không tính toán được` };
       }
       if (roots.length > 0) {
-        const randomCoordinate = roots[getRandomValue(0, roots.length)];
-        appModel.updateCoordinate(executingNode.id, randomCoordinate);
+        if (appModel.isNeedRandomCoordinate(executingNode.id)) {
+          const randomCoordinate = roots[getRandomValue(0, roots.length)];
+          appModel.updateCoordinate(executingNode.id, randomCoordinate);
+        }
       } else {
       }
     }
@@ -161,14 +163,10 @@ function makeCorrectShape(
         }
       }
     });
-    let pointDetails = appModel.__pointDetails__.get(nonStaticPoint);
-    pointDetails = {
-      ...pointDetails,
-      setOfEquation: [...nodeSetEquations, ...pointDetails.setOfEquation]
-    };
-    console.log(nonStaticPoint, pointDetails);
 
-    appModel._updatePointDetails(nonStaticPoint, pointDetails);
+    nodeSetEquations.forEach((equation) => {
+      appModel.executePointDetails(nonStaticPoint, equation);
+    });
   }
 }
 
