@@ -22,32 +22,24 @@ export function readPointsMap(): Array<DrawingNodeType> | {} {
     if (!executingNode) break;
 
     const executingNodeRelations = _makeUniqueNodeRelation(executingNode.dependentNodes);
+    let shape, shapeName, shapeType;
 
     executingNodeRelations.forEach((relation) => {
       if (relation.outputType === 'shape') {
-        const shapeName = Object.keys(relation).filter((key) => key !== 'type')[0];
-        const shapeType = mappingShapeType[relation.type] || 'normal';
-
+        shapeName = Object.keys(relation).filter((key) => key !== 'type')[0];
+        shapeType = mappingShapeType[relation.type] || 'normal';
+        shape = relation[shapeName];
         if (!appModel.isExecutedRelation(relation)) {
           generateGeometry(relation[shapeName], shapeName, relation.type);
         }
-
-        if (shapeRules[shapeName] && shapeRules[shapeName][shapeType]) {
-          makeCorrectShape(
-            relation[shapeName],
-            shapeName,
-            shapeRules[shapeName][shapeType],
-            executingNode.id,
-            relation[shapeName]
-              .split('')
-              .filter((string) => !appModel.isStaticNodeById(string) && string !== executingNode.id)
-          );
-        }
       }
 
-      const relationEquation = readRelation(relation, executingNode.id);
+      let relationEquation = readRelation(relation, executingNode.id);
 
       if (relationEquation) {
+        if (Array.isArray(relationEquation)) {
+          relationEquation = relationEquation[getRandomValue(0, relationEquation.length)];
+        }
         appModel.executePointDetails(executingNode.id, relationEquation);
       }
 
@@ -56,6 +48,16 @@ export function readPointsMap(): Array<DrawingNodeType> | {} {
         appModel.executedRelations.push(relation);
       }
     });
+
+    if (shapeRules[shapeName] && shapeRules[shapeName][shapeType]) {
+      makeCorrectShape(
+        shape,
+        shapeName,
+        shapeRules[shapeName][shapeType],
+        executingNode.id,
+        shape.split('').filter((string) => !appModel.isStaticNodeById(string) && string !== executingNode.id)
+      );
+    }
 
     //Update calculated value to pointsMap
     if (appModel.__pointDetails__.has(executingNode.id)) {
@@ -110,7 +112,6 @@ function makeCorrectShape(
 ) {
   const staticPointCountRequire = TwoStaticPointRequireShape.includes(shapeName) ? 2 : 1;
   let staticPoints = shape.replace(nonStaticPoint, '').split('');
-  console.log(nonStaticPoint);
   // check other points are static
   let count = 0;
   for (let i = 0; i < staticPoints.length; i++) {
@@ -141,7 +142,6 @@ function makeCorrectShape(
   if (arrayRules.length > 0) {
     arrayRules.forEach((rule) => {
       const relationType = rule[2];
-      console.log(rule, nonStaticIndex);
       if (rule.includes(nonStaticIndex)) {
         let equation;
         // eslint-disable-next-line default-case
@@ -158,7 +158,6 @@ function makeCorrectShape(
         }
         if (equation) {
           nodeSetEquations = nodeSetEquations.concat(equation);
-          console.log(equation);
         }
       }
     });

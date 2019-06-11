@@ -206,7 +206,6 @@ class AppModel {
   };
 
   _calculateSet(equations: Array<CircleEquation>) {
-    console.log(equations);
     if (equations.length === 2) {
       return calculateIntersectionTwoCircleEquations(equations[0], equations[1]);
     } else return NOT_ENOUGH_SET;
@@ -221,6 +220,7 @@ class AppModel {
   }
 
   executePointDetails(pointId: string, equation: CircleEquation) {
+    console.log(pointId, equation);
     if (!this.__pointDetails__.has(pointId)) {
       this._updatePointDetails(pointId, { setOfEquation: [], roots: [], exceptedCoordinates: [] });
     }

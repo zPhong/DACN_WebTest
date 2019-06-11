@@ -302,7 +302,7 @@ export function calculateSetOfLinearEquations(d1: LinearEquation, d2: LinearEqua
   } else {
     const tempY =
       (d1.constantTerm * d2.coefficientX - d1.coefficientX * d2.constantTerm) /
-      (d1.coefficientY * d2.coefficientX * d1.coefficientX * d2.coefficientY);
+      (d1.coefficientY * d2.coefficientX + d1.coefficientX * d2.coefficientY);
     return { x: (-d1.constantTerm - d1.coefficientY * tempY) / d1.coefficientX, y: tempY };
   }
 }
@@ -369,7 +369,9 @@ export function calculateQuadraticEquation(a: number, b: number, c: number) {
 // Ax2 + By2 + Cx + Dy + E = 0
 export function isIn(p: CoordinateType, e: TwoVariableQuadraticEquation): boolean {
   if (p.x === undefined || p.y === undefined) return false;
-
+  if (e.a === undefined) {
+    e = convertLinearToQuadratic(e);
+  }
   const temp = e.a * p.x * p.x + e.b * p.y * p.y + e.c * p.x + e.d * p.y + e.e;
   return _makeRound(temp) === 0;
 }
@@ -462,9 +464,12 @@ export function calculateIntersectionTwoCircleEquations(
       return calculateIntersectionLinearEquationWithCircleEquation(convertQuadraticEquationToLinearEquation(q2), q1);
     }
   } else if (q1.a === 0 && q1.b === 0 && q2.a === 0 && q2.b === 0) {
-    return calculateSetOfLinearEquations(
-      convertQuadraticEquationToLinearEquation(q1),
-      convertQuadraticEquationToLinearEquation(q2)
+    console.log(q1, q2);
+    results.push(
+      calculateSetOfLinearEquations(
+        convertQuadraticEquationToLinearEquation(q1),
+        convertQuadraticEquationToLinearEquation(q2)
+      )
     );
   } else {
     // a x2 + b y2 + Ax + By + C = 0
@@ -482,8 +487,6 @@ export function calculateIntersectionTwoCircleEquations(
     const a = Z === q1.a ? q1.c - D : D - q1.c;
     const b = Z === q1.a ? q1.d - E : E - q1.d;
     const c = Z === q1.a ? q1.e - G : G - q1.e;
-
-    console.log(q1, q2, Z, _D, _E, _G, a, b, c);
 
     if (a === 0 || b === 0) {
       return IMPOSSIBLE;
@@ -522,6 +525,8 @@ export function calculateIntersectionTwoCircleEquations(
 
 export function calculateLinesByAnotherLineAndAngle(d: LinearEquation, p: CoordinateType, angle: number) {
   let results: Array<LinearEquation> = [];
+
+  console.log(d, p, angle);
 
   const cosine = Math.cos((angle * Math.PI) / 180);
   const A =
