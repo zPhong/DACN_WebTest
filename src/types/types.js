@@ -58,20 +58,6 @@ export type Vector = {
   c: number
 };
 
-// (x − a)2 + (y − b)2 = r2
-export type CircleEquation = {
-  a: number,
-  b: number,
-  r: number
-};
-
-// Ax + By = C
-export type FirstDegreeEquation = {
-  a: number,
-  b: number,
-  c: number
-};
-
 // Ax2 + By2 + Cx + Dy + E = 0
 export type TwoVariableQuadraticEquation = {
   a: number,
@@ -82,7 +68,7 @@ export type TwoVariableQuadraticEquation = {
 };
 
 export type PointDetailsType = {
-  setOfEquation: Array<CircleEquation>,
+  setOfEquation: Array<TwoVariableQuadraticEquation>,
   roots: Array<Object>,
   exceptedCoordinates: Array<CoordinateType>
 };
