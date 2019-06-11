@@ -11,6 +11,7 @@ import type {
 import { IMPOSSIBLE, INFINITY, MAX_RANDOM_NUMBER, MIN_RANDOM_NUMBER, NOT_BE_IN_LINE } from '../values';
 import {
   convertLinearEquationToLineType,
+  convertLinearToQuadratic,
   convertLineEquationToLinearEquation,
   convertQuadraticEquationToLinearEquation
 } from './Converter';
@@ -415,10 +416,7 @@ export function calculateSetOfLinearEquationAndQuadraticEquation(
     } else {
       const r1 = root.x1;
       const r2 = root.x2;
-      results.push(
-        Object({ x: (-C - B * root.x1) / A, y: r1 }),
-        Object({ x: (-C - B * root.x2) / A, y: r2 })
-      );
+      results.push(Object({ x: (-C - B * root.x1) / A, y: r1 }), Object({ x: (-C - B * root.x2) / A, y: r2 }));
     }
   } else {
     u = q.a * l.coefficientY * l.coefficientY;
@@ -447,10 +445,13 @@ export function calculateSetOfLinearEquationAndQuadraticEquation(
 }
 
 export function calculateIntersectionTwoCircleEquations(
-  q1: TwoVariableQuadraticEquation,
-  q2: TwoVariableQuadraticEquation
+  firstEquation: TwoVariableQuadraticEquation,
+  secondEquation: TwoVariableQuadraticEquation
 ) {
   let results: Array<Object> = [];
+  let q1, q2;
+  firstEquation.a === undefined ? (q1 = convertLinearToQuadratic(firstEquation)) : (q1 = firstEquation);
+  secondEquation.a === undefined ? (q2 = convertLinearToQuadratic(secondEquation)) : (q2 = firstEquation);
 
   if (q1.a !== q2.a && q1.b !== q2.b) {
     if (q1.a === 0 && q1.b === 0) {
@@ -460,6 +461,11 @@ export function calculateIntersectionTwoCircleEquations(
       // q1 is a quadratic equation
       return calculateIntersectionLinearEquationWithCircleEquation(convertQuadraticEquationToLinearEquation(q2), q1);
     }
+  } else if (q1.a === 0 && q1.b === 0 && q2.a === 0 && q2.b === 0) {
+    return calculateSetOfLinearEquations(
+      convertQuadraticEquationToLinearEquation(q1),
+      convertQuadraticEquationToLinearEquation(q2)
+    );
   } else {
     // a x2 + b y2 + Ax + By + C = 0
     // a'x2 + b'y2 + Dx + Ey + G = 0
