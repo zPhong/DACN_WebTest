@@ -206,6 +206,7 @@ class AppModel {
   };
 
   _calculateSet(equations: Array<CircleEquation>) {
+    console.log(equations);
     if (equations.length === 2) {
       return calculateIntersectionTwoCircleEquations(equations[0], equations[1]);
     } else return NOT_ENOUGH_SET;
