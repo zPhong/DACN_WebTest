@@ -300,9 +300,10 @@ export function calculateSetOfLinearEquations(d1: LinearEquation, d2: LinearEqua
   } else if (d1.constantTerm === 0 && d2.constantTerm === 0) {
     return { x: 0, y: 0 };
   } else {
+    console.log(d1,d2)
     const tempY =
       (d1.constantTerm * d2.coefficientX - d1.coefficientX * d2.constantTerm) /
-      (d1.coefficientY * d2.coefficientX * d1.coefficientX * d2.coefficientY);
+      (d1.coefficientX * d2.coefficientY - d1.coefficientY * d2.coefficientX);
     return { x: (-d1.constantTerm - d1.coefficientY * tempY) / d1.coefficientX, y: tempY };
   }
 }
