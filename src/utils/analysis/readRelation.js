@@ -28,10 +28,11 @@ import {
   isIn,
   getMiddlePointFromThreePointsInALine,
   calculateIntersectionTwoCircleEquations,
-  convertLinearToQuadratic,
   getAngleFromTwoLines
 } from '../math/Math2D';
+
 import { NOT_ENOUGH_SET } from '../values';
+import { convertLinearToQuadratic } from '../math/Converter';
 
 export function readRelation(relation: mixed, point: string): TwoVariableQuadraticEquation {
   let equationResults;
@@ -51,6 +52,18 @@ export function readRelation(relation: mixed, point: string): TwoVariableQuadrat
         break;
       case 'cắt':
         equationResults = analyzeIntersectRelation(relation, point);
+        break;
+      default:
+        break;
+    }
+  } else if (relation.outputType === 'shape') {
+    const shapeType = Object.keys(relation).filter((key) => key !== 'type')[0];
+    switch (shapeType) {
+      case 'triangle':
+        equationResults = getLineFromTwoPoints(
+          appModel.getNodeInPointsMapById(relation[shapeType][0]).coordinate,
+          appModel.getNodeInPointsMapById(point).coordinate
+        );
         break;
       default:
         break;
