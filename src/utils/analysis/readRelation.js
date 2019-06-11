@@ -28,10 +28,11 @@ import {
   isIn,
   getMiddlePointFromThreePointsInALine,
   calculateIntersectionTwoCircleEquations,
-  convertLinearToQuadratic,
   getAngleFromTwoLines
 } from '../math/Math2D';
+
 import { NOT_ENOUGH_SET } from '../values';
+import { convertLinearToQuadratic } from "../math/Converter";
 
 export function readRelation(relation: mixed, point: string): TwoVariableQuadraticEquation {
   let equationResults;

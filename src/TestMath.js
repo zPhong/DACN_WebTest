@@ -9,15 +9,8 @@ import type {
 } from './types/types';
 import {
   calculateDistanceTwoPoints,
-  calculateParallelEquation,
-  calculateTwoVariablesFirstDegreeEquations,
-  calculateIntersectionLinearEquationWithCircleEquation,
-  calculateIntersectionTwoCircleEquations,
-  calculateSetOfLinearEquationAndQuadraticEquation,
   getLineFromTwoPoints,
-  calculatePerpendicularLineByPointAndLine,
-  calculateIntersectionByLineAndLine,
-  getAngleFromTwoLines, getMiddlePointFromThreePointsInALine
+  getMiddlePointFromThreePointsInALine
 } from "./utils/math/Math2D";
 
 class TestMath extends Component {
