@@ -410,13 +410,13 @@ export function calculateSetOfLinearEquationAndQuadraticEquation(
     const root = calculateQuadraticEquation(u, v, w);
 
     if (typeof root === 'number') {
-      results.push(Object({ x: (-C - B * root) / A, y: root }));
+      results.push({ x: (-C - B * root) / A, y: root });
     } else if (root === IMPOSSIBLE) {
       return root;
     } else {
       const r1 = root.x1;
       const r2 = root.x2;
-      results.push(Object({ x: (-C - B * root.x1) / A, y: r1 }), Object({ x: (-C - B * root.x2) / A, y: r2 }));
+      results.push({ x: (-C - B * root.x1) / A, y: r1 }, { x: (-C - B * root.x2) / A, y: r2 });
     }
   } else {
     u = q.a * l.coefficientY * l.coefficientY;
@@ -430,13 +430,13 @@ export function calculateSetOfLinearEquationAndQuadraticEquation(
     const root = calculateQuadraticEquation(u, v, w);
 
     if (typeof root === 'number') {
-      results.push(Object({ x: root, y: -l.constantTerm / l.coefficientY }));
+      results.push({ x: root, y: -l.constantTerm / l.coefficientY });
     } else if (root === IMPOSSIBLE) {
       return root;
     } else {
       results.push(
-        Object({ x: root.x1, y: -l.constantTerm / l.coefficientY }),
-        Object({ x: root.x2, y: -l.constantTerm / l.coefficientY })
+        { x: root.x1, y: -l.constantTerm / l.coefficientY },
+        { x: root.x2, y: -l.constantTerm / l.coefficientY }
       );
     }
   }
@@ -451,7 +451,7 @@ export function calculateIntersectionTwoCircleEquations(
   let results: Array<Object> = [];
   let q1, q2;
   firstEquation.a === undefined ? (q1 = convertLinearToQuadratic(firstEquation)) : (q1 = firstEquation);
-  secondEquation.a === undefined ? (q2 = convertLinearToQuadratic(secondEquation)) : (q2 = firstEquation);
+  secondEquation.a === undefined ? (q2 = convertLinearToQuadratic(secondEquation)) : (q2 = secondEquation);
 
   if (q1.a !== q2.a && q1.b !== q2.b) {
     if (q1.a === 0 && q1.b === 0) {
@@ -537,8 +537,9 @@ export function calculateLinesByAnotherLineAndAngle(d: LinearEquation, p: Coordi
 
   if (typeof root === 'number') {
     results.push({
-      x: Math.round(root),
-      y: -Math.round(root) * p.x - p.y
+      coefficientX: root,
+      coefficientY: 1,
+      constantTerm: -root * p.x - p.y
     });
   } else if (root === IMPOSSIBLE) {
     return root;
