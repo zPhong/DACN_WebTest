@@ -58,8 +58,33 @@ class App extends Component {
       bottom: viewBox.y + height
     });
 
+    const arrX = [];
+    const arrY = [];
     _points.forEach((point) => {
-      scene.point(point.id, point.coordinate.x * 10 + width / 4, point.coordinate.y * 10 + height / 4);
+      arrX.push(point.coordinate.x);
+      arrY.push(point.coordinate.y);
+    });
+
+    const disparityX = Math.max(...arrX) - Math.min(...arrX);
+    const disparityY = Math.max(...arrY) - Math.min(...arrY);
+    let ratio = 0;
+    const ODD = 15;
+    if (disparityX / disparityY >= 1) {
+      // scale theo width
+      // giá trị ước lượng (ODD): nhằm tránh điểm render ngay cạnh của viewBox sẽ làm mất tên điểm
+      ratio = Math.floor(width / disparityX) - ODD;
+    } else {
+      ratio = Math.floor(height / disparityY) - ODD;
+    }
+
+    const anchorX = Math.min(...arrX) + disparityX / 2;
+    const anchorY = Math.min(...arrY) + disparityY / 2;
+    _points.forEach((point) => {
+      scene.point(
+        point.id,
+        point.coordinate.x * ratio + width / 2 - ratio * anchorX,
+        point.coordinate.y * ratio + height / 2 - ratio * anchorY
+      );
     });
 
     _segments.forEach((segment) => {
