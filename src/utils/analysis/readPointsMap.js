@@ -24,6 +24,7 @@ export function readPointsMap(): Array<DrawingNodeType> | {} {
     const executingNodeRelations = _makeUniqueNodeRelation(executingNode.dependentNodes);
     let shape, shapeName, shapeType;
 
+    console.log(executingNode.id);
     executingNodeRelations.forEach((relation) => {
       if (relation.outputType === 'shape') {
         shapeName = Object.keys(relation).filter((key) => key !== 'type')[0];
@@ -189,41 +190,43 @@ function getLinearEquationsByEqualRule(
     }
   });
 
-  //1 circle equation
   if (staticLine) {
+    //1 circle equation
+    if (staticLine.includes(nonStaticLines[0].replace(nonStaticIndex, ''))) {
+      const radius = calculateDistanceTwoPoints(
+        appModel.getNodeInPointsMapById(shape[staticLine[0]]).coordinate,
+        appModel.getNodeInPointsMapById(shape[staticLine[1]]).coordinate
+      );
+
+      return [
+        calculateCircleEquationByCenterPoint(
+          appModel.getNodeInPointsMapById(shape[nonStaticLines[0].replace(nonStaticIndex, '')]).coordinate,
+          radius
+        )
+      ];
+    }
+
+    // tam giác đều
     const radius = calculateDistanceTwoPoints(
       appModel.getNodeInPointsMapById(shape[staticLine[0]]).coordinate,
       appModel.getNodeInPointsMapById(shape[staticLine[1]]).coordinate
     );
 
-    return [
-      calculateCircleEquationByCenterPoint(
-        appModel.getNodeInPointsMapById(shape[nonStaticLines[0].replace(nonStaticIndex, '')]).coordinate,
-        radius
-      )
-    ];
+    const circleOne = calculateCircleEquationByCenterPoint(
+      appModel.getNodeInPointsMapById(shape[staticLine[0]]).coordinate,
+      radius
+    );
+
+    const circleTwo = calculateCircleEquationByCenterPoint(
+      appModel.getNodeInPointsMapById(shape[staticLine[0]]).coordinate,
+      radius
+    );
+
+    const nonStaticNodeId = shape[nonStaticIndex].id;
+
+    appModel.updateCoordinate(nonStaticNodeId, calculateIntersectionTwoCircleEquations(circleOne, circleTwo));
+    return [circleOne, circleTwo];
   }
-
-  // tam giác đều
-  const radius = calculateDistanceTwoPoints(
-    appModel.getNodeInPointsMapById(shape[staticLine[0]]).coordinate,
-    appModel.getNodeInPointsMapById(shape[staticLine[1]]).coordinate
-  );
-
-  const circleOne = calculateCircleEquationByCenterPoint(
-    appModel.getNodeInPointsMapById(shape[staticLine[0]]).coordinate,
-    radius
-  );
-
-  const circleTwo = calculateCircleEquationByCenterPoint(
-    appModel.getNodeInPointsMapById(shape[staticLine[0]]).coordinate,
-    radius
-  );
-
-  const nonStaticNodeId = shape[nonStaticIndex].id;
-
-  appModel.updateCoordinate(nonStaticNodeId, calculateIntersectionTwoCircleEquations(circleOne, circleTwo));
-  return [circleOne, circleTwo];
 }
 
 function getLinearEquationByParallelRule(rule: string, shape: string, nonStaticIndex: number): LinearEquation {

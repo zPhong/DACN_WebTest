@@ -65,6 +65,14 @@ export function readRelation(relation: mixed, point: string): TwoVariableQuadrat
           appModel.getNodeInPointsMapById(point).coordinate
         );
         break;
+      case 'quadrilateral':
+        let index = relation[shapeType].indexOf(point);
+        index = index === 0 ? relation[shapeType].length - 1 : index - 1;
+        equationResults = getLineFromTwoPoints(
+          appModel.getNodeInPointsMapById(relation[shapeType][index]).coordinate,
+          appModel.getNodeInPointsMapById(point).coordinate
+        );
+        break;
       default:
         break;
     }
