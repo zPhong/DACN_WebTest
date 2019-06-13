@@ -160,10 +160,13 @@ function makeCorrectShape(
             break;
         }
         if (equation) {
+          console.log(rule, equation);
           nodeSetEquations = nodeSetEquations.concat(equation);
         }
       }
     });
+    console.log(arrayRules);
+    console.log(nonStaticIndex, nodeSetEquations);
 
     nodeSetEquations.forEach((equation) => {
       appModel.executePointDetails(nonStaticPoint, equation);
@@ -239,7 +242,24 @@ function getLinearEquationByParallelRule(rule: string, shape: string, nonStaticI
       staticLine = line;
     }
   });
-
+  console.log(appModel.getNodeInPointsMapById(shape[nonStaticLine.replace(nonStaticIndex, '')]).coordinate);
+  console.log(
+    getLineFromTwoPoints(
+      appModel.getNodeInPointsMapById(shape[staticLine[0]]).coordinate,
+      appModel.getNodeInPointsMapById(shape[staticLine[1]]).coordinate
+    )
+  );
+  console.log(
+    calculateParallelLineByPointAndLine(
+      //point
+      appModel.getNodeInPointsMapById(shape[nonStaticLine.replace(nonStaticIndex, '')]).coordinate,
+      //line
+      getLineFromTwoPoints(
+        appModel.getNodeInPointsMapById(shape[staticLine[0]]).coordinate,
+        appModel.getNodeInPointsMapById(shape[staticLine[1]]).coordinate
+      )
+    )
+  );
   return [
     calculateParallelLineByPointAndLine(
       //point

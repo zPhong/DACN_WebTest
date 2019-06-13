@@ -162,7 +162,11 @@ export function calculateParallelLineByPointAndLine(point: CoordinateType, line:
   parLine.a = lineEquation.a;
   parLine.b = point.y - lineEquation.a * point.x;
 
-  return convertLineEquationToLinearEquation(parLine);
+  let result = convertLineEquationToLinearEquation(parLine);
+  if (line.coefficientY === 0) {
+    result.coefficientY = line.coefficientY;
+  }
+  return result;
 }
 
 export function calculatePerpendicularLineByPointAndLine(point: CoordinateType, line: LinearEquation): LinearEquation {
@@ -291,20 +295,48 @@ function _getInternalBisectLineEquation(
 
 // TODO: Uncheck
 export function calculateSetOfLinearEquations(d1: LinearEquation, d2: LinearEquation) {
-  if ((d1.coefficientX === 0 && d2.coefficientX === 0) || (d1.coefficientY === 0 && d2.coefficientY === 0)) {
+  if (
+    (d1.coefficientX === 0 && d2.coefficientX === 0) ||
+    (d1.coefficientY === 0 && d2.coefficientY === 0) ||
+    (d1.coefficientX === 0 && d1.coefficientY === 0) ||
+    (d2.coefficientX === 0 && d2.coefficientY === 0)
+  ) {
     return IMPOSSIBLE;
-  } else if (d1.coefficientX === 0 && d2.coefficientY === 0) {
-    return { x: -d2.constantTerm / d2.coefficientX, y: -d1.constantTerm / d1.coefficientY };
-  } else if (d2.coefficientX === 0 && d1.coefficientY === 0) {
-    return { x: -d1.constantTerm / d1.coefficientX, y: -d2.constantTerm / d2.coefficientY };
-  } else if (d1.constantTerm === 0 && d2.constantTerm === 0) {
-    return { x: 0, y: 0 };
-  } else {
-    const tempY =
-      (d1.constantTerm * d2.coefficientX - d1.coefficientX * d2.constantTerm) /
-      (d1.coefficientY * d2.coefficientX + d1.coefficientX * d2.coefficientY);
-    return { x: (-d1.constantTerm - d1.coefficientY * tempY) / d1.coefficientX, y: tempY };
   }
+  if (d1.coefficientX === 0 && d2.coefficientY === 0) {
+    return { x: -d2.constantTerm / d2.coefficientX, y: -d1.constantTerm / d1.coefficientY };
+  }
+  if (d2.coefficientX === 0 && d1.coefficientY === 0) {
+    return { x: -d1.constantTerm / d1.coefficientX, y: -d2.constantTerm / d2.coefficientY };
+  }
+  if (d1.constantTerm === 0 && d2.constantTerm === 0) {
+    return { x: 0, y: 0 };
+  }
+
+  if (d1.coefficientX === 0) {
+    const tempY = -d1.constantTerm / d1.coefficientY;
+    return { x: (-d2.constantTerm - tempY * d2.coefficientY) / d2.coefficientX, y: tempY };
+  }
+
+  if (d1.coefficientY === 0) {
+    const tempX = -d1.constantTerm / d1.coefficientX;
+    return { y: (-d2.constantTerm - tempX * d2.coefficientX) / d2.coefficientY, x: tempX };
+  }
+
+  if (d2.coefficientX === 0) {
+    const tempY = -d2.constantTerm / d2.coefficientY;
+    return { x: (-d1.constantTerm - tempY * d1.coefficientY) / d1.coefficientX, y: tempY };
+  }
+
+  if (d2.coefficientY === 0) {
+    const tempX = -d2.constantTerm / d2.coefficientX;
+    return { y: (-d1.constantTerm - tempX * d1.coefficientX) / d1.coefficientY, x: tempX };
+  }
+
+  const tempY =
+    (d1.constantTerm * d2.coefficientX - d1.coefficientX * d2.constantTerm) /
+    (d1.coefficientY * d2.coefficientX + d1.coefficientX * d2.coefficientY);
+  return { x: (-d1.constantTerm - d1.coefficientY * tempY) / d1.coefficientX, y: tempY };
 }
 
 /*
