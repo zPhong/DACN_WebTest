@@ -66,6 +66,22 @@ export function readRelation(relation: mixed, point: string): TwoVariableQuadrat
         );
         break;
       case 'quadrilateral':
+      case 'rectangle':
+      case 'square':
+      case 'trapezoid':
+      case 'parallelogram':
+        if (shapeType !== 'quadrilateral') {
+          let count = 0;
+          relation[shapeType].split('').forEach((point) => {
+            if (appModel.isStaticNodeById(point)) {
+              count++;
+            }
+          });
+          const limit = shapeType === 'rectangle' || shapeType === 'square' ? 1 : 2;
+          if (count > limit) {
+            return;
+          }
+        }
         let index = relation[shapeType].indexOf(point);
         index = index === 0 ? relation[shapeType].length - 1 : index - 1;
         equationResults = getLineFromTwoPoints(

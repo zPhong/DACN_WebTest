@@ -1,4 +1,4 @@
-import type { LinearEquation, LineEquation, TwoVariableQuadraticEquation } from "../../types/types";
+import type { LinearEquation, LineEquation, TwoVariableQuadraticEquation } from '../../types/types';
 
 export function convertLinearToQuadratic(l: LinearEquation): TwoVariableQuadraticEquation {
   return {
@@ -12,8 +12,8 @@ export function convertLinearToQuadratic(l: LinearEquation): TwoVariableQuadrati
 
 export function convertLinearEquationToLineType(line: LinearEquation): LineEquation {
   return {
-    a: -line.coefficientX / line.coefficientY,
-    b: -line.constantTerm / line.coefficientY
+    a: -line.coefficientX / (line.coefficientY === 0 ? 1 : line.coefficientY),
+    b: -line.constantTerm / (line.coefficientY === 0 ? 1 : line.coefficientY)
   };
 }
 
