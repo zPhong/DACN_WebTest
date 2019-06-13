@@ -18,7 +18,8 @@ class AppModel {
 
   createPointDetails = () => {
     this.pointsMap.forEach((node) => {
-      this._updatePointDetails(node.id, { setOfEquation: [], roots: [], exceptedCoordinates: [] });
+      const roots = this.isValidCoordinate(node.coordinate) ? [node.coordinate] : [];
+      this._updatePointDetails(node.id, { setOfEquation: [], roots: roots, exceptedCoordinates: [] });
     });
   };
 
@@ -111,6 +112,7 @@ class AppModel {
       .filter((node) => !this.executedNode.includes(node.id))
       .sort(this.sortNodeByPriority);
 
+    console.log([...this.pointsMap].filter((node) => !this.executedNode.includes(node.id)));
     if (clonePointsMap.length > 0) return clonePointsMap[0];
     return null;
   };
@@ -243,7 +245,6 @@ class AppModel {
   }
 
   executePointDetails(pointId: string, equation: CircleEquation) {
-    console.log(pointId, equation);
     let isFirst = false;
     if (!this.__pointDetails__.has(pointId)) {
       this._updatePointDetails(pointId, { setOfEquation: [], roots: [], exceptedCoordinates: [] });
@@ -271,10 +272,12 @@ class AppModel {
       const roots = this._calculateSet(this.__pointDetails__.get(pointId).setOfEquation);
       console.log(roots);
       console.log(this.__pointDetails__.get(pointId).setOfEquation);
+      const currentRoots = this.__pointDetails__.get(pointId).roots;
 
+      const finalRoots = typeof roots === 'string' ? currentRoots : currentRoots.concat(roots);
       this._updatePointDetails(pointId, {
         setOfEquation: this.__pointDetails__.get(pointId).setOfEquation,
-        roots: roots,
+        roots: finalRoots,
         exceptedCoordinates: this.__pointDetails__.get(pointId).exceptedCoordinates
       });
     }
@@ -289,8 +292,6 @@ class AppModel {
     temp = temp.filter((root) => {
       return isIn(root, equation);
     });
-
-    console.log(pointId, temp);
 
     if (temp.length < tempLength) {
       // TODO: Add exception

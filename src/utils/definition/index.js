@@ -33,7 +33,9 @@ function defineInformation(data) {
 
   if (data.outputType === 'shape') {
     const shapeName = Object.keys(result).filter((key) => key !== 'type')[0];
-    result[shapeName] = sortString(result[shapeName]);
+    if (shapeName !== 'triangle') {
+      result[shapeName] = sortString(result[shapeName]);
+    }
   }
 
   delete result.object;

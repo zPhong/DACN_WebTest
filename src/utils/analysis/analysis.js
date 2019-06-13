@@ -184,6 +184,7 @@ function createPointsMapByRelation(relation: any) {
       const index = findIndexByNodeId(point, RelationPointsMap);
       const currentNode = RelationPointsMap[index];
       RelationPointsMap.forEach((node) => {
+        console.log(node);
         if (node.id !== point) {
           RelationPointsMap[index] = {
             ...currentNode,
@@ -202,12 +203,15 @@ function createPointsMapByRelation(relation: any) {
 function getDependentObject(): Array<string> {
   let result = [];
   const lastNode = RelationPointsMap[RelationPointsMap.length - 1];
-  result.push(lastNode.id);
+  if (lastNode) {
+    result.push(lastNode.id);
 
-  lastNode.dependentNodes.forEach((node) => {
-    const nodeIndex = findIndexByNodeId(node.id, appModel.pointsMap);
-    if (!result.includes(node.id) && nodeIndex !== -1 && !appModel.pointsMap[nodeIndex].isStatic) result.push(node.id);
-  });
+    lastNode.dependentNodes.forEach((node) => {
+      const nodeIndex = findIndexByNodeId(node.id, appModel.pointsMap);
+      if (!result.includes(node.id) && nodeIndex !== -1 && !appModel.pointsMap[nodeIndex].isStatic)
+        result.push(node.id);
+    });
+  }
   return result;
 }
 

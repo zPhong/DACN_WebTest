@@ -286,7 +286,7 @@ function _getInternalBisectLineEquation(
 ): LinearEquation {
   let firstEquation = pointOne.x * lineOne.coefficientX + pointOne.y * lineOne.coefficientY + lineOne.constantTerm;
   let secondEquation = pointTwo.x * lineOne.coefficientX + pointTwo.y * lineOne.coefficientY + lineOne.constantTerm;
-  return firstEquation * secondEquation < 0 ? lineOne : lineTwo;
+  return firstEquation * secondEquation > 0 ? lineOne : lineTwo;
 }
 
 // TODO: Uncheck
@@ -464,7 +464,6 @@ export function calculateIntersectionTwoCircleEquations(
       return calculateIntersectionLinearEquationWithCircleEquation(convertQuadraticEquationToLinearEquation(q2), q1);
     }
   } else if (q1.a === 0 && q1.b === 0 && q2.a === 0 && q2.b === 0) {
-    console.log(q1, q2);
     results.push(
       calculateSetOfLinearEquations(
         convertQuadraticEquationToLinearEquation(q1),
