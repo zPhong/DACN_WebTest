@@ -21,7 +21,6 @@ export function analyzeResult(validatedResult: RelationsResultType): DrawingData
   });
 
   const relations = validatedResult.relations;
-
   relations.forEach((relation) => {
     createPointsMapByRelation(relation).forEach((node) => {
       updateMap(node, appModel.pointsMap);
@@ -120,6 +119,11 @@ function createPointsMapByShape(shape: any) {
     }
   );
 
+  if (appModel.pointsMap.length === 0) {
+    const shouldStaticPoint = getFirstStaticPointInShape(shape[shapeName]);
+    points = [shouldStaticPoint].concat(points.filter((point) => point !== shouldStaticPoint));
+  }
+
   const objectPointsMap = points.map((point: string, index: number) => {
     return index !== 0 ? createNode(point, [{ id: points[0], relation: shape }]) : createNode(point);
   });
@@ -127,6 +131,44 @@ function createPointsMapByShape(shape: any) {
   objectPointsMap.forEach((node: NodeType) => {
     updateMap(node, appModel.pointsMap);
   });
+}
+
+function getFirstStaticPointInShape(shape: string): string {
+  const angles = [];
+  appModel.relationsResult.relations.forEach((relation) => {
+    if (!relation.angle) {
+      return;
+    }
+    angles.push(relation.angle[0]);
+  });
+
+  const shapePointCount = {};
+
+  angles.forEach(
+    (angle: string): void => {
+      angle.split('').forEach((point, index) => {
+        //don't check middle point
+        if (index !== 1) {
+          if (shapePointCount[point]) {
+            shapePointCount[point] += 1;
+          } else {
+            shapePointCount[point] = 1;
+          }
+        }
+      });
+    }
+  );
+
+  console.log(shapePointCount);
+  let minCountPoint = shape[0];
+  Object.keys(shapePointCount).forEach((point) => {
+    if (shapePointCount[point] < shapePointCount[minCountPoint]) {
+      minCountPoint = point;
+    }
+  });
+
+  console.log(minCountPoint);
+  return minCountPoint;
 }
 
 function createPointsMapByRelation(relation: any) {
@@ -174,7 +216,9 @@ function createPointsMapByRelation(relation: any) {
 
   if (relation.operation === '=' && relation.value) {
     const lastNodeDependentLength = RelationPointsMap[RelationPointsMap.length - 1].dependentNodes.length;
-    RelationPointsMap[RelationPointsMap.length - 1].dependentNodes[lastNodeDependentLength - 1].relation = relation;
+    if (RelationPointsMap[RelationPointsMap.length - 1].dependentNodes[lastNodeDependentLength - 1]) {
+      RelationPointsMap[RelationPointsMap.length - 1].dependentNodes[lastNodeDependentLength - 1].relation = relation;
+    }
   } else {
     let lastObjectPoints = getDependentObject();
     if (lastObjectPoints.length === RelationPointsMap.length) {
