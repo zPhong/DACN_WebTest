@@ -224,24 +224,29 @@ export function calculateCircleEquationByCenterPoint(
   };
 }
 
-export function calculateInternalBisectLineEquation(lineOne: LinearEquation, lineTwo: LinearEquation): LinearEquation {
+export function calculateInternalBisectLineEquation(
+  lineOne: LinearEquation,
+  lineTwo: LinearEquation,
+  pointOne: CoordinateType,
+  pointTwo: CoordinateType
+): LinearEquation {
   const results = _calculateBisectLineEquation(lineOne, lineTwo);
   const firstLine: LinearEquation = results[0];
   const secondLine: LinearEquation = results[1];
 
-  const pointInFirstLine: CoordinateType = getRandomPointInLine(lineOne);
-  let pointInSecondLine: CoordinateType = { x: pointInFirstLine.x, y: undefined };
-  if (lineTwo.coefficientY !== 0) {
-    pointInSecondLine.y = (-lineTwo.constantTerm - lineTwo.coefficientX * pointInSecondLine.x) / lineTwo.coefficientY;
-  } else {
-    pointInSecondLine.y = getRandomValue(MIN_RANDOM_NUMBER, MAX_RANDOM_NUMBER);
-  }
+  // const pointInFirstLine: CoordinateType = getRandomPointInLine(lineOne);
+  // let pointInSecondLine: CoordinateType = { x: pointInFirstLine.x, y: undefined };
+  // if (lineTwo.coefficientY !== 0) {
+  //   pointInSecondLine.y = (-lineTwo.constantTerm - lineTwo.coefficientX * pointInSecondLine.x) / lineTwo.coefficientY;
+  // } else {
+  //   pointInSecondLine.y = getRandomValue(MIN_RANDOM_NUMBER, MAX_RANDOM_NUMBER);
+  // }
 
   if (getAngleFromTwoLines(lineOne, lineTwo) === 0) {
     throw new Map().set('error', 'không hỗ trợ trường hợp này');
   }
 
-  return _getInternalBisectLineEquation(firstLine, secondLine, pointInFirstLine, pointInSecondLine);
+  return _getInternalBisectLineEquation(firstLine, secondLine, pointOne, pointTwo);
 }
 
 function _calculateBisectLineEquation(
@@ -290,7 +295,7 @@ function _getInternalBisectLineEquation(
 ): LinearEquation {
   let firstEquation = pointOne.x * lineOne.coefficientX + pointOne.y * lineOne.coefficientY + lineOne.constantTerm;
   let secondEquation = pointTwo.x * lineOne.coefficientX + pointTwo.y * lineOne.coefficientY + lineOne.constantTerm;
-  return firstEquation * secondEquation > 0 ? lineOne : lineTwo;
+  return firstEquation * secondEquation <= 0 ? lineOne : lineTwo;
 }
 
 // TODO: Uncheck

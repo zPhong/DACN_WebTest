@@ -275,7 +275,9 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
         getLineFromTwoPoints(
           appModel.getNodeInPointsMapById(angle[1]).coordinate,
           appModel.getNodeInPointsMapById(angle[2]).coordinate
-        )
+        ),
+        appModel.getNodeInPointsMapById(angle[0]).coordinate,
+        appModel.getNodeInPointsMapById(angle[2]).coordinate
       );
 
       const calculatedPoint = calculateIntersectionByLineAndLine(calculatedLineEquation, staticLineEquation);
