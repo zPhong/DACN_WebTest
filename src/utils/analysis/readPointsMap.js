@@ -32,6 +32,7 @@ export function readPointsMap(): Array<DrawingNodeType> | {} {
         shape = relation[shapeName];
         if (!appModel.isExecutedRelation(relation)) {
           generateGeometry(relation[shapeName], shapeName, relation.type);
+          //setPointsDirection(relation[shapeName]);
         }
       }
 
@@ -67,11 +68,37 @@ export function readPointsMap(): Array<DrawingNodeType> | {} {
         return { Error: `không tính toán được` };
       }
       if (roots.length > 0) {
+        let coordinate;
         if (appModel.isNeedRandomCoordinate(executingNode.id)) {
-          const randomCoordinate = roots[getRandomValue(0, roots.length)];
-          appModel.updateCoordinate(executingNode.id, randomCoordinate);
+          coordinate = roots[getRandomValue(0, roots.length)];
+        } else {
+          const nodeDirectionInfo = appModel.pointsDirectionMap[executingNode.id];
+          const staticPointCoordinate = appModel.getNodeInPointsMapById(nodeDirectionInfo.root).coordinate;
+          if (roots.length > 1) {
+            const rootsDirection = roots.map((root) => ({
+              isRight: root.x > staticPointCoordinate.x,
+              isUp: root.y < staticPointCoordinate.y
+            }));
+
+            coordinate = rootsDirection
+              .map((directionInfo) => {
+                let matchCount = 0;
+                if (directionInfo.isRight === nodeDirectionInfo.isRight) {
+                  matchCount++;
+                }
+                if (directionInfo.isUp === nodeDirectionInfo.isUp) {
+                  matchCount++;
+                }
+                return matchCount;
+              })
+              .sort((a, b) => b - a)[0]; //get max
+          } else {
+            coordinate = roots[0];
+          }
         }
+        appModel.updateCoordinate(executingNode.id, coordinate);
       } else {
+        return { Error: `không tính toán được` };
       }
     }
 
@@ -86,6 +113,21 @@ export function readPointsMap(): Array<DrawingNodeType> | {} {
     id: node.id,
     coordinate: node.coordinate
   }));
+}
+
+function setPointsDirection(shape: string) {
+  shape.split('').forEach((point, index) => {
+    if (index > 0) {
+      const pointCoordinate = appModel.getNodeInPointsMapById(point).coordinate;
+      const rootCoordinate = appModel.getNodeInPointsMapById(shape[index - 1]).coordinate;
+
+      appModel.pointsDirectionMap[point] = {
+        root: shape[index - 1],
+        isRight: pointCoordinate.x > rootCoordinate.x,
+        isUp: pointCoordinate.y < rootCoordinate.y
+      };
+    }
+  });
 }
 
 export function _makeUniqueNodeRelation(dependentNodes: Array<NodeRelationType>): Array<any> {

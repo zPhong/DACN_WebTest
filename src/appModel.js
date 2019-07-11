@@ -1,4 +1,11 @@
-import type { CircleEquation, CoordinateType, NodeType, PointDetailsType, RelationsResultType } from './types/types';
+import type {
+  PointDirectionType,
+  CircleEquation,
+  CoordinateType,
+  NodeType,
+  PointDetailsType,
+  RelationsResultType
+} from './types/types';
 import {
   calculateIntersectionTwoCircleEquations,
   convertCircleEquationToQuadraticEquation,
@@ -12,6 +19,7 @@ class AppModel {
   additionSegment: string[] = [];
   relationsResult: RelationsResultType = {};
   pointsMap: Array<NodeType> = [];
+  pointsDirectionMap = {};
   executedRelations = [];
   executedNode = [];
   __pointDetails__ = new Map();
@@ -41,10 +49,10 @@ class AppModel {
     if (roots) {
       for (let i = 0; i < roots.length; i++) {
         if (
+          this.pointsDirectionMap[pointId] ||
           JSON.stringify(makeRoundCoordinate(roots[i])) ===
-          JSON.stringify(makeRoundCoordinate(this.getNodeInPointsMapById(pointId).coordinate))
+            JSON.stringify(makeRoundCoordinate(this.getNodeInPointsMapById(pointId).coordinate))
         ) {
-          console.log('A');
           return false;
         }
       }
@@ -112,7 +120,6 @@ class AppModel {
       .filter((node) => !this.executedNode.includes(node.id))
       .sort(this.sortNodeByPriority);
 
-    console.log([...this.pointsMap].filter((node) => !this.executedNode.includes(node.id)));
     if (clonePointsMap.length > 0) return clonePointsMap[0];
     return null;
   };
@@ -244,6 +251,19 @@ class AppModel {
     });
   }
 
+  uniqueSetOfEquation(equations: any[]): any[] {
+    let result = [];
+
+    equations.forEach((equation) => {
+      for (let i = 0; i < result.length; i++) {
+        if (JSON.stringify(equation) === JSON.stringify(result[i])) return;
+      }
+      result.push(equation);
+    });
+
+    return result;
+  }
+
   executePointDetails(pointId: string, equation: CircleEquation) {
     let isFirst = false;
     if (!this.__pointDetails__.has(pointId)) {
@@ -270,8 +290,6 @@ class AppModel {
       }
 
       const roots = this._calculateSet(this.__pointDetails__.get(pointId).setOfEquation);
-      console.log(roots);
-      console.log(this.__pointDetails__.get(pointId).setOfEquation);
       const currentRoots = this.__pointDetails__.get(pointId).roots;
 
       const finalRoots = typeof roots === 'string' ? currentRoots : currentRoots.concat(roots);

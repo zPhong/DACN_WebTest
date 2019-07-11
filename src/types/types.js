@@ -4,6 +4,12 @@ export type CoordinateType = {
   z: number
 };
 
+export type PointDirectionType = {
+  root: string,
+  isRight: boolean,
+  isUp: boolean
+};
+
 export type HasFixedCoordinateType = {
   fixedX: boolean,
   fixedY: boolean,

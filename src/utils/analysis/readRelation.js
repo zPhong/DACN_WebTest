@@ -281,7 +281,6 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
       );
 
       const calculatedPoint = calculateIntersectionByLineAndLine(calculatedLineEquation, staticLineEquation);
-      console.log(point);
       appModel.updateCoordinate(point, calculatedPoint);
 
       return calculatedLineEquation;
