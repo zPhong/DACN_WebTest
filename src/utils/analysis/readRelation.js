@@ -383,7 +383,6 @@ function analyzeOperationType(relation: mixed, point: string): any {
     if (objectType === 'segment') {
       const staticPointOne = objectsIncludePoint[0].replace(point, '');
       const staticPointTwo = objectsIncludePoint[1].replace(point, '');
-      console.log(staticPointOne, staticPointTwo);
       //cần check thêm loại shape
       if (!appModel.isStaticNodeById(staticPointOne) || !appModel.isStaticNodeById(staticPointTwo)) {
         return;
