@@ -10,6 +10,7 @@ import type {
 } from '../../types/types';
 import appModel from '../../appModel';
 import { readPointsMap } from './readPointsMap';
+import { generateCoordinateInQuadratic } from '../math/Math2D';
 
 let RelationPointsMap: Array<NodeType> = [];
 
@@ -32,11 +33,24 @@ export function analyzeResult(validatedResult: RelationsResultType): DrawingData
   let result = {};
 
   readPointsMap();
+
   result.points = appModel.pointsMap.map(
-    (node: NodeType): DrawingNodeType => ({
-      id: node.id,
-      coordinate: node.coordinate
-    })
+    (node: NodeType): DrawingNodeType => {
+      if (!appModel.isValidCoordinate(node.id)) {
+        if (appModel.__pointDetails__.has(node.id)) {
+          const equation = appModel.__pointDetails__.get(node.id).setOfEquation[0];
+          console.log(node.id);
+          node.coordinate = generateCoordinateInQuadratic(equation);
+        } else {
+          return { Error: 'AAAA' };
+        }
+      }
+      console.log(node.id, node.coordinate);
+      return {
+        id: node.id,
+        coordinate: node.coordinate
+      };
+    }
   );
 
   result.segments = [...getArraySegments(validatedResult), ...appModel.additionSegment];

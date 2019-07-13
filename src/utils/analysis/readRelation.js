@@ -56,6 +56,9 @@ export function readRelation(relation: mixed, point: string): TwoVariableQuadrat
       default:
         break;
     }
+    relation.segment.forEach((segment) => {
+      appModel.additionSegment.push(`${point}${segment[0]}`);
+    });
   } else if (relation.outputType === 'shape') {
     const shapeType = Object.keys(relation).filter((key) => key !== 'type')[0];
     switch (shapeType) {
@@ -128,6 +131,7 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
   //points = [...new Set(points)].filter((point: string): boolean => !nonStaticPoints.includes(point));
   const relationType = relation.relation;
 
+  appModel.additionSegment.push(point + segmentIncludePoint[0]);
   if (
     relationType === 'trung điểm' ||
     relationType === 'thuộc' ||
@@ -373,11 +377,33 @@ function analyzeOperationType(relation: mixed, point: string): any {
       appModel.getNodeInPointsMapById(objectsIncludePoint[0].replace(point, '')[1]).coordinate
     );
 
-    return calculateLinesByAnotherLineAndAngle(
-      staticLineInAngle,
-      appModel.getNodeInPointsMapById(objectsIncludePoint[0].replace(point, '')[1]).coordinate,
-      staticValue
-    );
+    const staticPoint = appModel.getNodeInPointsMapById(objectsIncludePoint[0].replace(point, '')[0]).coordinate;
+    const rotatePoint = appModel.getNodeInPointsMapById(objectsIncludePoint[0].replace(point, '')[1]).coordinate;
+    const result = calculateLinesByAnotherLineAndAngle(staticLineInAngle, rotatePoint, staticValue)[0];
+
+    const isObtuse = staticValue > 90;
+
+    const pointOne = getRandomPointInLine(result);
+    const pointTwo = {
+      x: 2 * rotatePoint.x - pointOne.x,
+      y: 2 * rotatePoint.y - pointOne.y
+    };
+
+    let correctPont;
+    if (calculateDistanceTwoPoints(pointOne, staticPoint) > calculateDistanceTwoPoints(pointTwo, staticPoint)) {
+      correctPont = isObtuse ? pointOne : pointTwo;
+    } else {
+      correctPont = isObtuse ? pointTwo : pointOne;
+    }
+
+    appModel.updateCoordinate(point, correctPont);
+    const pointDirectInfo = appModel.pointsDirectionMap[point];
+    const rootCoordinate = appModel.getNodeInPointsMapById(pointDirectInfo.root).coordinate;
+    appModel.pointsDirectionMap[point] = {
+      ...pointDirectInfo,
+      isRight: rootCoordinate.x > correctPont.x,
+      isUp: correctPont.y > rootCoordinate.y
+    };
   }
   if (objectsIncludePoint.length === 2) {
     if (objectType === 'segment') {

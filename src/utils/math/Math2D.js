@@ -52,6 +52,41 @@ export function generatePointAlignmentInside(firstPoint: CoordinateType, secondP
   };
 }
 
+export function generateCoordinateInQuadratic(quadratic: TwoVariableQuadraticEquation): CoordinateType {
+  const { a, b, c, d, e } = quadratic;
+  let x, y;
+  const randomValue = getRandomValue(MIN_RANDOM_NUMBER, MAX_RANDOM_NUMBER);
+  if (d === 0) {
+    const f = b * randomValue * randomValue + d * randomValue + e;
+    const roots = calculateQuadraticEquation(a, c, f);
+    if (typeof roots === 'string') {
+      return { Error: 'AAAA' };
+    } else {
+      if (typeof roots === 'object') {
+        x = roots.x1;
+      } else if (roots) {
+        x = roots;
+      }
+    }
+    y = randomValue;
+  } else if (c === 0) {
+    const f = a * randomValue * randomValue + c * randomValue + e;
+    const roots = calculateQuadraticEquation(b, d, f);
+    if (typeof roots === 'string') {
+      return { Error: 'AAAA' };
+    } else {
+      if (typeof roots === 'object') {
+        y = roots.x1;
+      } else if (roots) {
+        y = roots;
+      }
+    }
+    x = randomValue;
+  }
+
+  return { x, y };
+}
+
 export function generatePointAlignmentOutside(
   firstPoint: CoordinateType,
   secondPoint: CoordinateType,
@@ -560,7 +595,6 @@ export function calculateIntersectionTwoCircleEquations(
 
 export function calculateLinesByAnotherLineAndAngle(d: LinearEquation, p: CoordinateType, angle: number) {
   let results: Array<LinearEquation> = [];
-
 
   const cosine = Math.cos((angle * Math.PI) / 180);
   const A =

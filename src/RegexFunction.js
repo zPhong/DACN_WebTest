@@ -39,6 +39,12 @@ export function analyzeInput(input) {
 }
 
 function getInformation(string) {
+  if (string.length === 2 && string.toUpperCase() === string) {
+    return {
+      segment: [string],
+      outputType: 'define'
+    };
+  }
   const _string = '_ '.concat(string.concat(' _'));
   let isMatching = false;
   let preProgress = [];

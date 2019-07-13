@@ -37,7 +37,6 @@ export function readPointsMap(): Array<DrawingNodeType> | {} {
       }
 
       let relationEquation = readRelation(relation, executingNode.id);
-
       if (relationEquation) {
         if (Array.isArray(relationEquation)) {
           relationEquation = relationEquation[getRandomValue(0, relationEquation.length)];
@@ -98,7 +97,9 @@ export function readPointsMap(): Array<DrawingNodeType> | {} {
         }
         appModel.updateCoordinate(executingNode.id, coordinate);
       } else {
-        return { Error: `không tính toán được` };
+        if (!appModel.isValidCoordinate(executingNode.id)) {
+          return { Error: `không tính toán được` };
+        }
       }
     }
 
