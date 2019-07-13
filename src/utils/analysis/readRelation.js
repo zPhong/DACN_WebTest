@@ -131,7 +131,6 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
   //points = [...new Set(points)].filter((point: string): boolean => !nonStaticPoints.includes(point));
   const relationType = relation.relation;
 
-  appModel.additionSegment.push(point + segmentIncludePoint[0]);
   if (
     relationType === 'trung điểm' ||
     relationType === 'thuộc' ||
@@ -139,11 +138,12 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
     relationType === 'thẳng hàng'
   ) {
     let calculatedPoint;
+    console.log(point, segmentIncludePoint);
     if (segmentIncludePoint) {
       const otherStaticPoint = relation.point[0];
       const otherStaticNodeInSegment = appModel.getNodeInPointsMapById(segmentIncludePoint.replace(point, ''));
 
-      if (!otherStaticNodeInSegment.coordinate.x && !otherStaticNodeInSegment.coordinate.y) {
+      if (!appModel.isValidCoordinate(otherStaticNodeInSegment.id)) {
         return null;
       }
 
@@ -153,6 +153,7 @@ function analyzeRelationType(relation: mixed, point: string): LinearEquation {
           appModel.getNodeInPointsMapById(otherStaticPoint).coordinate,
           segmentIncludePoint.indexOf(point) === 1
         );
+        console.log(calculatedPoint);
 
         appModel.updateCoordinate(point, calculatedPoint);
       }

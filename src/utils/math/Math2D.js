@@ -53,6 +53,9 @@ export function generatePointAlignmentInside(firstPoint: CoordinateType, secondP
 }
 
 export function generateCoordinateInQuadratic(quadratic: TwoVariableQuadraticEquation): CoordinateType {
+  if (!quadratic) {
+    throw { Error: 'Sai' };
+  }
   const { a, b, c, d, e } = quadratic;
   let x, y;
   const randomValue = getRandomValue(MIN_RANDOM_NUMBER, MAX_RANDOM_NUMBER);
