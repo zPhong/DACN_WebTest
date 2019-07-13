@@ -386,7 +386,6 @@ export function calculateIntersectionLinearEquationWithCircleEquation(
 export function calculateQuadraticEquation(a: number, b: number, c: number) {
   const delta = b * b - 4 * a * c;
 
-  console.table({ a, b, c, delta });
   let x1,
     x2: number = undefined;
 
@@ -562,7 +561,6 @@ export function calculateIntersectionTwoCircleEquations(
 export function calculateLinesByAnotherLineAndAngle(d: LinearEquation, p: CoordinateType, angle: number) {
   let results: Array<LinearEquation> = [];
 
-  console.log(d, p, angle);
 
   const cosine = Math.cos((angle * Math.PI) / 180);
   const A =

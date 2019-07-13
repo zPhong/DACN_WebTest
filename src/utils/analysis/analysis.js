@@ -159,7 +159,6 @@ function getFirstStaticPointInShape(shape: string): string {
     }
   );
 
-  console.log(shapePointCount);
   let minCountPoint = shape[0];
   Object.keys(shapePointCount).forEach((point) => {
     if (shapePointCount[point] < shapePointCount[minCountPoint]) {
@@ -167,7 +166,6 @@ function getFirstStaticPointInShape(shape: string): string {
     }
   });
 
-  console.log(minCountPoint);
   return minCountPoint;
 }
 
@@ -228,7 +226,6 @@ function createPointsMapByRelation(relation: any) {
       const index = findIndexByNodeId(point, RelationPointsMap);
       const currentNode = RelationPointsMap[index];
       RelationPointsMap.forEach((node) => {
-        console.log(node);
         if (node.id !== point) {
           RelationPointsMap[index] = {
             ...currentNode,
